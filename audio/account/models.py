@@ -15,6 +15,7 @@ class Profile(BaseModel):
     email_token = models.CharField(max_length=100, null = True, blank = True)
     profile_image =models.ImageField(upload_to="profile",null=True)
     is_blocked = models.BooleanField(default=False)
+    forgot_password_token = models.CharField(max_length=100, null = True, blank = True)
 
     def __str__(self) -> str:
         return self.user.username
@@ -22,7 +23,7 @@ class Profile(BaseModel):
 @receiver(post_save, sender = User)
 def send_email_tokent(sender,  instance, created, **kwargs):
     try:
-        if created:
+        if created :
             email_token = str(uuid.uuid4())
             profile_obj = Profile.objects.create(user = instance, email_token = email_token)
             email = instance.email
