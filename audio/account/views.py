@@ -52,12 +52,17 @@ def logining(request):
             return HttpResponseRedirect(request.path_info)
 
 
-        if not user[0].profile.email_verified:
+        elif not user[0].profile.email_verified:
             messages.warning(request, 'Your account is not verified.')
             return HttpResponseRedirect(request.path_info)
+        
+        elif user[0].profile.is_blocked is True:
+            messages.warning(request, 'Your account has been blocked.')
+            return HttpResponseRedirect(request.path_info)
 
-        user = authenticate(username = email , password= password)
-        if user:
+        
+        elif user:
+            user = authenticate(username = email , password= password)
             login(request , user)
             return redirect('/')
 

@@ -1,0 +1,66 @@
+{% extends 'base/base.html' %} {% load static %} {% block head %}
+<title>Admin Login</title>
+<link
+  rel="stylesheet"
+  href="{% static 'admins/assets/css/login_style.css' %} "
+/>
+{% endblock head %} {% block content %}
+<section class="vh-100 gradient-custom">
+  <div class="container py-5 h-100">
+    <div class="row d-flex justify-content-center align-items-center h-100">
+      <div class="col-12 col-md-8 col-lg-6 col-xl-5">
+        <div class="card bg-dark text-white" style="border-radius: 1rem">
+          <div class="card-body p-5 text-center">
+            <div class="mb-md-5 mt-md-4 pb-5">
+              <h2 class="fw-bold mb-2 text-uppercase">Admin Login</h2>
+              <p class="text-white-50 mb-5">
+                Please enter your Admin login and password!
+              </p>
+
+              
+
+              <form method="post">
+                {% csrf_token %}
+                {% include "base/message.html" %}
+              <div class="form-outline form-white mb-4">
+                <label class="form-label" for="typeEmailX">username</label>
+                <input
+                  class="fs-5 border rounded"
+                  type="text"
+                  id="typeEmailX"
+                  class="form-control form-control-lg"
+                  placeholder="username"
+                  name="username"
+                />
+              </div>
+
+              <div class="form-outline form-white mb-4">
+                <label class="form-label" for="typePasswordX">Password</label>
+                <input
+                  class="fs-5 border rounded"
+                  type="password"
+                  id="typePasswordX"
+                  placeholder="password"
+                  class="form-control form-control-lg"
+                  name="password"
+                />
+              </div>
+              <button class="btn btn-outline-light btn-lg px-5 w-100 h-auto" type="submit">
+                Login
+              </button>
+            </form>
+          
+
+              
+
+              
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.5.2/dist/js/bootstrap.bundle.min.js"></script>
+
+{% endblock content %}

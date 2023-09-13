@@ -1,5 +1,6 @@
 from django.db import models
 from base.models import BaseModel
+from django.http import HttpResponse
 from django.contrib.auth.models import User
 from django.db.models import functions
 from django.db.models.signals import post_save
@@ -13,7 +14,7 @@ class Profile(BaseModel):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="profile")
     email_verified = models.BooleanField(default=False)
     email_token = models.CharField(max_length=100, null = True, blank = True)
-    profile_image =models.ImageField(upload_to="profile",null=True)
+    profile_image =models.CharField(null=True,default="https://i.imgur.com/KEVc5ox.jpg")
     is_blocked = models.BooleanField(default=False)
     forgot_password_token = models.CharField(max_length=100, null = True, blank = True)
 
@@ -23,7 +24,7 @@ class Profile(BaseModel):
 @receiver(post_save, sender = User)
 def send_email_tokent(sender,  instance, created, **kwargs):
     try:
-        if created :
+        if created and instance.is_staff is False:
             email_token = str(uuid.uuid4())
             profile_obj = Profile.objects.create(user = instance, email_token = email_token)
             email = instance.email
@@ -32,4 +33,4 @@ def send_email_tokent(sender,  instance, created, **kwargs):
             send_account_activation_email(email, email_token, username)
 
     except Exception as e:
-        print(e)
+        return HttpResponse(e)
