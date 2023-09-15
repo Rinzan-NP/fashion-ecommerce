@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate,login,logout
 from django.contrib import messages
 from django.urls import reverse
-from products.models import Product,Category,Size,Brand,Color
+from products.models import Product,Category,Size,Brand,Color,Product_image
 from account.models import Profile
 # Create your views here.
 def dashboard(request):
@@ -66,6 +66,9 @@ def product_adding(request):
         size = request.POST.get('size')
         image = request.POST.get('image')
         category = request.POST.get('category')
+        image_side = request.POST.get('side_image')
+        image_back = request.POST.get('back_image')
+        image_up = request.POST.get('up_iamge')
         try:
             color_obj = Color.objects.get(color_name = color)
             brand_obj = Brand.objects.get(brand_name = brand)
@@ -80,6 +83,8 @@ def product_adding(request):
         elif not product_obj.exists():
             try:
                 Product.objects.create(name = name, description = description, price = price, selling_price = selling_price, stock = stock,color = color_obj,brand = brand_obj,main_image = image,category = category_obj,size = size_obj)
+                product_obj = Product.objects.get(name = name, description = description, price = price, selling_price = selling_price, stock = stock,color = color_obj,brand = brand_obj,main_image = image,category = category_obj,size = size_obj)
+                Product_image.objects.create(product = product_obj, image_side = image_side, image_back = image_back, image_up = image_up)
                 messages.success(request, 'Product added successfully!')
                 return redirect(reverse('product_adding'))
             except Exception as e:
@@ -187,3 +192,76 @@ def staff_adding(request):
 
 
     return render(request, 'admins/staff_register.html')
+
+def product_editing(request , uid):
+    context = {}
+    products = Product.objects.get(uid = uid)
+    image = Product_image.objects.get(product = products)
+    categories = Category.objects.all()
+    sizes = Size.objects.all()
+    brands = Brand.objects.all()
+    colors = Color.objects.all()
+
+    if request.method == "POST":
+        name = request.POST.get('name')
+        description = request.POST.get('description')
+        price = request.POST.get('price')
+        selling_price = request.POST.get('selling_price')
+        stock = request.POST.get('stock')
+        color = request.POST.get('color')
+        brand = request.POST.get('brand')
+        size = request.POST.get('size')
+        main_image = request.POST.get('main_image')
+        category = request.POST.get('category')
+        image_side = request.POST.get('side_image')
+        image_back = request.POST.get('back_image')
+        image_up = request.POST.get('up_image')
+        try:
+            size_instance = Size.objects.get(size = size)
+            color_instance = Color.objects.get(color_name = color)
+            brand_instance = Brand.objects.get(brand_name = brand)
+            category_instance = Category.objects.get(category_name = category)
+            products.name = name
+            products.description = description
+            products.size = size_instance
+            products.main_image = main_image
+            products.stock = stock
+            products.color = color_instance
+            products.brand = brand_instance
+            products.category = category_instance
+            products.price = price
+            products.selling_price = selling_price
+            image.image_side = image_side
+            image.image_back = image_back
+            image.image_up = image_up
+            products.save()
+            image.save()
+            messages.success(request, 'Edited Successfully!')
+            return redirect(reverse('product_listing'))
+        except Exception as e:
+            return HttpResponse(e)
+        
+    context['categories'] = categories
+    context['brands'] = brands
+    context['sizes'] = sizes
+    context['colors'] = colors
+    context['product'] = products
+    context['image'] = image
+
+    return render(request, 'admins/product_editing.html', context)   
+
+def product_unlisting(request, uid):
+    try:
+        product = Product.objects.get(uid = uid)
+        if product.is_selling is True:
+            product.is_selling = False
+            product.save()
+        elif product.is_selling is False:
+            product.is_selling = True
+            product.save()
+        return redirect(reverse('product_listing'))
+    except Exception as e:
+        return HttpResponse(e)
+    
+
+    

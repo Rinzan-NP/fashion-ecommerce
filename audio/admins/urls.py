@@ -15,6 +15,8 @@ urlpatterns = [
     path('staffs/', views.staff_listing, name = "staff_listing"),
     path('staffs/block/<int:id>', views.staff_blocking, name = "staff_blocking"),
     path('staffs/add_staff', views.staff_adding, name = "staff_adding"),
+    path('product/edit/<uid>', views.product_editing, name = "product_editing"),
+    path('product/delete/<uid>', views.product_unlisting ,name = "product_unlisting")
 
 ]
 

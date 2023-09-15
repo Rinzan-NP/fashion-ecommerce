@@ -4,14 +4,14 @@ from products.models import Product,Product_image,Category,Size,Color
 # Create your views here.
 def home(request):
     context = {}
-    latest_products = Product.objects.order_by('-created_at')[:8]
+    latest_products = Product.objects.filter(is_selling = True).order_by('-created_at')[:8]
     context['products'] = latest_products
     return render(request, 'navbarpages/index.html', context)
 
 def shop_listing(request):
     context = {}
-    product_obj = Product.objects.all()
-    categories = Category.objects.all()
+    product_obj = Product.objects.filter(is_selling = True)
+    categories = Category.objects.filter(unlisted = False)
     sizes = Size.objects.all()
     color = Color.objects.all()
     context['products'] = product_obj

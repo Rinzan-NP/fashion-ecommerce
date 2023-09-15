@@ -47,7 +47,7 @@ class Product(BaseModel):
     stock = models.IntegerField()
     is_selling = models.BooleanField(default=True)
     color = models.ForeignKey(Color, related_name='color_of_product', on_delete=models.CASCADE)
-    unlisted = models.BooleanField(default=False)
+
 
 
     def __str__(self):

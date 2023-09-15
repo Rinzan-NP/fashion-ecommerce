@@ -8,11 +8,6 @@
     
     
 
-    <!-- Favicon -->
-    <link rel="shortcut icon" type="image/x-icon" href="{% static 'admins/assets/imgs/theme/logo.png' %}">
-    <!-- Template CSS -->
-    <link href="{% static 'admins/assets/css/main.css' %}" rel="stylesheet" type="text/css" />
-
 
 {% endblock head %} 
 {% block content %}
@@ -135,6 +130,7 @@
                 </ul>
             </div>
         </header>
+        {% include "base/message.html" %}
         <section class="content-main">
             <div class="content-header">
                 <div>
@@ -185,14 +181,14 @@
                         </div>
                     </div>
                 </header> <!-- card-header end// -->
-                <div class="card-body">
+                <div class="card-body bg-light">
                     <article class="itemlist">
                         <div class="row align-items-center">
                             
                             <div class="col-lg-4 col-sm-4 col-8 flex-grow-1 col-name">
                                 <a class="itemside" href="#">
-                                    <div class="left">
-                                        <img src="" class="img-sm img-thumbnail" alt="Image">
+                                    <div class="info">
+                                        <h6 class="mb-0">Image</h6>
                                     </div>
                                     <div class="info">
                                         <h6 class="mb-0">Name</h6>
@@ -204,14 +200,12 @@
                                 <span class="alert">Availability</span>
                             </div>
                             <div class="col-lg-1 col-sm-2 col-4 ">
-                                <span>Quantity</span>
+                                <span class="w-auto">Qty</span>
                             </div>
-                            <div class="col-lg-2 col-sm-2 col-4 col-action text-end">
-                                <a href="product/edit/{{product.uid}}" class="btn btn-sm font-sm rounded btn-brand">
-                                    <i class="material-icons md-edit"></i> Edit
-                                </a>
-                                <a href="product/delete/{{product.uid}}" class="btn btn-sm font-sm btn-light rounded">
-                                    <i class="material-icons md-delete_forever"></i> Delete
+                            <div class="col-lg-2 col-sm-2 col-4 col-action text-end ">
+                                
+                                <a href="#}" class="btn btn-sm font-sm btn-econdary rounded">
+                                    </i>Change
                                 </a>
                             </div>
                         </div> <!-- row .// -->
@@ -236,18 +230,28 @@
                             </div>
                             <div class="col-lg-2 col-sm-2 col-4 col-price"> <span>Rs.{{product.selling_price}}</span> </div>
                             <div class="col-lg-2 col-sm-2 col-4 col-status">
-                                <span class="badge rounded-pill alert-success">{% if product.is_selling %}Available {% else %}Not available{% endif %}</span>
+                                {% if product.is_selling %}
+                                <span class="badge rounded-pill alert-success">Available </span>
+                                {% else %}
+                                <span class="badge rounded-pill alert-danger">Not available</span>
+                                {% endif %}
                             </div>
                             <div class="col-lg-1 col-sm-2 col-4 ">
                                 <span>{{product.stock}}</span>
                             </div>
-                            <div class="col-lg-2 col-sm-2 col-4 col-action text-end">
-                                <a href="product/edit/{{product.uid}}" class="btn btn-sm font-sm rounded btn-brand">
-                                    <i class="material-icons md-edit"></i> Edit
+                            <div class="col-lg-2 col-sm-2 col-4 col-action text-end d-flex gap-2">
+                                <a href="/admin/product/edit/{{product.uid}}" class="btn btn-sm font-sm rounded btn-info text-white d-flex justify-content-center align-items-center fs-4">
+                                   <i class="material-icons md-edit"></i> 
                                 </a>
-                                <a href="product/delete/{{product.uid}}" class="btn btn-sm font-sm btn-light rounded">
-                                    <i class="material-icons md-delete_forever"></i> Delete
+                                {% if product.is_selling is False %}
+                                <a href="/admin/product/delete/{{product.uid}}" class="btn btn-sm font-sm btn-success h-auto d-flex justify-content-center align-items-center rounded">
+                                    List
                                 </a>
+                                {% else %}
+                                <a href="/admin/product/delete/{{product.uid}}" class="btn btn-sm font-sm btn-danger rounded">
+                                    Unlist
+                                </a>
+                                {% endif %}
                             </div>
                         </div> <!-- row .// -->
                     </article> <!-- itemlist  .// -->
