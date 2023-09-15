@@ -11,7 +11,7 @@ from .utils import send_forgot_pass_token
 # Create your views here.
 
 def register(request):
-    if request.user.is_authenticated:
+    if request.user.is_authenticated and user.is_staff is False:
         return redirect('/')
     if request.method == "POST":
         firstname = request.POST.get('fname')
@@ -40,13 +40,14 @@ def register(request):
 
 
 def logining(request):
-    if request.user.is_authenticated:
+    if request.user.is_authenticated and request.user.is_staff is False:
         return redirect('/')
     if request.method == 'POST':
         email = request.POST.get('email')
         password = request.POST.get('password')
         user = User.objects.filter(username = email)
-
+        user_obj = User.objects.get(username = email)
+        
         if not user.exists():
             messages.warning(request, 'Account not found.')
             return HttpResponseRedirect(request.path_info)
@@ -61,7 +62,7 @@ def logining(request):
             return HttpResponseRedirect(request.path_info)
 
         
-        elif user:
+        elif user and user_obj.is_staff is False and user[0].profile.email_verified:
             user = authenticate(username = email , password= password)
             login(request , user)
             return redirect('/')

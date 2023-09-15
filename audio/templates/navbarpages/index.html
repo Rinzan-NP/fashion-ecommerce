@@ -1,119 +1,61 @@
 {% extends 'base/base.html' %} {% load static %} {% block head %}
 
-<title>Audio</title>
+<title>FASHION</title>
+<link rel="shortcut icon" type="image/x-icon" href="{% static 'admins/assets/imgs/theme/logo.png' %}">
 
 {% endblock head %} {% block content %}
 
-<header class="header-area wrapper-padding-2 fashion-2-header">
-  <div id="main-menu" class="header-sticky-2">
-    <div class="container-fluid">
-      <div class="logo-menu-wrapper">
-        <div class="logo-watch navbar-header">
-          <a class="navbar-brand" href="{% static 'index.html' %}">
-            <img src="{% static 'assets/img/logo/logo-9.png' %}" alt="" />
-          </a>
-        </div>
-        <div class="header-search-cart-login">
 
-          {% if request.user.is_authenticated %}
-          <div class="header-login">
-            <ul>
-              <li><a href="account/logouting">Log Out</a></li>
+<header class="header-area wrapper-padding-2">
+  <div id="main-menu" class=" header-sticky" >
+      <div class="container-fluid">
+          <div class="logo-menu-wrapper">
+              <div class="logo-watch navbar-header">
+                <ul class="d-flex list-unstyled">
+                  <li class="mr-3">
+                    
+                  
+                  </li>
+              </ul>
               
-            </ul>
+              
+              </div>
+              <div class="hamburger-wrapper">
+                  <div class="hamburger-menu menu-style-toggle text-end" id="main-menu-2">
+                      <nav class="">
+                          <ul>
+                              <li><a href="/">HOME</a></li>
+                              <li><a href="/shop">Shop</a></li>
+                              <li><a href="/aboutus">ABOUT US</a></li>
+                              <li><a href="/contact">Contact Us</a></li>
+                              {% if request.user.is_authenticated and user.is_staff is False%}
+                                <li><a href="/account/logouting/">Logout</a></li>
+                              {% else %}
+                                <li><a href="/account/register/">Sign Up</a></li>
+                                <li><a href="/account/login/">Log in</a></li>
+                              {% endif %}
+                              
+                          </ul>
+                      </nav>
+                      <div class="menu-toggle hamburger hamburger--squeeze">
+                          <div class="hamburger-box">
+                              <div class="hamburger-inner"></div>
+                          </div>
+                      </div>
+                  </div>
+                  
+              </div>
           </div>
-
-
-          {% else %}
-          <div class="header-login">
-            <ul>
-              <li><a href="account/login">Login</a></li>
-              <li><a href="account/register">Reg</a></li>
-            </ul>
-          </div>
-          {% endif %}
-
-
-
-
-          <div class="header-cart">
-            <a class="icon-cart" href="#">
-              <i class="ti-shopping-cart"></i>
-              <span class="shop-count pink">02</span>
-            </a>
-            <ul class="cart-dropdown">
-              <li class="single-product-cart">
-                <div class="cart-img">
-                  <a href="#"
-                    ><img src="{% static 'assets/img/cart/1.jpg' %}" alt=""
-                  /></a>
-                </div>
-                <div class="cart-title">
-                  <h5><a href="#"> Bits Headphone</a></h5>
-                  <h6><a href="#">Black</a></h6>
-                  <span>$80.00 x 1</span>
-                </div>
-                <div class="cart-delete">
-                  <a href="#"><i class="ti-trash"></i></a>
-                </div>
-              </li>
-              <li class="single-product-cart">
-                <div class="cart-img">
-                  <a href="#"
-                    ><img src="{% static 'assets/img/cart/2.jpg' %}" alt=""
-                  /></a>
-                </div>
-                <div class="cart-title">
-                  <h5><a href="#"> Bits Headphone</a></h5>
-                  <h6><a href="#">Black</a></h6>
-                  <span>$80.00 x 1</span>
-                </div>
-                <div class="cart-delete">
-                  <a href="#"><i class="ti-trash"></i></a>
-                </div>
-              </li>
-              <li class="single-product-cart">
-                <div class="cart-img">
-                  <a href="#"
-                    ><img src="{% static 'assets/img/cart/3.jpg' %}" alt=""
-                  /></a>
-                </div>
-                <div class="cart-title">
-                  <h5><a href="#"> Bits Headphone</a></h5>
-                  <h6><a href="#">Black</a></h6>
-                  <span>$80.00 x 1</span>
-                </div>
-                <div class="cart-delete">
-                  <a href="#"><i class="ti-trash"></i></a>
-                </div>
-              </li>
-              <li class="cart-space">
-                <div class="cart-sub">
-                  <h4>Subtotal</h4>
-                </div>
-                <div class="cart-price">
-                  <h4>$240.00</h4>
-                </div>
-              </li>
-              <li class="cart-btn-wrapper">
-                <a class="cart-btn btn-hover" href="#">view cart</a>
-                <a class="cart-btn btn-hover" href="#">checkout</a>
-              </li>
-            </ul>
-          </div>
-        </div>
       </div>
-    </div>
   </div>
 </header>
-
 <!-- header end -->
 <!-- slider start -->
 <div class="slider-area">
   <div class="slider-active owl-carousel">
     <div
       class="single-slider single-slider-hm1 bg-img height-100vh"
-      style="background-image: url('{% static 'assets/img/slider/13.jpg' %}');"
+      style="background-image: url('{% static 'assets/img/slider/test.webp' %}');"
 
     >
       <div class="container">
@@ -127,13 +69,13 @@
               alt=""
             />
           </div>
-          <p class="animated">Create your own style for better looks.</p>
+          <p class="animated">Step into you Style</p>
         </div>
       </div>
     </div>
     <div
       class="single-slider single-slider-hm1 bg-img height-100vh"
-      style="background-image: url('{% static 'assets/img/slider/13.jpg' %}');"
+      style="background-image: url('{% static 'assets/img/slider/bg.jpeg' %}');"
 
     >
       <div class="container">
@@ -153,27 +95,23 @@
     </div>
   </div>
 
-  <div class="clickable-mainmenu-btn">
-    <a class="clickable-mainmenu-active" href="#"
-      ><img src="{% static 'assets/img/icon-img/43.png' %}" alt=""
-    /></a>
-  </div>
-</div>
+
 
 <!-- banner3 area start -->
 <div class="banner-area3 pt-120 pb-115">
   <div class="pl-100 pr-100">
     <div class="container">
       <div class="row g-0">
+
         <div class="col-md-12 col-lg-4 col-xl-4">
           <div class="banner-wrapper mrgn-negative">
             <a href="#"
-              ><img src="{% static 'assets/img/banner/8.jpg' %}" alt=""
+              ><img src="{% static 'assets/img/banner/banner1.jpg' %}" alt="" style="height:625px"
             /></a>
-            <div class="banner-wrapper2-content">
+            <div class="banner-wrapper2-content" style="height : 315px">
               <h3>Spatial</h3>
               <h2>Style</h2>
-              <span>Start from $299.00</span>
+              
             </div>
           </div>
         </div>
@@ -181,7 +119,9 @@
           <div class="row g-0 banner-mrg">
             <div class="col-md-6">
               <div class="banner-wrapper mrgn-b-5 mrgn-r-5">
-                <img src="{% static 'assets/img/banner/9.jpg' %}" alt="" />
+                <div class="aspect-ratio aspect-ratio-1x1">
+                  <img src="{% static 'assets/img/banner/9.jpg' %}" alt="" class="img-fluid" />
+                </div>
                 <div class="banner-wrapper3-content">
                   <a href="#">Shop Now</a>
                 </div>
@@ -189,15 +129,19 @@
             </div>
             <div class="col-md-6">
               <div class="banner-wrapper mrgn-b-5">
-                <img src="{% static 'assets/img/banner/10.jpg' %}" alt="" />
-                <div class="banner-wrapper3-content banner-text-color">
+                <div class="aspect-ratio aspect-ratio-1x1">
+                  <img src="{% static 'assets/img/banner/casual.jpeg' %}" alt="" class="img-fluid" />
+                </div>
+                <div class="banner-wrapper3-content ">
                   <a href="#">Shop Now</a>
                 </div>
               </div>
             </div>
             <div class="col-md-6">
               <div class="banner-wrapper mrgn-r-5">
-                <img src="{% static 'assets/img/banner/11.jpg' %}" alt="" />
+                <div class="aspect-ratio aspect-ratio-1x1">
+                  <img src="{% static 'assets/img/banner/11.jpg' %}" alt="" class="img-fluid" />
+                </div>
                 <div class="banner-wrapper3-content">
                   <a href="#">Shop Now</a>
                 </div>
@@ -205,12 +149,17 @@
             </div>
             <div class="col-md-6">
               <div class="banner-wrapper">
-                <img src="{% static 'assets/img/banner/12.jpg' %}" alt="" />
+                <div class="aspect-ratio aspect-ratio-1x1">
+                  <img src="{% static 'assets/img/banner/12.jpg' %}" alt="" class="img-fluid" />
+                </div>
                 <div class="banner-wrapper3-content">
                   <a href="#">Shop Now</a>
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+        
           </div>
         </div>
       </div>
@@ -219,88 +168,18 @@
 </div>
 
 <!-- banner3 area end -->
+
 <!-- all products area start -->
 <div class="all-products-area pb-70">
   <div class="pl-100 pr-100">
     <div class="container-fluid">
       <div class="row">
+        {% for product in products %}
         <div class="col-lg-3 col-xl-3 col-md-6">
           <div class="product-wrapper mb-45">
             <div class="product-img">
               <a href="#">
-                <img
-                  src="{% static 'assets/img/product/fashion-2/1.jpg' %}"
-                  alt=""
-                />
-              </a>
-              <span>hot</span>
-              <div class="product-action">
-                <a class="animate-left" title="Wishlist" href="#">
-                  <i class="pe-7s-like"></i>
-                </a>
-                <a class="animate-top" title="Add To Cart" href="#">
-                  <i class="pe-7s-cart"></i>
-                </a>
-                <a
-                  class="animate-right"
-                  title="Quick View"
-                  data-bs-toggle="modal"
-                  data-bs-target="#exampleModal"
-                  href="#"
-                >
-                  <i class="pe-7s-look"></i>
-                </a>
-              </div>
-            </div>
-            <div class="product-content">
-              <h4><a href="product-details.html">Navy Bird Print</a></h4>
-              <span>$115.00</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="col-lg-3 col-xl-3 col-md-6">
-          <div class="product-wrapper mb-45">
-            <div class="product-img">
-              <a href="#">
-                <img
-                  src="{% static 'assets/img/product/fashion-2/2.jpg' %}"
-                  alt=""
-                />
-              </a>
-              <div class="product-action">
-                <a class="animate-left" title="Wishlist" href="#">
-                  <i class="pe-7s-like"></i>
-                </a>
-                <a class="animate-top" title="Add To Cart" href="#">
-                  <i class="pe-7s-cart"></i>
-                </a>
-                <a
-                  class="animate-right"
-                  title="Quick View"
-                  data-bs-toggle="modal"
-                  data-bs-target="#exampleModal"
-                  href="#"
-                >
-                  <i class="pe-7s-look"></i>
-                </a>
-              </div>
-            </div>
-            <div class="product-content">
-              <h4><a href="product-details.html">Denim Stonewash</a></h4>
-              <span>$115.00</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="col-lg-3 col-xl-3 col-md-6">
-          <div class="product-wrapper mb-45">
-            <div class="product-img">
-              <a href="#">
-                <img
-                  src="{% static 'assets/img/product/fashion-2/3.jpg' %}"
-                  alt=""
-                />
+                <img src="{{product.main_image}}" alt="" />
               </a>
               <span>new</span>
               <div class="product-action">
@@ -310,201 +189,35 @@
                 <a class="animate-top" title="Add To Cart" href="#">
                   <i class="pe-7s-cart"></i>
                 </a>
-                <a
-                  class="animate-right"
-                  title="Quick View"
-                  data-bs-toggle="modal"
-                  data-bs-target="#exampleModal"
-                  href="#"
-                >
-                  <i class="pe-7s-look"></i>
-                </a>
               </div>
             </div>
             <div class="product-content">
-              <h4><a href="product-details.html">Mini Waffle 5 Pack</a></h4>
-              <span>$115.00</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="col-lg-3 col-xl-3 col-md-6">
-          <div class="product-wrapper mb-45">
-            <div class="product-img">
-              <a href="#">
-                <img
-                  src="{% static 'assets/img/product/fashion-2/4.jpg' %}"
-                  alt=""
-                />
-              </a>
-              <span>hot</span>
-              <div class="product-action">
-                <a class="animate-left" title="Wishlist" href="#">
-                  <i class="pe-7s-like"></i>
-                </a>
-                <a class="animate-top" title="Add To Cart" href="#">
-                  <i class="pe-7s-cart"></i>
-                </a>
-                <a
-                  class="animate-right"
-                  title="Quick View"
-                  data-bs-toggle="modal"
-                  data-bs-target="#exampleModal"
-                  href="#"
-                >
-                  <i class="pe-7s-look"></i>
-                </a>
+              <h4><a href="/product/detail/{{ product.uid }}">{{ product.name }}</a></h4>
+              <div class="product-category d-flex align-items-center">
+                  <div class="color-circle rounded-circle mr-2" style="background-color: {{ product.color.hexcode }}; border: 1px solid #000; width: 20px; height: 20px;"></div>
+                  <p class="mb-0">{{ product.category }}</p>
               </div>
+              {% if product.price > product.selling_price %}
+                  <p>
+                      <span class="text-muted text-decoration-line-through">₹{{ product.price }}</span>
+                      <span class="text-black">₹{{ product.selling_price }}</span>
+                  </p>
+              {% else %}
+                  <p class="text-black">₹{{ product.selling_price }}</p>
+              {% endif %}
             </div>
-            <div class="product-content">
-              <h4><a href="product-details.html">Dagger Smart Trousers</a></h4>
-              <span>$115.00</span>
-            </div>
+          
+          
+            
           </div>
         </div>
-
-        <div class="col-lg-3 col-xl-3 col-md-6">
-          <div class="product-wrapper mb-45">
-            <div class="product-img">
-              <a href="#">
-                <img
-                  src="{% static 'assets/img/product/fashion-2/5.jpg' %}"
-                  alt=""
-                />
-              </a>
-              <span>sell</span>
-              <div class="product-action">
-                <a class="animate-left" title="Wishlist" href="#">
-                  <i class="pe-7s-like"></i>
-                </a>
-                <a class="animate-top" title="Add To Cart" href="#">
-                  <i class="pe-7s-cart"></i>
-                </a>
-                <a
-                  class="animate-right"
-                  title="Quick View"
-                  data-bs-toggle="modal"
-                  data-bs-target="#exampleModal"
-                  href="#"
-                >
-                  <i class="pe-7s-look"></i>
-                </a>
-              </div>
-            </div>
-            <div class="product-content">
-              <h4><a href="product-details.html">Homme Tapered Smart</a></h4>
-              <span>$115.00</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="col-lg-3 col-xl-3 col-md-6">
-          <div class="product-wrapper mb-45">
-            <div class="product-img">
-              <a href="#">
-                <img
-                  src="{% static 'assets/img/product/fashion-2/6.jpg' %}"
-                  alt=""
-                />
-              </a>
-              <span>hot</span>
-              <div class="product-action">
-                <a class="animate-left" title="Wishlist" href="#">
-                  <i class="pe-7s-like"></i>
-                </a>
-                <a class="animate-top" title="Add To Cart" href="#">
-                  <i class="pe-7s-cart"></i>
-                </a>
-                <a
-                  class="animate-right"
-                  title="Quick View"
-                  data-bs-toggle="modal"
-                  data-bs-target="#exampleModal"
-                  href="#"
-                >
-                  <i class="pe-7s-look"></i>
-                </a>
-              </div>
-            </div>
-            <div class="product-content">
-              <h4><a href="product-details.html">Navy Bird Print</a></h4>
-              <span>$115.00</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="col-lg-3 col-xl-3 col-md-6">
-          <div class="product-wrapper mb-45">
-            <div class="product-img">
-              <a href="#">
-                <img
-                  src="{% static 'assets/img/product/fashion-2/7.jpg' %}"
-                  alt=""
-                />
-              </a>
-              <div class="product-action">
-                <a class="animate-left" title="Wishlist" href="#">
-                  <i class="pe-7s-like"></i>
-                </a>
-                <a class="animate-top" title="Add To Cart" href="#">
-                  <i class="pe-7s-cart"></i>
-                </a>
-                <a
-                  class="animate-right"
-                  title="Quick View"
-                  data-bs-toggle="modal"
-                  data-bs-target="#exampleModal"
-                  href="#"
-                >
-                  <i class="pe-7s-look"></i>
-                </a>
-              </div>
-            </div>
-            <div class="product-content">
-              <h4><a href="product-details.html">Jacket Stonewash</a></h4>
-              <span>$115.00</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="col-lg-3 col-xl-3 col-md-6">
-          <div class="product-wrapper mb-45">
-            <div class="product-img">
-              <a href="#">
-                <img
-                  src="{% static 'assets/img/product/fashion-2/8.jpg' %}"
-                  alt=""
-                />
-              </a>
-              <span>new</span>
-              <div class="product-action">
-                <a class="animate-left" title="Wishlist" href="#">
-                  <i class="pe-7s-like"></i>
-                </a>
-                <a class="animate-top" title="Add To Cart" href="#">
-                  <i class="pe-7s-cart"></i>
-                </a>
-                <a
-                  class="animate-right"
-                  title="Quick View"
-                  data-bs-toggle="modal"
-                  data-bs-target="#exampleModal"
-                  href="#"
-                >
-                  <i class="pe-7s-look"></i>
-                </a>
-              </div>
-            </div>
-            <div class="product-content">
-              <h4><a href="product-details.html">Skinny Jeans Terry</a></h4>
-              <span>$115.00</span>
-            </div>
-          </div>
-        </div>
+        {% endfor %}
       </div>
     </div>
   </div>
 </div>
+
+
 <!-- all products area end -->
 <!-- fashion banner area start -->
 <div class="fashion-banner-area pb-120">
@@ -552,7 +265,7 @@
 
 <!-- brand logo area end -->
 <!-- testimonials area start -->
-<div class="testimonials-area pt-105 pb-105">
+<div class="testimonials-area pt-105 pb">
   <div class="container">
     <div class="section-title-2 text-center mb-35">
       <h2>Testimonial</h2>
@@ -576,16 +289,6 @@
         </p>
         <h4>Newaz Sharif / UI Ux Designer</h4>
       </div>
-      <div class="single-testimonial-4 text-center">
-        <img src="{% static 'assets/img/icon-img/42.png' %}" alt="" />
-        <p>
-          This product is the best product I ever got. Lorem ipsum dolor sit
-          amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt
-          labore et dolore magna.
-        </p>
-        <h4>Newaz Sharif / UI Ux Designer</h4>
-      </div>
-    </div>
   </div>
 </div>
 
@@ -595,7 +298,7 @@
   <div class="pl-185 pr-185">
     <div class="section-title-2 text-center mb-50">
       <h2>Insta Feed</h2>
-      <h4>Follow us on Instagram. <span>@Ezonepro</span></h4>
+      <h4>Follow us on Instagram. <span>@rinzan</span></h4>
     </div>
     <div class="instafeed-wrapper">
       <div class="instafeed-active owl-carousel">
@@ -727,7 +430,7 @@
           <div class="copyright">
             <p>
               Copyright ©
-              <a href="#">Your Company Name</a>
+              <a href="#">FASHION</a>
               {{ year }}. All Right Reserved.
             </p>
           </div>
@@ -852,94 +555,8 @@
   </div>
 </div>
 
-<div class="clickable-mainmenu text-center">
-  <div class="clickable-mainmenu-icon">
-    <button class="clickable-mainmenu-close">
-      <span class="pe-7s-close"></span>
-    </button>
-  </div>
-  <div id="menu" class="text-start">
-    <ul>
-      <li>
-        <a href="#">home</a>
-        <ul>
-          <li><a href="index.html">Fashion</a></li>
-          <li><a href="index-fashion-2.html">Fashion style 2</a></li>
-          <li><a href="index-fruits.html">fruits</a></li>
-          <li><a href="index-book.html">book</a></li>
-          <li><a href="index-electronics.html">electronics</a></li>
-          <li><a href="index-electronics-2.html">electronics style 2</a></li>
-          <li><a href="index-food.html">food & drink</a></li>
-          <li><a href="index-furniture.html">furniture</a></li>
-          <li><a href="index-handicraft.html">handicraft</a></li>
-          <li><a href="index-smart-watch.html">smart watch</a></li>
-          <li><a href="index-sports.html">sports</a></li>
-        </ul>
-      </li>
-      <li>
-        <a href="about-us.html">about us</a>
-      </li>
-      <li>
-        <a href="#">shop</a>
-        <ul>
-          <li>
-            <a href="#">shop grid</a>
-            <ul>
-              <li><a href="shop-grid-2-col.html">grid 2 column</a></li>
-              <li><a href="shop-grid-3-col.html">grid 3 column</a></li>
-              <li><a href="shop.html">grid 4 column</a></li>
-              <li><a href="shop-grid-box.html">grid box style</a></li>
-            </ul>
-          </li>
-          <li>
-            <a href="#">shop list</a>
-            <ul>
-              <li><a href="shop-list-1-col.html">list 1 column</a></li>
-              <li><a href="shop-list-2-col.html">list 2 column</a></li>
-              <li><a href="shop-list-box.html">list box style</a></li>
-            </ul>
-          </li>
-        </ul>
-      </li>
-      <li>
-        <a href="#">product details</a>
-        <ul>
-          <li><a href="product-details.html">tab style 1</a></li>
-          <li><a href="product-details-2.html">tab style 2</a></li>
-          <li><a href="product-details-3.html">tab style 3</a></li>
-          <li><a href="product-details-4.html">sticky style</a></li>
-          <li><a href="product-details-5.html">sticky style 2</a></li>
-          <li><a href="product-details-6.html">gallery style</a></li>
-          <li><a href="product-details-7.html">gallery style 2</a></li>
-          <li><a href="product-details-8.html">fixed image style</a></li>
-          <li><a href="product-details-9.html">fixed image style 2</a></li>
-        </ul>
-      </li>
-      <li>
-        <a href="#">pages</a>
-        <ul>
-          <li><a href="about-us.html">about us</a></li>
-          <li><a href="menu-list.html">menu list</a></li>
-          <li><a href="login.html">login</a></li>
-          <li><a href="register.html">register</a></li>
-          <li><a href="cart.html">cart page</a></li>
-          <li><a href="checkout.html">checkout</a></li>
-          <li><a href="wishlist.html">wishlist</a></li>
-          <li><a href="contact.html">contact</a></li>
-        </ul>
-      </li>
-      <li>
-        <a href="#">blog</a>
-        <ul>
-          <li><a href="blog.html">blog 3 column</a></li>
-          <li><a href="blog-2-col.html">blog 2 column</a></li>
-          <li><a href="blog-sidebar.html">blog sidebar</a></li>
-          <li><a href="blog-details.html">blog details</a></li>
-          <li><a href="blog-details-sidebar.html">blog details 2</a></li>
-        </ul>
-      </li>
-    </ul>
-  </div>
-</div>
+
+
+
 
 {% endblock content %}

@@ -4,6 +4,7 @@ from base.models import BaseModel
 
 class Category(models.Model):
     category_name = models.CharField(max_length=100)
+    unlisted = models.BooleanField(default=False)
 
     def __str__(self) -> str:
         return self.category_name
@@ -11,6 +12,7 @@ class Category(models.Model):
 
 class Size(models.Model):
     size = models.IntegerField()
+    unlisted = models.BooleanField(default=False)
 
     def __str__(self):
         str_size = str(self.size)
@@ -19,6 +21,7 @@ class Size(models.Model):
 
 class Brand(models.Model):
     brand_name = models.CharField(max_length=50)
+    unlisted = models.BooleanField(default=False)
 
     def __str__(self):
         return self.brand_name
@@ -26,6 +29,7 @@ class Brand(models.Model):
 
 class Color(models.Model):
     color_name = models.CharField(max_length=100)
+    hexcode = models.CharField(max_length=50)
 
     def __str__(self):
         return self.color_name
@@ -43,6 +47,7 @@ class Product(BaseModel):
     stock = models.IntegerField()
     is_selling = models.BooleanField(default=True)
     color = models.ForeignKey(Color, related_name='color_of_product', on_delete=models.CASCADE)
+    unlisted = models.BooleanField(default=False)
 
 
     def __str__(self):
@@ -51,11 +56,11 @@ class Product(BaseModel):
 
 class Product_image(models.Model):
     product = models.OneToOneField(Product, on_delete=models.CASCADE)
-    image_left = models.CharField(max_length=255, null=True, blank=True)
+    image_side = models.CharField(max_length=255, null=True, blank=True)
     image_back = models.CharField(max_length=255, null=True, blank=True)
-    image_right = models.CharField(max_length=255, null=True, blank=True)
-    inside_image = models.CharField(max_length=255, null=True, blank=True)
-    image_down = models.CharField(max_length=255, null=True, blank=True)
+    image_up = models.CharField(max_length=255, null=True, blank=True)
+
+    
 
     def __str__(self):
         return self.product.name

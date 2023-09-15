@@ -7,7 +7,7 @@
     <meta name="description" content="">
     <meta http-equiv="x-ua-compatible" content="ie=edge">
       <!-- Favicon -->
-      <link rel="shortcut icon" type="image/x-icon" href="assets/img/favicon.png">
+      
       
       <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 
@@ -24,7 +24,29 @@
       <link rel="stylesheet" href="{% static "assets/css/responsive.css" %}">
       <script src=" {% static 'assets/js/vendor/modernizr-3.11.7.min.js' %}"></script>
 
+      
+      <link rel="stylesheet" href="{% static "assets/css/icofont.css" %}">
+      <link rel="stylesheet" href="{% static "assets/css/meanmenu.min.css" %}">
+
+     
+      <link rel="stylesheet" href="{% static "assets/css/icofont.css" %}">
+      <link rel="stylesheet" href="{% static "assets/css/hamburgers.min.css" %}">
+      
+      <link rel="stylesheet" href="{% static "assets/css/jquery-ui.css" %}">
+
+      <link rel="shortcut icon" type="image/x-icon" href="{% static 'admins/assets/imgs/theme/logo.png' %}">
+
+      
+      <link rel="stylesheet" href="{% static 'assets/css/easyzoom.css' %}">
+      
+
+
+  
+    
+     
+     
    
+
     {% block head %}{% endblock head %}
 
     <!--  stylesheet -->
@@ -38,8 +60,8 @@
 <body >
     {% block content %}{% endblock content %}
 
-
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+{% comment %} 
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script> {% endcomment %}
     <script src="{% static 'assets/js/vendor/jquery-1.12.4.min.js' %}"></script>
     <script src="{% static 'assets/js/popper.js' %}"></script>
     <script src="{% static 'assets/js/bootstrap.min.js' %}"></script>
