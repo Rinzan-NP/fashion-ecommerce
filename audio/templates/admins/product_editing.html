@@ -52,6 +52,15 @@
           <a href="/admin/staffs">Staff</a>
         </div>
       </li>
+      <li class="menu-item has-submenu ">
+        <a class="menu-link" href="#"> <i class="icon material-icons md-store"></i>
+            <span class="text">Category</span>
+        </a>
+        <div class="submenu">
+            <a href="/admin/category/add">Add</a>
+            <a href="/admin/category" >Listing</a>
+        </div>
+    </li>
       <li class="menu-item has-submenu">
         <a class="menu-link" href="page-orders-1.html">
           <i class="icon material-icons md-shopping_cart"></i>
@@ -63,17 +72,7 @@
           <a href="page-orders-detail.html">Order detail</a>
         </div>
       </li>
-      <li class="menu-item has-submenu">
-        <a class="menu-link" href="page-sellers-cards.html">
-          <i class="icon material-icons md-store"></i>
-          <span class="text">Sellers</span>
-        </a>
-        <div class="submenu">
-          <a href="page-sellers-cards.html">Sellers cards</a>
-          <a href="page-sellers-list.html">Sellers list</a>
-          <a href="page-seller-detail.html">Seller profile</a>
-        </div>
-      </li>
+      
 
       <li class="menu-item has-submenu">
         <a class="menu-link" href="page-transactions-1.html">
@@ -189,28 +188,41 @@
                   <div class="mb-4">
                     <label class="form-label">Brand name</label>
                     <select class="form-select" name="brand" required>
+                      <option value="{{ product.brand.brand_name }}">
+                        {{ product.brand.brand_name }}
+                      </option>
                       {% for brand in brands %}
+                      {% if brand.brand_name != product.brand.brand_name %}
                       <option value="{{ brand.brand_name }}">
                         {{ brand.brand_name }}
                       </option>
+                      {% endif %}
                       {% endfor %}
                     </select>
                   </div>
                   <div class="mb-4">
                     <label class="form-label">Size</label>
                     <select class="form-select" name="size" required>
+                      <option value={{ product.size.size }}>{{ product.size.size }}</option>
                       {% for size in sizes %}
+                      {% if size.size != product.size.size %}
                       <option value={{ size.size }}>{{ size.size }}</option>
+                      {% endif %}
                       {% endfor %}
                     </select>
                   </div>
                   <div class="mb-4">
                     <label class="form-label">Color</label>
                     <select class="form-select" name="color" required>
+                      <option value="{{ product.color.color_name }}">
+                        {{ product.color.color_name }}
+                      </option>
                       {% for color in colors %}
+                      {% if color.color_name != product.color.color_name %}
                       <option value="{{ color.color_name }}">
                         {{ color.color_name }}
                       </option>
+                      {% endif %}
                       {% endfor %}
                     </select>
                   </div>

@@ -263,5 +263,50 @@ def product_unlisting(request, uid):
     except Exception as e:
         return HttpResponse(e)
     
+def category_listing(request):
+    context = {}
+    categories = Category.objects.all()
+    context['categories'] = categories
+    return render(request, 'admins/category/category.html', context)
 
+def category_adding(request):
+    if request.method == "POST":
+        name = request.POST.get('name')
+        if Category.objects.filter(category_name = name).exists():
+            messages.warning(request, "Category already exist!")
+            return redirect(reverse('category_adding'))
+        else:
+            try:
+                Category.objects.create(category_name = name)
+                messages.success(request, "Category created successfylly!")
+                return redirect(reverse('category_listing'))
+            except Exception as  e:
+                return HttpResponse(e)
+    return render(request, 'admins/category/category_adding.html')
     
+def category_editng(request, id):
+    context = {}
+    category = Category.objects.get(id = id)
+    if request.method == "POST":
+        name = request.POST.get('name')
+        if Category.objects.filter(name = name).exists():
+            messages.warning(request, 'Category already exist!')
+            return redirect(reverse("category_editing"))
+        else:
+            try:
+                category.name = name
+                category.save()
+            except Exception as e:
+                return HttpResponse(e)
+    context['category'] = category
+    return render(request, 'admins/category/category_editing.html', context)
+
+def category_deleting(request, id):
+    category = Category.objects.get(id = id)
+    if category.unlisted is True:
+        category.unlisted = False
+        category.save()
+    elif  category.unlisted is False:
+        category.unlisted = True
+        category.save()
+    return redirect(reverse('category_listing'))

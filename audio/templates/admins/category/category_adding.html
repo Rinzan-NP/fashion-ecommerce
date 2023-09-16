@@ -1,21 +1,16 @@
-{% extends 'base/base.html' %} {% load static %} {% block head %}
+{% extends 'base/base.html' %} {% load static %} 
+{% block head %}
 
-<title>Product</title>
 
-<!-- Favicon -->
-<link
-  rel="shortcut icon"
-  type="image/x-icon"
-  href="{% static 'admins/assets/imgs/theme/logo.png' %}"
-/>
-<!-- Template CSS -->
-<link
-  href="{% static 'admins/assets/css/main.css' %}"
-  rel="stylesheet"
-  type="text/css"
-/>
 
-{% endblock head %} {% block content %}
+    
+    <title>Category</title>
+    
+    
+
+
+{% endblock head %} 
+{% block content %}
 <div class="screen-overlay"></div>
 <aside class="navbar-aside" id="offcanvas_aside">
     <div class="aside-top">
@@ -33,7 +28,7 @@
                     <span class="text">Dashboard</span>
                 </a>
             </li>
-            <li class="menu-item ">
+            <li class="menu-item">
                 <a class="menu-link" href="/admin/products"> <i class="icon material-icons md-shopping_bag"></i>
                     <span class="text">Products</span>
                 </a>
@@ -45,22 +40,23 @@
                 </a>
                 
             </li>
-            <li class="menu-item has-submenu active">
+            <li class="menu-item has-submenu">
                 <a class="menu-link" href="#"> <i class="icon material-icons md-person"></i>
                     <span class="text">Account</span>
                 </a>
                 <div class="submenu">
-                    <a href="/admin/users" class="active">User</a>
+                    <a href="/admin/users">User</a>
                     <a href="/admin/staffs">Staff</a>
                     
                 </div>
             </li>
-            <li class="menu-item has-submenu">
+            
+            <li class="menu-item has-submenu active">
                 <a class="menu-link" href="#"> <i class="icon material-icons md-store"></i>
                     <span class="text">Category</span>
                 </a>
                 <div class="submenu">
-                    <a href="/admin/category/add">Add</a>
+                    <a href="/admin/category/add" class="active">Add</a>
                     <a href="/admin/category" >Listing</a>
                 </div>
             </li>
@@ -74,8 +70,6 @@
                     <a href="page-orders-detail.html">Order detail</a>
                 </div>
             </li>
-            
-            
             <li class="menu-item has-submenu">
                 <a class="menu-link" href="page-transactions-1.html"> <i class="icon material-icons md-monetization_on"></i>
                     <span class="text">Transactions</span>
@@ -122,86 +116,89 @@
         <br>
     </nav>
 </aside>
-<main class="main-wrap">
+
+
+
+  <main class="main-wrap">
     <header class="main-header navbar" style="display: flex; justify-content: flex-end;">
-        <div class="col-nav">
-            <ul class="nav">
-                <li class="nav-item">
-                    <a class="nav-link btn-icon" href="/admin/logouting">Logout</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link btn-icon darkmode" href="#"><i class="material-icons md-nights_stay"></i></a>
-                </li>
-            </ul>
-        </div>
-    </header>
-  <form method="post">
-    {% csrf_token %}
-    {% include "base/message.html" %}
+      <div class="col-nav">
+          <ul class="nav">
+              <li class="nav-item">
+                  <a class="nav-link btn-icon" href="/admin/logouting">Logout</a>
+              </li>
+              <li class="nav-item">
+                  <a class="nav-link btn-icon darkmode" href="#"><i class="material-icons md-nights_stay"></i></a>
+              </li>
+          </ul>
+      </div>
+  </header>
+    
+ <form method="post">
+    {% csrf_token %} {% include "base/message.html" %}
     <section class="content-main">
-        <div class="row">
-            <div class="col-6">
-                <div class="content-header">
-                    <h2 class="content-title">Add New Staff</h2>
-                </div>
-            </div>
+      <div class="row">
+        <div class="col-6">
+          <div class="content-header">
+            <h2 class="content-title">Add New Category</h2>
+            <button class="btn btn-md rounded font-sm hover-up h-auto">
+              Add
+            </button>
+          </div>
         </div>
-        <div class="row">
-            <div class="col-lg-12">
-                <div class="card mb-4">
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-md-3">
-                                <h6>Staff Info:</h6>
-                            </div>
-                            <div class="col-md-9">
-                                <div class="mb-4">
-                                    <label class="form-label">Username</label>
-                                    <input type="text" placeholder="Username" class="form-control" name="username" required />
-                                </div>
-                               
-                                
-                                <div class="mb-4">
-                                  <label class="form-label">Password</label>
-                                  <input type="password" placeholder="password" class="form-control" rows="4" name="pass1" required></input>
-                              </div>
-                              <div class="mb-4">
-                                <label class="form-label">Confirm Password</label>
-                                <input type="password" placeholder="re_password" class="form-control" rows="4" name="pass2" required></input>
-                            </div>
-                            <button type="submit" class="btn btn-md rounded font-sm hover-up h-auto">Add</button>                   
-                            </div>
-                        </div>
-                    </div>
+      </div>
+      <div class="row">
+        <div class="col-lg-12">
+          <div class="card mb-4">
+            <div class="card-body">
+              <div class="row">
+                <div class="col-md-3">
+                  <h6>1. General info</h6>
                 </div>
+                <div class="col-md-9">
+                  <div class="mb-4">
+                    <label class="form-label">Category name</label>
+                    <input
+                      type="text"
+                      placeholder="Type here"
+                      class="form-control"
+                      name="name"
+                      required
+                    
+                    />
+                  </div>
+                </div>
+              </div>
             </div>
+          </div>
         </div>
+      </div>
     </section>
-</form>
+  </form> 
+  
+    <footer class="main-footer font-xs">
+      <div class="row pb-30 pt-15">
+        <div class="col-sm-6">
+          <script>
+            document.write(new Date().getFullYear());
+          </script>
+          ©, Evara - HTML Ecommerce Template .
+        </div>
+        <div class="col-sm-6">
+          <div class="text-sm-end">All rights reserved</div>
+        </div>
+      </div>
+    </footer>
+  </main>
+  <script src="{% static 'admins/assets/js/vendors/jquery-3.6.0.min.js' %}"></script>
+  <script src="{% static 'admins/assets/js/vendors/bootstrap.bundle.min.js' %}"></script>
+  <script src="{% static 'admins/assets/js/vendors/select2.min.js' %}"></script>
+  <script src="{% static 'admins/assets/js/vendors/perfect-scrollbar.js' %}"></script>
+  <script src="{% static 'admins/assets/js/vendors/jquery.fullscreen.min.js' %}"></script>
+  <!-- Main Script -->
+  <script
+    src="{% static 'admins/assets/js/main.js' %}"
+    type="text/javascript"
+  ></script>
 
 
-  
-    <!-- content-main end// -->
-  
-  <footer class="main-footer font-xs">
-    <div class="row pb-30 pt-15">
-      <div class="col-sm-6">
-        <script>
-          document.write(new Date().getFullYear());
-        </script>
-        ©, Evara - HTML Ecommerce Template .
-      </div>
-      <div class="col-sm-6">
-        <div class="text-sm-end">All rights reserved</div>
-      </div>
-    </div>
-  </footer>
-</main>
-<script src="{% static 'admins/assets/js/vendors/jquery-3.6.0.min.js' %}"></script>
-<script src="{% static 'admins/assets/js/vendors/bootstrap.bundle.min.js' %}"></script>
-<script src="{% static 'admins/assets/js/vendors/select2.min.js' %}"></script>
-<script src="{% static 'admins/assets/js/vendors/perfect-scrollbar.js' %}"></script>
-<script src="{% static 'admins/assets/js/vendors/jquery.fullscreen.min.js' %}"></script>
-<!-- Main Script -->
-<script src="{% static 'admins/assets/js/main.js' %}" type="text/javascript"></script>
-{% endblock content %}
+{% endblock %}
