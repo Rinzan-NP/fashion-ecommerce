@@ -4,7 +4,7 @@
 
 
     
-    <title>Color</title>
+    <title>Brand</title>
     
     
 
@@ -56,20 +56,19 @@
                     <span class="text">Category</span>
                 </a>
                 <div class="submenu">
-                    <a href="/admin/category/add">Add</a>
+                    <a href="/admin/category/add" >Add</a>
                     <a href="/admin/category" >Listing</a>
                 </div>
             </li>
-            <li class="menu-item has-submenu active">
+            <li class="menu-item has-submenu">
               <a class="menu-link" href="#"><i class="icon material-icons md-stars"></i>
                   <span class="text">Color</span>
               </a>
               <div class="submenu">
                   <a href="/admin/color">Listing</a>
-                  <a href="/admin/color/add"  class="active" >Add</a>
+                  <a href="/admin/color/add">Add</a>
               </div>
           </li>
-            
             <li class="menu-item has-submenu ">
                 <a class="menu-link" href="page-orders-1.html"> <i class="icon material-icons md-shopping_cart"></i>
                     <span class="text">Orders</span>
@@ -80,13 +79,12 @@
                     <a href="page-orders-detail.html">Order detail</a>
                 </div>
             </li>
-            
             <li class="menu-item">
                 <a class="menu-link" href="page-reviews.html"> <i class="icon material-icons md-comment"></i>
                     <span class="text">Reviews</span>
                 </a>
             </li>
-            <li class="menu-item">
+            <li class="menu-item active">
                 <a class="menu-link" href="/admin/brand"> <i class="icon material-icons md-stars"></i>
                     <span class="text">Brands</span> </a>
             </li>
@@ -140,9 +138,9 @@
       <div class="row">
         <div class="col-6">
           <div class="content-header">
-            <h2 class="content-title">Add New Color</h2>
+            <h2 class="content-title">Edit Brand</h2>
             <button class="btn btn-md rounded font-sm hover-up h-auto">
-              Add
+              Edit
             </button>
           </div>
         </div>
@@ -157,31 +155,17 @@
                 </div>
                 <div class="col-md-9">
                   <div class="mb-4">
-                    <label class="form-label">Color name</label>
+                    <label class="form-label">Brand name</label>
                     <input
                       type="text"
                       placeholder="Type here"
                       class="form-control"
                       name="name"
                       required
-                    
+                      value = "{{brand.brand_name}}"
                     />
                   </div>
                 </div>
-                <div class="col-md-3"></div>
-                <div class="col-md-9">
-                    <div class="mb-4">
-                      <label class="form-label">Hexcode</label>
-                      <input
-                        type="text"
-                        placeholder="Type here"
-                        class="form-control"
-                        name="hexcode"
-                        required
-                      
-                      />
-                    </div>
-                  </div>
               </div>
             </div>
           </div>

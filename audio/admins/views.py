@@ -296,6 +296,7 @@ def category_editng(request, id):
             try:
                 category.name = name
                 category.save()
+                return redirect(reverse('category_listing'))
             except Exception as e:
                 return HttpResponse(e)
     context['category'] = category
@@ -350,4 +351,53 @@ def color_editing(request, id):
             return HttpResponse(e)
 
     return render(request, 'admins/color/edit_color.html', context)
+
+def brand(request):
+    context = {}
+    brands = Brand.objects.all()
+    context['brands'] = brands
+    return render(request, 'admins/brand/brand.html', context)
+
+def brand_editing(request, id):
+    context = {}
+    brand = Brand.objects.get(id = id)
+    if request.method == "POST":
+        name = request.POST.get('name')
+        if Brand.objects.filter(brand_name = name).exists():
+            messages.warning(request, 'Brand already exist!')
+            return redirect(reverse("brand_editing"))
+        else:
+            try:
+                brand.brand_name = name
+                brand.save()
+                return redirect(reverse("brand"))
+            except Exception as e:
+                return HttpResponse(e)
+    context['brand'] = brand
+    return render(request, 'admins/brand/brand_editing.html', context)
+
+def brand_deleting(request, id):
+    brand = Brand.objects.get(id = id)
+    if brand.unlisted is True:
+        brand.unlisted = False
+        brand.save()
+    elif  brand.unlisted is False:
+        brand.unlisted = True
+        brand.save()
+    return redirect(reverse('brand'))
+
+def brand_adding(request):
+    if request.method == "POST":
+        name = request.POST.get('name')
+        if Brand.objects.filter(brand_name = name).exists():
+            messages.warning(request, "brand already exist!")
+            return redirect(reverse('brand_adding'))
+        else:
+            try:
+                Brand.objects.create(brand_name = name)
+                messages.success(request, "Brand created successfylly!")
+                return redirect(reverse('brand'))
+            except Exception as  e:
+                return HttpResponse(e)
+    return render(request, 'admins/brand/brand_add.html')
 

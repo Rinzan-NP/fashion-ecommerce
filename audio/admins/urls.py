@@ -29,7 +29,13 @@ urlpatterns = [
 
     path('color/', views.color_listing, name='color_listing'),
     path('color/add', views.color_adding, name='color_adding'),
-    path('color/edit/<int:id>', views.color_editing, name='color_adding'),
+    path('color/edit/<int:id>', views.color_editing, name='color_editing'),
+
+    path('brand/', views.brand, name = "brand"),
+    path('brand/edit/<int:id>', views.brand_editing, name='brand_editing'),
+    path('brand/delete/<int:id>', views.brand_deleting, name = "brand_deleting"),
+    path('brand/add', views.brand_adding, name="brand_adding"),
+
 
 
 

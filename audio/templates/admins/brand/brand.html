@@ -4,7 +4,7 @@
 
 
     
-    <title>Product</title>
+    <title>Brand</title>
     
     
 
@@ -28,7 +28,7 @@
                         <span class="text">Dashboard</span>
                     </a>
                 </li>
-                <li class="menu-item  active">
+                <li class="menu-item ">
                     <a class="menu-link" href="/admin/products"> <i class="icon material-icons md-shopping_bag"></i>
                         <span class="text">Products</span>
                     </a>
@@ -50,17 +50,18 @@
                         
                     </div>
                 </li>
+                
                 <li class="menu-item has-submenu">
                     <a class="menu-link" href="#"> <i class="icon material-icons md-store"></i>
                         <span class="text">Category</span>
                     </a>
                     <div class="submenu">
                         <a href="/admin/category/add">Add</a>
-                        <a href="/admin/category" >Listing</a>
+                        <a href="/admin/category" class="active">Listing</a>
                     </div>
                 </li>
                 <li class="menu-item has-submenu">
-                    <a class="menu-link" href="#"><i class="icon material-icons md-stars"></i>
+                    <a class="menu-link" href="page-transactions-1.html"><i class="icon material-icons md-stars"></i>
                         <span class="text">Color</span>
                     </a>
                     <div class="submenu">
@@ -80,14 +81,12 @@
                 </li>
                 
                 
-                
-                
                 <li class="menu-item">
                     <a class="menu-link" href="page-reviews.html"> <i class="icon material-icons md-comment"></i>
                         <span class="text">Reviews</span>
                     </a>
                 </li>
-                <li class="menu-item">
+                <li class="menu-item active">
                     <a class="menu-link" href="/admin/brand"> <i class="icon material-icons md-stars"></i>
                         <span class="text">Brands</span> </a>
                 </li>
@@ -135,53 +134,16 @@
         <section class="content-main">
             <div class="content-header">
                 <div>
-                    <h2 class="content-title card-title">Products List</h2>
-                    <p>List of the products.</p>
+                    <h2 class="content-title card-title">Brand List</h2>
+                    <p>List of the brands.</p>
                 </div>
                 <div>
                     
-                    <a href="/admin/products/add_product" class="btn btn-primary btn-sm rounded h-auto">Create new</a>
+                    <a href="/admin/brand/add" class="btn btn-primary btn-sm rounded h-auto">Add Brand</a>
                 </div>
             </div>
             <div class="card mb-4">
-                <header class="card-header">
-                    <div class="row align-items-center">
-                        
-                        <div class="col-md-3 col-12 me-auto mb-md-0 mb-3">
-                            <select class="form-select">
-                                <option selected>All category</option>
-                                {% for category in categories %}
-                                <option>{{ category.category_name }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        <div class="col-md-3 col-12 me-auto mb-md-0 mb-3">
-                            <select class="form-select">
-                                <option selected>All Brands</option>
-                                {% for brand in brands %}
-                                <option>{{ brand.brand_name }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        <div class="col-md-3 col-12 me-auto mb-md-0 mb-3">
-                            <select class="form-select">
-                                <option selected>All Size</option>
-                                {% for size in sizes %}
-                                <option>{{ size.size }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        
-                        <div class="col-md-2 col-6">
-                            <select class="form-select">
-                                <option selected>Status</option>
-                                <option>Selling</option>
-                                <option>Not Selling</option>
-                                
-                            </select>
-                        </div>
-                    </div>
-                </header> <!-- card-header end// -->
+                 <!-- card-header end// -->
                 <div class="card-body bg-light">
                     <article class="itemlist">
                         <div class="row align-items-center">
@@ -189,71 +151,54 @@
                             <div class="col-lg-4 col-sm-4 col-8 flex-grow-1 col-name">
                                 <a class="itemside" href="#">
                                     <div class="info">
-                                        <h6 class="mb-0">Image</h6>
-                                    </div>
-                                    <div class="info">
                                         <h6 class="mb-0">Name</h6>
                                     </div>
                                 </a>
                             </div>
-                            <div class="col-lg-2 col-sm-2 col-4 col-price"> <span>Price</span> </div>
-                            <div class="col-lg-2 col-sm-2 col-4 col-status">
-                                <span class="alert">Availability</span>
-                            </div>
-                            <div class="col-lg-1 col-sm-2 col-4 ">
-                                <span class="w-auto">Qty</span>
-                            </div>
-                            <div class="col-lg-2 col-sm-2 col-4 col-action text-end ">
-                                
-                                <a href="#}" class="btn btn-sm font-sm btn-econdary rounded">
-                                    </i>Change
+                            
+                            <div class="col-lg-4 col-sm-4 col-8 flex-grow-1 ">
+                                <a class="itemside" href="#">
+                                    <div class="info">
+                                        <h6 class="mb-0">Actions</h6>
+                                    </div>
                                 </a>
                             </div>
-                        </div> <!-- row .// -->
-                    </article> <!-- itemlist  .// -->
+                            
+                            
+                        </div>
+                    </article> 
                     
                     
                 </div> <!-- card-body end// -->
-                {% for product in products %}
+                {% for brand in brands %}
                 <div class="card-body">
                     <article class="itemlist">
                         <div class="row align-items-center">
                             
                             <div class="col-lg-4 col-sm-4 col-8 flex-grow-1 col-name">
                                 <a class="itemside" href="#">
-                                    <div class="left">
-                                        <img src="{{product.main_image}}" class="img-sm img-thumbnail" alt="Item">
-                                    </div>
                                     <div class="info">
-                                        <h6 class="mb-0">{{product.name}}</h6>
+                                        <h6 class="mb-0">{{brand.brand_name}}</h6>
                                     </div>
                                 </a>
                             </div>
-                            <div class="col-lg-2 col-sm-2 col-4 col-price"> <span>Rs.{{product.selling_price}}</span> </div>
-                            <div class="col-lg-2 col-sm-2 col-4 col-status">
-                                {% if product.is_selling %}
-                                <span class="badge rounded-pill alert-success">Available </span>
-                                {% else %}
-                                <span class="badge rounded-pill alert-danger">Not available</span>
-                                {% endif %}
-                            </div>
-                            <div class="col-lg-1 col-sm-2 col-4 ">
-                                <span>{{product.stock}}</span>
-                            </div>
+                           
                             <div class="col-lg-2 col-sm-2 col-4 col-action text-end d-flex gap-2">
-                                <a href="/admin/product/edit/{{product.uid}}" class="btn btn-sm font-sm rounded btn-info text-white d-flex justify-content-center align-items-center fs-4">
+                                <a href="/admin/brand/edit/{{brand.id}}" class="btn btn-sm font-sm rounded btn-info text-white d-flex justify-content-center align-items-center fs-4">
                                    <i class="material-icons md-edit"></i> 
                                 </a>
-                                {% if product.is_selling is False %}
-                                <a href="/admin/product/delete/{{product.uid}}" class="btn btn-sm font-sm btn-success h-auto d-flex justify-content-center align-items-center rounded">
+                                {% if brand.unlisted is True %}
+                                <a href="/admin/brand/delete/{{brand.id}}" class="btn btn-sm font-sm btn-success h-auto d-flex justify-content-center align-items-center rounded">
                                     List
                                 </a>
                                 {% else %}
-                                <a href="/admin/product/delete/{{product.uid}}" class="btn btn-sm font-sm btn-danger rounded">
+                                <a href="/admin/brand/delete/{{brand.id}}" class="btn btn-sm font-sm btn-danger rounded">
                                     Unlist
                                 </a>
                                 {% endif %}
                             </div>
+                            
+                            
                         </div> <!-- row .// -->
                     </article> <!-- itemlist  .// -->
                     
