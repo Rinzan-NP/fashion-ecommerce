@@ -25,7 +25,14 @@ urlpatterns = [
     path('category/add', views.category_adding, name="category_adding"),
     path('category/', views.category_listing, name = "category_listing"),
     path('category/edit/<int:id>', views.category_editng, name = 'category_editing'),
-    path('category/delete/<int:id>', views.category_deleting, name = "category_deleting")
+    path('category/delete/<int:id>', views.category_deleting, name = "category_deleting"),
+
+    path('color/', views.color_listing, name='color_listing'),
+    path('color/add', views.color_adding, name='color_adding'),
+    path('color/edit/<int:id>', views.color_editing, name='color_adding'),
+
+
+
 
 
 ]

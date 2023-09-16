@@ -4,7 +4,7 @@
 
 
     
-    <title>Category</title>
+    <title>Color</title>
     
     
 
@@ -51,22 +51,22 @@
                 </div>
             </li>
             
-            <li class="menu-item has-submenu active">
+            <li class="menu-item has-submenu">
                 <a class="menu-link" href="#"> <i class="icon material-icons md-store"></i>
                     <span class="text">Category</span>
                 </a>
                 <div class="submenu">
-                    <a href="/admin/category/add" class="active">Add</a>
+                    <a href="/admin/category/add">Add</a>
                     <a href="/admin/category" >Listing</a>
                 </div>
             </li>
-            <li class="menu-item has-submenu">
+            <li class="menu-item has-submenu active">
               <a class="menu-link" href="#"><i class="icon material-icons md-stars"></i>
                   <span class="text">Color</span>
               </a>
               <div class="submenu">
                   <a href="/admin/color">Listing</a>
-                  <a href="/admin/color/add">Add</a>
+                  <a href="/admin/color/add"  class="active" >Add</a>
               </div>
           </li>
             
@@ -140,9 +140,9 @@
       <div class="row">
         <div class="col-6">
           <div class="content-header">
-            <h2 class="content-title">Add New Category</h2>
+            <h2 class="content-title">Edit Color</h2>
             <button class="btn btn-md rounded font-sm hover-up h-auto">
-              Add
+              Edit
             </button>
           </div>
         </div>
@@ -157,17 +157,32 @@
                 </div>
                 <div class="col-md-9">
                   <div class="mb-4">
-                    <label class="form-label">Category name</label>
+                    <label class="form-label">Color name</label>
                     <input
                       type="text"
                       placeholder="Type here"
                       class="form-control"
                       name="name"
                       required
+                      value = "{{color.color_name}}"
                     
                     />
                   </div>
                 </div>
+                <div class="col-md-3"></div>
+                <div class="col-md-9">
+                    <div class="mb-4">
+                      <label class="form-label">Hexcode</label>
+                      <input
+                        type="text"
+                        placeholder="Type here"
+                        class="form-control"
+                        name="hexcode"
+                        required
+                        value = "{{color.hexcode}}"
+                      />
+                    </div>
+                  </div>
               </div>
             </div>
           </div>

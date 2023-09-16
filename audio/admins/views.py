@@ -310,3 +310,44 @@ def category_deleting(request, id):
         category.unlisted = True
         category.save()
     return redirect(reverse('category_listing'))
+
+def color_listing(request):
+    context = {}
+    colors = Color.objects.all()
+    context['colors'] = colors
+    return render(request, 'admins/color/color.html', context)
+
+def color_adding(request):
+    if request.method == "POST":
+        name = request.POST.get('name')
+        hexcode = request.POST.get('hexcode')
+        if Color.objects.filter(color_name = name).exists() or Color.objects.filter(hexcode = hexcode):
+            messages.warning(request, 'Color already exists!')
+            return redirect(reverse('color_adding'))
+        else:
+            try:
+                Color.objects.create(color_name = name, hexcode = hexcode)
+                messages.success(request, 'Color added sucessfully!')
+                return redirect(reverse('color_listing'))
+            except Exception as e:
+                return HttpResponse(e)
+    return render(request, 'admins/color/add_color.html')
+
+def color_editing(request, id):
+    context = {}
+    color = Color.objects.get(id = id)
+    context['color'] = color
+    if request.method == "POST":
+        name = request.POST.get('name')
+        hexcode = request.POST.get('hexcode')
+        try:
+            color.color_name = name
+            color.hexcode = hexcode
+            color.save()
+            messages.success(request, 'Edited Successfully!')
+            return redirect(reverse('color_listing'))
+        except Exception as e:
+            return HttpResponse(e)
+
+    return render(request, 'admins/color/edit_color.html', context)
+
