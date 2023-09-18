@@ -137,7 +137,7 @@
         </ul>
     </div>
 </header>
-  <form method="post">
+  <form method="post" enctype="multipart/form-data">
     {% csrf_token %} {% include "base/message.html" %}
     <section class="content-main">
       <div class="row">
@@ -302,64 +302,80 @@
                 <!-- col-md-9 end -->
               </div>
               <!-- row end -->
+              <style>
+                .media_image{
+                  width: 200px;
+                  height : 200px;
+                }
+              </style>
               <hr class="mb-4 mt-0" />
               <div class="row">
                 <div class="col-md-3">
                   <h6>4. Media</h6>
                 </div>
-                <div class="col-md-9">
-                  <div class="mb-4">
-                    <label class="form-label">Main Images</label>
-                    <input
-                      class="form-control"
-                      type="text"
-                      name="main_image"
-                      required
-                      value = "{{product.main_image}}"
-                    />
-                  </div>
+                <!-- Main Image -->
+                    <div class="col-md-9">
+                      <div class="mb-4">
+                        <label class="form-label">Main Image</label>
+                        <input
+                          class="form-control"
+                          type="file"
+                          name="main_image"
+                          id="main_image_input"
+                          value="{{ product.main_image.url }}"
+                        />
+                        <img src="{{ product.main_image.url }}" alt="Main Image" id="main_image_preview" class="media_image">
+                      </div>
+                    </div>
+
+                    <!-- Side Image -->
+                    <div class="col-md-3"></div>
+                    <div class="col-md-9">
+                      <div class="mb-4">
+                        <label class="form-label">Side Image</label>
+                        <input
+                          class="form-control"
+                          type="file"
+                          name="side_image"
+                          id="side_image_input"
+                          {% if image.image_side %} value="{{ image.image_side.url }}"{% endif %}
+                        />
+                        <img src="{{ image.image_side.url }}" alt="Side Image" id="side_image_preview" class="media_image">
+                      </div>
+                    </div>
+
+                    <!-- Up Image -->
+                    <div class="col-md-3"></div>
+                    <div class="col-md-9">
+                      <div class="mb-4">
+                        <label class="form-label">Up Image</label>
+                        <input
+                          class="form-control"
+                          type="file"
+                          name="up_image"
+                          id="up_image_input"
+                          {% if image.image_up %} value="{{ image.image_up.url }}"{% endif %}
+                        />
+                        <img src="{{ image.image_up.url }}" alt="Up Image" id="up_image_preview" class="media_image">
+                      </div>
+                    </div>
+
+                    <!-- Back Image -->
+                    <div class="col-md-3"></div>
+                    <div class="col-md-9">
+                      <div class="mb-4">
+                        <label class="form-label">Back Image</label>
+                        <input
+                          class="form-control"
+                          type="file"
+                          name="back_image"
+                          id="back_image_input"
+                          value= "{{ image.image_back.url }} "
+                        />
+                        <img src="{{ image.image_back.url }}" alt="Back Image" id="back_image_preview" class="media_image">
+                      </div>
+                    </div>
                 </div>
-                <div class="col-md-3"></div>
-                <div class="col-md-9">
-                  <div class="mb-4">
-                    <label class="form-label">Side Images</label>
-                    <input
-                      class="form-control"
-                      type="text"
-                      name="side_image"
-                      required
-                      value = "{{image.image_side}}"
-                    />
-                  </div>
-                </div>
-                <div class="col-md-3"></div>
-                <div class="col-md-9">
-                  <div class="mb-4">
-                    <label class="form-label">Up Images</label>
-                    <input
-                      class="form-control"
-                      type="text"
-                      name="up_image"
-                      required
-                      value = "{{image.image_up}}"
-                    />
-                  </div>
-                </div>
-                <div class="col-md-3"></div>
-                <div class="col-md-9">
-                  <div class="mb-4">
-                    <label class="form-label">Back Images</label>
-                    <input
-                      class="form-control"
-                      type="text"
-                      name="back_image"
-                      required
-                      value = "{{image.image_back}}"
-                    />
-                  </div>
-                </div>
-                
-                
                 </div>
                 <!-- col-md-9 end -->
               </div>
@@ -401,4 +417,31 @@
   src="{% static 'admins/assets/js/main.js' %}"
   type="text/javascript"
 ></script>
+
+<script>
+  // Function to handle image input changes
+  function handleImageInputChange(inputId, previewId) {
+    const imageInput = document.getElementById(inputId);
+    const imagePreview = document.getElementById(previewId);
+    const initialValue = imageInput.value;
+
+    imageInput.addEventListener("change", (event) => {
+      const selectedFile = event.target.files[0];
+      if (selectedFile) {
+        const objectURL = URL.createObjectURL(selectedFile);
+        imageInput.value = objectURL;
+        imagePreview.src = objectURL;
+      } else {
+        imageInput.value = initialValue;
+        imagePreview.src = initialValue;
+      }
+    });
+  }
+
+  // Call the function for each image input and preview
+  handleImageInputChange("main_image_input", "main_image_preview");
+  handleImageInputChange("side_image_input", "side_image_preview");
+  handleImageInputChange("up_image_input", "up_image_preview");
+  handleImageInputChange("back_image_input", "back_image_preview");
+</script>
 {% endblock content %}

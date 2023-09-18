@@ -11,7 +11,7 @@ from .utils import send_forgot_pass_token
 # Create your views here.
 
 def register(request):
-    if request.user.is_authenticated and user.is_staff is False:
+    if request.user.is_authenticated and request.user.is_staff is False:
         return redirect('/')
     if request.method == "POST":
         firstname = request.POST.get('fname')

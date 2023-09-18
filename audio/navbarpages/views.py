@@ -1,5 +1,5 @@
 from django.shortcuts import render,render
-from products.models import Product,Product_image,Category,Size,Color
+from products.models import Product,Product_image,Category,Size,Color,Brand
 
 # Create your views here.
 def home(request):
@@ -12,13 +12,14 @@ def shop_listing(request):
     context = {}
     product_obj = Product.objects.filter(is_selling = True)
     categories = Category.objects.filter(unlisted = False)
+    brands = Brand.objects.filter(unlisted = False)
     sizes = Size.objects.all()
     color = Color.objects.all()
     context['products'] = product_obj
     context['categories'] = categories
     context['sizes'] = sizes
     context['colors'] = color
-
+    context['brands'] = brands
     return render(request, 'navbarpages/shop.html', context)
 
 def product_detail(request, uid):

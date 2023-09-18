@@ -64,11 +64,13 @@ def product_adding(request):
         color = request.POST.get('color')
         brand = request.POST.get('brand')
         size = request.POST.get('size')
-        image = request.POST.get('image')
         category = request.POST.get('category')
-        image_side = request.POST.get('side_image')
-        image_back = request.POST.get('back_image')
-        image_up = request.POST.get('up_iamge')
+        
+        image = request.FILES.get('main_image')
+        image_side = request.FILES.get('side_image')
+        image_back = request.FILES.get('back_image')
+        image_up = request.FILES.get('up_image')
+       
         try:
             color_obj = Color.objects.get(color_name = color)
             brand_obj = Brand.objects.get(brand_name = brand)
@@ -77,18 +79,18 @@ def product_adding(request):
             product_obj = Product.objects.filter(name = name,description = description,selling_price = selling_price, color = color_obj,brand = brand_obj, size =size_obj,main_image =image, category = category_obj)
         except Exception as e:
             return HttpResponse(e)
-        if product_obj.exists():
+        if Product.objects.filter(name = name,description = description,selling_price = selling_price, color = color_obj,brand = brand_obj, size =size_obj,main_image =image, category = category_obj).exists():
             messages.warning(request, 'Product already exist!')
             return redirect(reverse('product_adding'))
         elif not product_obj.exists():
-            try:
-                Product.objects.create(name = name, description = description, price = price, selling_price = selling_price, stock = stock,color = color_obj,brand = brand_obj,main_image = image,category = category_obj,size = size_obj)
-                product_obj = Product.objects.get(name = name, description = description, price = price, selling_price = selling_price, stock = stock,color = color_obj,brand = brand_obj,main_image = image,category = category_obj,size = size_obj)
-                Product_image.objects.create(product = product_obj, image_side = image_side, image_back = image_back, image_up = image_up)
-                messages.success(request, 'Product added successfully!')
-                return redirect(reverse('product_adding'))
-            except Exception as e:
-                return HttpResponse(e)
+            # try:
+            Product.objects.create(name = name, description = description, price = price, selling_price = selling_price, stock = stock,color = color_obj,brand = brand_obj,main_image = image,category = category_obj,size = size_obj)
+            product_obj = Product.objects.get(name = name, description = description, price = price, selling_price = selling_price, stock = stock,color = color_obj,brand = brand_obj,category = category_obj,size = size_obj)
+            Product_image.objects.create(product = product_obj, image_side = image_side, image_back = image_back, image_up = image_up)
+            messages.success(request, 'Product added successfully!')
+            return redirect(reverse('product_adding'))
+            # except Exception as e:
+            #     return HttpResponse(e)
 
 
     categories = Category.objects.all()
@@ -193,7 +195,7 @@ def staff_adding(request):
 
     return render(request, 'admins/staff_register.html')
 
-def product_editing(request , uid):
+def product_editing(request , uid): 
     context = {}
     products = Product.objects.get(uid = uid)
     image = Product_image.objects.get(product = products)
@@ -211,33 +213,52 @@ def product_editing(request , uid):
         color = request.POST.get('color')
         brand = request.POST.get('brand')
         size = request.POST.get('size')
-        main_image = request.POST.get('main_image')
+        main_image = request.FILES.get('main_image') if 'main_image' in request.FILES else None
         category = request.POST.get('category')
-        image_side = request.POST.get('side_image')
-        image_back = request.POST.get('back_image')
-        image_up = request.POST.get('up_image')
+        side_image = request.FILES.get('side_image') if 'side_image' in request.FILES else None
+        back_image = request.FILES.get('back_image') if 'back_image' in request.FILES else None
+        up_image = request.FILES.get('up_image') if 'up_image' in request.FILES else None
+
         try:
-            size_instance = Size.objects.get(size = size)
-            color_instance = Color.objects.get(color_name = color)
-            brand_instance = Brand.objects.get(brand_name = brand)
-            category_instance = Category.objects.get(category_name = category)
+            size_instance = Size.objects.get(size=size)
+            color_instance = Color.objects.get(color_name=color)
+            brand_instance = Brand.objects.get(brand_name=brand)
+            category_instance = Category.objects.get(category_name=category)
+
             products.name = name
             products.description = description
             products.size = size_instance
-            products.main_image = main_image
+            if main_image is not None:
+                products.main_image = main_image
             products.stock = stock
             products.color = color_instance
             products.brand = brand_instance
             products.category = category_instance
             products.price = price
             products.selling_price = selling_price
-            image.image_side = image_side
-            image.image_back = image_back
-            image.image_up = image_up
+
+            if side_image is not None:
+                image.image_side = side_image
+            if back_image is not None:
+                image.image_back = back_image
+            if up_image is not None:
+                image.image_up = up_image
+
             products.save()
+            if main_image is not None:
+                products.main_image.save(main_image.name, main_image)
+
             image.save()
+            if side_image is not None:
+                image.image_side.save(side_image.name, side_image)
+            if back_image is not None:
+                image.image_back.save(back_image.name, back_image)
+            if up_image is not None:
+                image.image_up.save(up_image.name, up_image)
+
             messages.success(request, 'Edited Successfully!')
             return redirect(reverse('product_listing'))
+            
         except Exception as e:
             return HttpResponse(e)
         
@@ -248,7 +269,8 @@ def product_editing(request , uid):
     context['product'] = products
     context['image'] = image
 
-    return render(request, 'admins/product_editing.html', context)   
+    return render(request, 'admins/product_editing.html', context)
+
 
 def product_unlisting(request, uid):
     try:

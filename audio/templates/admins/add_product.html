@@ -150,14 +150,14 @@
         </ul>
     </div>
 </header>
-  <form method="post">
+  <form method="post" enctype="multipart/form-data">
     {% csrf_token %} {% include "base/message.html" %}
     <section class="content-main">
       <div class="row">
         <div class="col-6">
           <div class="content-header">
             <h2 class="content-title">Add New Product</h2>
-            <button class="btn btn-md rounded font-sm hover-up h-auto">
+            <button class="btn btn-md rounded font-sm hover-up h-auto" type="submit">
               Add
             </button>
           </div>
@@ -307,7 +307,7 @@
                     <label class="form-label">Main Images</label>
                     <input
                       class="form-control"
-                      type="text"
+                      type="file"
                       name="main_image"
                       required
                     />
@@ -319,7 +319,7 @@
                     <label class="form-label">Side Images</label>
                     <input
                       class="form-control"
-                      type="text"
+                      type="file"
                       name="side_image"
                       required
                     />
@@ -331,7 +331,7 @@
                     <label class="form-label">Up Images</label>
                     <input
                       class="form-control"
-                      type="text"
+                      type="file"
                       name="up_image"
                       required
                     />
@@ -343,7 +343,7 @@
                     <label class="form-label">Back Images</label>
                     <input
                       class="form-control"
-                      type="text"
+                      type="file"
                       name="back_image"
                       required
                     />

@@ -1,5 +1,9 @@
 from django.db import models
+from django.http import HttpResponse
 from base.models import BaseModel
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from PIL import Image
 # Create your models here.
 
 class Category(models.Model):
@@ -38,7 +42,7 @@ class Color(models.Model):
 class Product(BaseModel):
     name = models.CharField(max_length=100)
     description = models.TextField()
-    main_image = models.CharField(max_length=255)
+    main_image = models.ImageField(upload_to='product_images')
     price = models.DecimalField(max_digits=7, decimal_places=2)
     selling_price = models.DecimalField(max_digits=7, decimal_places=2)
     brand = models.ForeignKey(Brand, related_name='brand_of_product', on_delete=models.CASCADE)
@@ -56,12 +60,33 @@ class Product(BaseModel):
 
 class Product_image(models.Model):
     product = models.OneToOneField(Product, on_delete=models.CASCADE)
-    image_side = models.CharField(max_length=255, null=True, blank=True)
-    image_back = models.CharField(max_length=255, null=True, blank=True)
-    image_up = models.CharField(max_length=255, null=True, blank=True)
+    image_side = models.ImageField(upload_to='product_images')
+    image_back = models.ImageField(upload_to='product_images')
+    image_up = models.ImageField(upload_to='product_images')
 
     
 
     def __str__(self):
         return self.product.name
-    
+
+
+@receiver(post_save, sender=Product_image)
+def resize_images(sender, instance, **kwargs):
+    # Open the image file
+    main_img = Image.open(instance.product.main_image.path)
+    side_img = Image.open(instance.image_side.path)
+    back_img = Image.open(instance.image_back.path)
+    up_img = Image.open(instance.image_up.path)
+
+    # Resize the images
+    main_img = main_img.resize((840, 840), Image.LANCZOS)
+    side_img = side_img.resize((840, 840), Image.LANCZOS)
+    back_img = back_img.resize((840, 840), Image.LANCZOS)
+    up_img = up_img.resize((840, 840), Image.LANCZOS)
+
+    # Save the images
+    main_img.save(instance.product.main_image.path)
+    side_img.save(instance.image_side.path)
+    back_img.save(instance.image_back.path)
+    up_img.save(instance.image_up.path)
+

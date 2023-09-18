@@ -92,7 +92,17 @@
                         <div class="sidebar-categories">
                             <ul>
                                 {% for category in categories %}
-                                <li><a href="#">{{category}} </a></li>
+                                <li><a href="#">{{category.category_name}} </a></li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="sidebar-widget mb-45">
+                        <h3 class="sidebar-title">Brands</h3>
+                        <div class="sidebar-categories">
+                            <ul>
+                                {% for brand in brands %}
+                                <li><a href="#">{{brand.brand_name}} </a></li>
                                 {% endfor %}
                             </ul>
                         </div>
@@ -155,7 +165,7 @@
                                         <div class="product-wrapper product-box-style mb-30">
                                             <div class="product-img">
                                                 <a href="/product/detail/{{product.uid}}">
-                                                    <img src="{{product.main_image}}" alt="">
+                                                    <img src="{{product.main_image.url}}" alt="">
                                                 </a>
                                                 
                                                 <div class="product-action">
@@ -196,7 +206,7 @@
                                         <div class="product-wrapper mb-30 single-product-list product-list-right-pr mb-60">
                                             <div class="product-img list-img-width">
                                                 <a href="/product/detail/{{ product.uid }}">
-                                                    <img src="{{product.main_image}}" alt="">
+                                                    <img src="{{product.main_image.url}}" alt="">
                                                 </a>
                                                 
                                                 <div class="product-action-list-style">
