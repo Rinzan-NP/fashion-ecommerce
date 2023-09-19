@@ -40,43 +40,37 @@ def register(request):
     
     return render(request, 'accounts/register.html')
 
-
 def logining(request):
-    if request.user.is_authenticated and request.user.is_staff is False:
+    if request.user.is_authenticated and not request.user.is_staff:
         return redirect('/')
+    
     if request.method == 'POST':
         email = request.POST.get('email')
         password = request.POST.get('password')
-        user = User.objects.filter(username = email)
-        user_obj = User.objects.get(username = email)
-        
-        if not user.exists():
+        user = User.objects.filter(username=email).first()
+
+        if not user:
             messages.warning(request, 'Account not found.')
             return HttpResponseRedirect(request.path_info)
 
-
-        elif not user[0].profile.email_verified:
+        if not user.profile.email_verified:
             messages.warning(request, 'Your account is not verified.')
             return HttpResponseRedirect(request.path_info)
-        
-        elif user[0].profile.is_blocked is True:
+
+        if user.profile.is_blocked:
             messages.warning(request, 'Your account has been blocked.')
             return HttpResponseRedirect(request.path_info)
 
+        authenticated_user = authenticate(username=email, password=password)
         
-        elif user and user_obj.is_staff is False and user[0].profile.email_verified:
-            user = authenticate(username = email , password= password)
-            login(request , user)
+        if authenticated_user is not None and not authenticated_user.is_staff:
+            login(request, authenticated_user)
             return redirect('/')
-
         
-
         messages.warning(request, 'Invalid credentials')
         return HttpResponseRedirect(request.path_info)
 
-
-    return render(request ,'accounts/login.html')
-
+    return render(request, 'accounts/login.html')
 
 def verify_email(request, email_token):
     try:
@@ -93,12 +87,10 @@ def verify_email(request, email_token):
     except Profile.DoesNotExist:
         return HttpResponse('Invalid Email token') 
 
-
 def logouting(request):
     if request.user.is_authenticated:
         logout(request)
     return redirect('/') 
-
 
 def verify_account(request):
     if request.method == "POST":
@@ -134,33 +126,32 @@ def verify_account(request):
 def change_password(request, forgot_password_token):
     context = {}
     try:
-        user = Profile.objects.get(forgot_password_token = forgot_password_token)
+        profile = Profile.objects.get(forgot_password_token=forgot_password_token)
         
-        token_expiration = user.forgot_password_token_created_at + timedelta(minutes=2)
+        token_expiration = profile.forgot_password_token_created_at + timedelta(minutes=2)
         if timezone.now() > token_expiration:
-            messages.warning(request, "Forgot password timeout ,please try again!")
+            messages.warning(request, "Forgot password timeout, please try again!")
             return redirect(reverse('logining'))
         else:
             if request.method == "POST":
-                username = request.POST.get('email')
-                password = request.POST.get('pass1')
+                new_password = request.POST.get('pass1')
                 re_password = request.POST.get('pass2')
-                if password == re_password and len(password) < 8:
-                    messages.warning(request, "Passwords must be minimum of 8 length.")  
-                elif password == re_password and len(password)  > 8:
-                    user = User.objects.get(username=username)
-                    user.set_password(password)
+                if new_password == re_password and len(new_password) < 8:
+                    messages.warning(request, "Passwords must be a minimum of 8 characters.")  
+                elif new_password == re_password and len(new_password) >= 8:
+                    # Set the new password securely for the associated User
+                    user = profile.user
+                    user.set_password(new_password)
                     user.save()
                     messages.success(request, "Password changed successfully")
                     return redirect('/account/login')
-
-
-
             else:
-                context['user_id'] = user.user.username 
+                context['user_id'] = profile.user.username
                 return render(request, 'accounts/forgot_pass.html', context)       
+    except Profile.DoesNotExist:
+        messages.warning(request, "Profile not found.")
+        return redirect(reverse('logining'))
     except Exception as e:
-
         return HttpResponse(e)
         
 def email_verification(request):
