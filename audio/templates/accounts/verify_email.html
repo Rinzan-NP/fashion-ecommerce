@@ -1,6 +1,6 @@
 {% extends 'base/base.html' %} {% load static %} {% block head %}
 
-<title>Login</title>
+<title>Verify account</title>
 
 
 <link rel="stylesheet" href="{% static 'account/css/style.css' %}" />
@@ -19,22 +19,7 @@
           <div class="login-wrap p-4 p-md-5">
             <div class="d-flex">
               <div class="w-100">
-                <h3 class="mb-4">Login</h3>
-              </div>
-              
-              <div class="w-100">
-                <p class="social-media d-flex justify-content-end">
-                  <a
-                    href="#"
-                    class="social-icon d-flex align-items-center justify-content-center"
-                    ><span class="fa fa-facebook"></span
-                  ></a>
-                  <a
-                    href="#"
-                    class="social-icon d-flex align-items-center justify-content-center"
-                    ><span class="fa fa-twitter"></span
-                  ></a>
-                </p>
+                <h3 class="mb-4">Verify account</h3>
               </div>
             </div>
             {% include 'base/message.html' %}
@@ -53,31 +38,14 @@
               </div>
               
               
-              <div class="form-group mb-3">
-                <label class="label" for="password">Password</label>
-                <input
-                  type="password"
-                  class="form-control"
-                  placeholder="Password"
-                  required
-                  name="password"
-                />
-              </div>
-              <p class="text-end  text-primary fs-8">
-                <a  class="text-decoration-none" href="/account/verify_account">Forgotten password ?</a>
-             </p>
+              
+              
               
               <div class="form-group">
-                <button type="submit" class="form-control btn btn-primary rounded submit px-3 ">Log in</button>
+                <button type="submit" class="form-control btn btn-primary rounded submit px-3 ">Verify</button>
               </div>
             </form>
-            <p class="text-center">
-              New Customer? <a  class="text-decoration-none" href="/account/register">Sign up</a>
-            </p>
             
-            <p class="text-center">
-              Account <a  href="/account/verify_email"  class="text-decoration-none">not verified ?</a>
-           </p>
           </div>
         </div>
       </div>

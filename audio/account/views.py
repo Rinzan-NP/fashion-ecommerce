@@ -6,7 +6,9 @@ from django.contrib.auth.models import User
 from django.contrib import messages
 from . models import Profile
 from django.urls import reverse
-from .utils import send_forgot_pass_token
+from .utils import send_account_activation_email, send_forgot_pass_token
+from django.utils import timezone
+from datetime import timedelta 
 
 # Create your views here.
 
@@ -79,6 +81,11 @@ def logining(request):
 def verify_email(request, email_token):
     try:
         user = Profile.objects.get(email_token=email_token)
+        token_expiration = user.email_token_created_at + timedelta(minutes=2)
+        if timezone.now() > token_expiration:
+            messages.warning(request, "Token has been  expired please try again")
+            return redirect(reverse('logining'))
+        
         user.email_verified = True
         user.save()
         messages.success(request, 'Your account is  verified.')
@@ -114,6 +121,7 @@ def verify_account(request):
             user_obj = User.objects.get(username = email)
             profile_obj = Profile.objects.get(user = user_obj)
             profile_obj.forgot_password_token = forgot_password_token
+            profile_obj.forgot_password_token_created_at = timezone.now()
             profile_obj.save()
             
             # sending message and mail
@@ -128,26 +136,61 @@ def change_password(request, forgot_password_token):
     try:
         user = Profile.objects.get(forgot_password_token = forgot_password_token)
         
-
-        if request.method == "POST":
-            username = request.POST.get('email')
-            password = request.POST.get('pass1')
-            re_password = request.POST.get('pass2')
-            if password == re_password and len(password) < 8:
-                messages.warning(request, "Passwords must be minimum of 8 length.")  
-            elif password == re_password and len(password)  > 8:
-                user = User.objects.get(username=username)
-                user.set_password(password)
-                user.save()
-                messages.success(request, "Password changed successfully")
-                return redirect('/account/login')
-
-
-
+        token_expiration = user.forgot_password_token_created_at + timedelta(minutes=2)
+        if timezone.now() > token_expiration:
+            messages.warning(request, "Forgot password timeout ,please try again!")
+            return redirect(reverse('logining'))
         else:
-            context['user_id'] = user.user.username 
-            return render(request, 'accounts/forgot_pass.html', context)       
+            if request.method == "POST":
+                username = request.POST.get('email')
+                password = request.POST.get('pass1')
+                re_password = request.POST.get('pass2')
+                if password == re_password and len(password) < 8:
+                    messages.warning(request, "Passwords must be minimum of 8 length.")  
+                elif password == re_password and len(password)  > 8:
+                    user = User.objects.get(username=username)
+                    user.set_password(password)
+                    user.save()
+                    messages.success(request, "Password changed successfully")
+                    return redirect('/account/login')
+
+
+
+            else:
+                context['user_id'] = user.user.username 
+                return render(request, 'accounts/forgot_pass.html', context)       
     except Exception as e:
 
         return HttpResponse(e)
         
+def email_verification(request):
+    if request.method == "POST":
+        email = request.POST.get('email')
+        try:
+            user = User.objects.get(email = email)
+            profile = Profile.objects.get(user = user)
+            if profile.email_verified is True:
+                messages.success(request,"Email is already verified!")
+                return redirect(reverse('logining'))
+            else:
+                try:
+                    profile = Profile.objects.get(user = user)
+                    email_token = str(uuid.uuid4())
+                    email = user.email
+                    profile.email_token = email_token
+                    profile.email_token_created_at = timezone.now()
+                    profile.save()
+                    username = user.first_name
+                    
+                    send_account_activation_email(email, email_token, username)
+                    messages.success(request, "An email has been sended to your account!")
+                    return redirect(reverse('logining'))
+                except Exception as e:
+                    return HttpResponse(e)
+
+        except Exception as e:
+            messages.warning(request, "account doesnt exist!")
+            return redirect(reverse('verify_email_account'))
+
+    return render(request, 'accounts/verify_email.html')
+
