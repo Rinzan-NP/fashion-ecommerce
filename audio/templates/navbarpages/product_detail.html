@@ -5,14 +5,28 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Oswald:wght@600&family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> 
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
 {% endblock head %} {% block content %}
+<style>
+    .product-details-small a img,
+.product-details-large .tab-pane img {
+    transition: transform 0.3s;
+    transform-origin: center center; /* Set the transform origin to the center */
+}
 
+.product-details-small a:hover img,
+.product-details-large .tab-pane:hover img {
+    transform: scale(0.8); /* Adjust the zoom factor as needed (0.8 means 80% of the original size) */
+}
+</style>
 
 
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark static-top">
     <div class="container">
-      <a class="navbar-brand text-white ml-3 " href="#" height="36" style="font-family: 'Oswald', sans-serif;">
+      <a class="navbar-brand text-white ml-3 " href="/" height="36" style="font-family: 'Oswald', sans-serif;">
         FASHION
       </a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -33,6 +47,8 @@
             <a class="nav-link" href="/contact">Contact Us</a>
           </li>
           {% if request.user.is_authenticated %}
+          <li><a class="nav-link" href="/account/wishlist/{{user.profile.uid}}">Wishlist</a></li>
+          <li><a class="nav-link" href="/account/cart/{{user.profile.uid}}">Cart</a></li>
           <li><a class="nav-link" href="/account/logouting/">Logout</a></li>
           {% else %}
             <li><a class="nav-link" href="/account/register/">Sign Up</a></li>
@@ -67,31 +83,23 @@
                         </div>
                         <div class="product-details-large tab-content">
                             <div class="tab-pane active show fade" id="pro-details1" role="tabpanel">
-                                <div class="easyzoom easyzoom--overlay is-ready">
-                                    <a href="{{products.main_image.url}}">
+                                <div class="">
                                         <img src="{{products.main_image.url}}" alt="">
-                                    </a>
                                 </div>
                             </div>
                             <div class="tab-pane fade" id="pro-details2" role="tabpanel">
-                                <div class="easyzoom easyzoom--overlay is-ready">
-                                    <a href="{{images.image_side.url}}">
-                                        <img src="{{images.image_side.url}}" alt="">
-                                    </a>
+                                <div class="">   
+                                    <img src="{{images.image_side.url}}" alt="">
                                 </div>
                             </div>
                             <div class="tab-pane fade" id="pro-details3" role="tabpanel">
-                                <div class="easyzoom easyzoom--overlay is-ready">
-                                    <a href="{{images.image_up.url}}">
-                                        <img src="{{images.image_up.url}}" alt="">
-                                    </a>
+                                <div class="">                                
+                                        <img src="{{images.image_up.url}}" alt="">                                 
                                 </div>
                             </div>
                             <div class="tab-pane fade" id="pro-details4" role="tabpanel">
-                                <div class="easyzoom easyzoom--overlay  is-ready">
-                                    <a href="{{images.image_back.url}}">
-                                        <img src="{{images.image_back.url}}" alt="">
-                                    </a>
+                                <div class="">                           
+                                        <img src="{{images.image_back.url}}" alt="">                            
                                 </div>
                             </div>
                         </div>
@@ -142,7 +150,22 @@
                             <a class="btn-hover-black" href="#">add to cart</a>
                         </div>
                         <div class="quickview-btn-wishlist">
-                            <a class="btn-hover" href="#"><i class="pe-7s-like"></i></a>
+                            {% if request.user.is_authenticated and request.user.is_staff is False %} 
+                                {% if products in wishlist %}
+                                    <a href="/product/wishlist/{{user.profile.uid}}/{{products.uid}}" class="btn-hover text-danger">
+                                        <i class="pe-7s-like text-danger"></i>
+                                    </a>
+                                {% else %}
+                                    <a href="/product/wishlist/{{user.profile.uid}}/{{products.uid}}" class="btn-hover ">
+                                        <i class="pe-7s-like"></i>
+                                    </a>
+                                {% endif %}
+                            {% else %}
+                                <a class="animate-left" title="Wishlist" href="/account/login/">
+                                    <i class="pe-7s-like"></i>
+                                </a>
+                            {% endif %}
+                            
                         </div>
                     </div>
                     <div class="product-details-cati-tag mt-35">
@@ -213,164 +236,41 @@
         </div>
         <div class="product-style">
             <div class="related-product-active owl-carousel">
+                {% for product in category_products %}
                 <div class="product-wrapper">
                     <div class="product-img">
-                        <a href="#">
-                            <img src="{% static "assets/img/product/fashion-colorful/1.jpg" %}" alt="">
+                        <a href="/product/detail/{{product.uid}}">
+                            <img src="{{product.main_image.url}}" alt="">
                         </a>
-                        <span>hot</span>
+                        
                         <div class="product-action">
-                            <a class="animate-left" title="Wishlist" href="#">
-                                <i class="pe-7s-like"></i>
+                            {% if request.user.is_authenticated and request.user.is_staff is False%}
+                            <a class="animate-left" title="Wishlist" href="/product/wishlist/{{user.profile.uid}}/{{product.uid}}">
+                              {% if product in wishlist %}
+                              <i class="pe-7s-like text-danger"></i>
+                              {% else %}
+                              <i class="pe-7s-like"></i>
+                              {% endif %}
                             </a>
                             <a class="animate-top" title="Add To Cart" href="#">
-                                <i class="pe-7s-cart"></i>
+                              <i class="pe-7s-cart"></i>
                             </a>
-                            <a class="animate-right" title="Quick View" data-bs-toggle="modal" data-bs-target="#exampleModal" href="#">
-                                <i class="pe-7s-look"></i>
+                            {% else %}
+                            <a class="animate-left" title="Wishlist" href="/account/login/">
+                              <i class="pe-7s-like"></i>
                             </a>
+                            <a class="animate-top" title="Add To Cart" href="/account/login/">
+                              <i class="pe-7s-cart"></i>
+                            </a>
+                            {% endif %}
                         </div>
                     </div>
                     <div class="product-content">
-                        <h4><a href="#">Arifo Stylas Dress</a></h4>
-                        <span>$115.00</span>
+                        <h4><a href="/product/detail/{{product.uid}}">{{product.name}}</a></h4>
+                        <span>Rs{{product.selling_price}}</span>
                     </div>
                 </div>
-                <div class="product-wrapper">
-                    <div class="product-img">
-                        <a href="#">
-                            <img src="{% static "assets/img/product/fashion-colorful/2.jpg" %}" alt="">
-                        </a>
-                        <div class="product-action">
-                            <a class="animate-left" title="Wishlist" href="#">
-                                <i class="pe-7s-like"></i>
-                            </a>
-                            <a class="animate-top" title="Add To Cart" href="#">
-                                <i class="pe-7s-cart"></i>
-                            </a>
-                            <a class="animate-right" title="Quick View" data-bs-toggle="modal" data-bs-target="#exampleModal" href="#">
-                                <i class="pe-7s-look"></i>
-                            </a>
-                        </div>
-                    </div>
-                    <div class="product-content">
-                        <h4><a href="#">Arifo Stylas Dress</a></h4>
-                        <span>$115.00</span>
-                    </div>
-                </div>
-                <div class="product-wrapper">
-                    <div class="product-img">
-                        <a href="#">
-                            <img src="{% static "assets/img/product/fashion-colorful/3.jpg" %}" alt="">
-                        </a>
-                        <span>hot</span>
-                        <div class="product-action">
-                            <a class="animate-left" title="Wishlist" href="#">
-                                <i class="pe-7s-like"></i>
-                            </a>
-                            <a class="animate-top" title="Add To Cart" href="#">
-                                <i class="pe-7s-cart"></i>
-                            </a>
-                            <a class="animate-right" title="Quick View" data-bs-toggle="modal" data-bs-target="#exampleModal" href="#">
-                                <i class="pe-7s-look"></i>
-                            </a>
-                        </div>
-                    </div>
-                    <div class="product-content">
-                        <h4><a href="#">Arifo Stylas Dress</a></h4>
-                        <span>$115.00</span>
-                    </div>
-                </div>
-                <div class="product-wrapper">
-                    <div class="product-img">
-                        <a href="#">
-                            <img src="{% static "assets/img/product/fashion-colorful/4.jpg" %}" alt="">
-                        </a>
-                        <div class="product-action">
-                            <a class="animate-left" title="Wishlist" href="#">
-                                <i class="pe-7s-like"></i>
-                            </a>
-                            <a class="animate-top" title="Add To Cart" href="#">
-                                <i class="pe-7s-cart"></i>
-                            </a>
-                            <a class="animate-right" title="Quick View" data-bs-toggle="modal" data-bs-target="#exampleModal" href="#">
-                                <i class="pe-7s-look"></i>
-                            </a>
-                        </div>
-                    </div>
-                    <div class="product-content">
-                        <h4><a href="#">Arifo Stylas Dress</a></h4>
-                        <span>$115.00</span>
-                    </div>
-                </div>
-                <div class="product-wrapper">
-                    <div class="product-img">
-                        <a href="#">
-                            <img src="{% static "assets/img/product/fashion-colorful/5.jpg" %}" alt="">
-                        </a>
-                        <span>hot</span>
-                        <div class="product-action">
-                            <a class="animate-left" title="Wishlist" href="#">
-                                <i class="pe-7s-like"></i>
-                            </a>
-                            <a class="animate-top" title="Add To Cart" href="#">
-                                <i class="pe-7s-cart"></i>
-                            </a>
-                            <a class="animate-right" title="Quick View" data-bs-toggle="modal" data-bs-target="#exampleModal" href="#">
-                                <i class="pe-7s-look"></i>
-                            </a>
-                        </div>
-                    </div>
-                    <div class="product-content">
-                        <h4><a href="#">Arifo Stylas Dress</a></h4>
-                        <span>$115.00</span>
-                    </div>
-                </div>
-                <div class="product-wrapper">
-                    <div class="product-img">
-                        <a href="#">
-                            <img src="{% static "assets/img/product/fashion-colorful/1.jpg" %}" alt="">
-                        </a>
-                        <div class="product-action">
-                            <a class="animate-left" title="Wishlist" href="#">
-                                <i class="pe-7s-like"></i>
-                            </a>
-                            <a class="animate-top" title="Add To Cart" href="#">
-                                <i class="pe-7s-cart"></i>
-                            </a>
-                            <a class="animate-right" title="Quick View" data-bs-toggle="modal" data-bs-target="#exampleModal" href="#">
-                                <i class="pe-7s-look"></i>
-                            </a>
-                        </div>
-                    </div>
-                    <div class="product-content">
-                        <h4><a href="#">Arifo Stylas Dress</a></h4>
-                        <span>$115.00</span>
-                    </div>
-                </div>
-                <div class="product-wrapper">
-                    <div class="product-img">
-                        <a href="#">
-                            <img src="{% static "assets/img/product/fashion-colorful/2.jpg" %}" alt="">
-                        </a>
-                        <span>hot</span>
-                        <div class="product-action">
-                            <a class="animate-left" title="Wishlist" href="#">
-                                <i class="pe-7s-like"></i>
-                            </a>
-                            <a class="animate-top" title="Add To Cart" href="#">
-                                <i class="pe-7s-cart"></i>
-                            </a>
-                            <a class="animate-right" title="Quick View" data-bs-toggle="modal" data-bs-target="#exampleModal" href="#">
-                                <i class="pe-7s-look"></i>
-                            </a>
-                        </div>
-                    </div>
-                    <div class="product-content">
-                        <h4><a href="#">Arifo Stylas Dress</a></h4>
-                        <span>$115.00</span>
-                    </div>
-                </div>
+                {% endfor %}
             </div>
         </div>
     </div>
@@ -631,5 +531,17 @@
     </div>
 </div>
 
+<script>
+    $(document).ready(function () {
+        // Activate the first tab by default
+        $('.product-details-small a:first').tab('show');
+    
+        // Handle tab changes to update the active class
+        $('.product-details-small a').on('click', function () {
+            $('.product-details-small a').removeClass('active');
+            $(this).addClass('active');
+        });
+    });
+</script>
 
 {% endblock content%}

@@ -28,7 +28,9 @@
                               <li><a href="/shop">Shop</a></li>
                               <li><a href="/aboutus">ABOUT US</a></li>
                               <li><a href="/contact">Contact Us</a></li>
-                              {% if request.user.is_authenticated and user.is_staff is False%}
+                              {% if request.user.is_authenticated and request.user.is_staff is False%}
+                                <li><a href="/account/wishlist/{{user.profile.uid}}">Wishlist</a></li>
+                                <li><a href="/account/cart/{{user.profile.uid}}">Cart</a></li>
                                 <li><a href="/account/logouting/">Logout</a></li>
                               {% else %}
                                 <li><a href="/account/register/">Sign Up</a></li>
@@ -89,7 +91,7 @@
               alt=""
             />
           </div>
-          <p class="animated">Create your own style for better looks.</p>
+          <p class="animated">Step into your style.</p>
         </div>
       </div>
     </div>
@@ -105,7 +107,7 @@
 
         <div class="col-md-12 col-lg-4 col-xl-4">
           <div class="banner-wrapper mrgn-negative">
-            <a href="#"
+            <a href="/shop"
               ><img src="{% static 'assets/img/banner/banner1.jpg' %}" alt="" style="height:625px"
             /></a>
             <div class="banner-wrapper2-content" style="height : 315px">
@@ -123,7 +125,7 @@
                   <img src="{% static 'assets/img/banner/9.jpg' %}" alt="" class="img-fluid" />
                 </div>
                 <div class="banner-wrapper3-content">
-                  <a href="#">Shop Now</a>
+                  <a href="/shop">Shop Now</a>
                 </div>
               </div>
             </div>
@@ -133,7 +135,7 @@
                   <img src="{% static 'assets/img/banner/casual.jpeg' %}" alt="" class="img-fluid" />
                 </div>
                 <div class="banner-wrapper3-content ">
-                  <a href="#">Shop Now</a>
+                  <a href="/shop">Shop Now</a>
                 </div>
               </div>
             </div>
@@ -143,7 +145,7 @@
                   <img src="{% static 'assets/img/banner/11.jpg' %}" alt="" class="img-fluid" />
                 </div>
                 <div class="banner-wrapper3-content">
-                  <a href="#">Shop Now</a>
+                  <a href="/shop">Shop Now</a>
                 </div>
               </div>
             </div>
@@ -153,7 +155,7 @@
                   <img src="{% static 'assets/img/banner/12.jpg' %}" alt="" class="img-fluid" />
                 </div>
                 <div class="banner-wrapper3-content">
-                  <a href="#">Shop Now</a>
+                  <a href="/shop">Shop Now</a>
                 </div>
               </div>
             </div>
@@ -183,13 +185,26 @@
               </a>
               <span>new</span>
               <div class="product-action">
-                <a class="animate-left" title="Wishlist" href="#">
+                {% if request.user.is_authenticated and request.user.is_staff is False %}
+                <a class="animate-left" title="Wishlist" href="/product/wishlist/{{user.profile.uid}}/{{product.uid}}">
+                  {% if product in wishlist %}
+                  <i class="pe-7s-like text-danger"></i>
+                  {% else %}
                   <i class="pe-7s-like"></i>
+                  {% endif %}
                 </a>
                 <a class="animate-top" title="Add To Cart" href="#">
                   <i class="pe-7s-cart"></i>
                 </a>
-              </div>
+                {% else %}
+                <a class="animate-left" title="Wishlist" href="/account/login/">
+                  <i class="pe-7s-like"></i>
+                </a>
+                <a class="animate-top" title="Add To Cart" href="/account/login/">
+                  <i class="pe-7s-cart"></i>
+                </a>
+                {% endif %}
+            </div>
             </div>
             <div class="product-content">
               <h4><a href="/product/detail/{{ product.uid }}">{{ product.name }}</a></h4>

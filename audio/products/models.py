@@ -4,6 +4,7 @@ from base.models import BaseModel
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from PIL import Image
+from account.models import Profile
 # Create your models here.
 
 class Category(models.Model):
@@ -90,3 +91,13 @@ def resize_images(sender, instance, **kwargs):
     back_img.save(instance.image_back.path)
     up_img.save(instance.image_up.path)
 
+class Wishlist(BaseModel):
+    user = models.ForeignKey(Profile, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+
+    class Meta:
+        unique_together = ('user', 'product')
+
+    def __str__(self) -> str:
+        return f'{self.user.user.username} : {self.product.name}'
+    

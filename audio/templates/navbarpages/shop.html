@@ -12,7 +12,7 @@
 
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark static-top">
     <div class="container">
-      <a class="navbar-brand text-white ml-3 " href="#" height="36" style="font-family: 'Oswald', sans-serif;">
+      <a class="navbar-brand text-white ml-3 " href="/" height="36" style="font-family: 'Oswald', sans-serif;">
         FASHION
       </a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -33,6 +33,8 @@
             <a class="nav-link" href="/contact">Contact Us</a>
           </li>
           {% if request.user.is_authenticated %}
+          <li><a class="nav-link" href="/account/wishlist/{{user.profile.uid}}">Wishlist</a></li>
+          <li><a class="nav-link" href="/account/cart/{{user.profile.uid}}">Cart</a></li>
           <li><a class="nav-link" href="/account/logouting/">Logout</a></li>
           {% else %}
             <li><a class="nav-link" href="/account/register/">Sign Up</a></li>
@@ -169,13 +171,25 @@
                                                 </a>
                                                 
                                                 <div class="product-action">
-                                                    <a class="animate-left" title="Wishlist" href="#">
-                                                        <i class="pe-7s-like"></i>
+                                                    {% if request.user.is_authenticated and request.user.is_staff is False%}
+                                                    <a class="animate-left" title="Wishlist" href="/product/wishlist/{{user.profile.uid}}/{{product.uid}}">
+                                                      {% if product in wishlist %}
+                                                      <i class="pe-7s-like text-danger"></i>
+                                                      {% else %}
+                                                      <i class="pe-7s-like"></i>
+                                                      {% endif %}
                                                     </a>
                                                     <a class="animate-top" title="Add To Cart" href="#">
-                                                        <i class="pe-7s-cart"></i>
+                                                      <i class="pe-7s-cart"></i>
                                                     </a>
-                                                    
+                                                    {% else %}
+                                                    <a class="animate-left" title="Wishlist" href="/account/login/">
+                                                      <i class="pe-7s-like"></i>
+                                                    </a>
+                                                    <a class="animate-top" title="Add To Cart" href="/account/login/">
+                                                      <i class="pe-7s-cart"></i>
+                                                    </a>
+                                                    {% endif %}
                                                 </div>
                                             </div>
                                             <div class="product-content">
@@ -224,9 +238,22 @@
                                                         <a class="btn-hover list-btn-style text-decoration-none" href="#">Add to cart</a>
                                                     </div>
                                                     <div class="product-list-wishlist">
-                                                        <a class="btn-hover list-btn-wishlist" href="#">
+                                                        {% if request.user.is_authenticated %} 
+                                                            {% if product in wishlist %}
+                                                                <a href="/product/wishlist/{{user.profile.uid}}/{{product.uid}}" class="btn-hover list-btn-wishlist text-danger">
+                                                                    <i class="pe-7s-like"></i>
+                                                                </a>
+                                                            {% else %}
+                                                                <a href="/product/wishlist/{{user.profile.uid}}/{{product.uid}}" class="btn-hover list-btn-wishlist">
+                                                                    <i class="pe-7s-like"></i>
+                                                                </a>
+                                                            {% endif %}
+                                                        {% else %}
+                                                        <a class="animate-left" title="Wishlist" href="/account/login/">
                                                             <i class="pe-7s-like"></i>
-                                                        </a>
+                                                          </a>
+                                                        {% endif %}
+                                                       
                                                     </div>
                                                 </div>
                                             </div>
@@ -240,14 +267,28 @@
                 </div>
                 <div class="pagination-style mt-10 text-center">
                     <ul>
-                        <li><a href="#"><i class="ti-angle-left"></i></a></li>
-                        <li><a href="#">1</a></li>
-                        <li><a href="#">2</a></li>
-                        <li><a href="#">...</a></li>
-                        <li><a href="#">19</a></li>
-                        <li class="active"><a href="#"><i class="ti-angle-right"></i></a></li>
+                        {% if products.has_previous %}
+                            <li><a href="?page=1"><i class="ti-angle-double-left"></i></a></li>
+                            <li><a href="?page={{ products.previous_page_number }}"><i class="ti-angle-left"></i></a></li>
+                        {% else %}
+                            <li class="disabled"><span><i class="ti-angle-double-left"></i></span></li>
+                            <li class="disabled"><span><i class="ti-angle-left"></i></span></li>
+                        {% endif %}
+                        
+                        {% for i in products.paginator.page_range %}
+                            <li{% if products.number == i %} class="active"{% endif %}><a href="?page={{ i }}">{{ i }}</a></li>
+                        {% endfor %}
+                        
+                        {% if products.has_next %}
+                            <li><a href="?page={{ products.next_page_number }}"><i class="ti-angle-right"></i></a></li>
+                            <li><a href="?page={{ products.paginator.num_pages }}"><i class="ti-angle-double-right"></i></a></li>
+                        {% else %}
+                            <li class="disabled"><span><i class="ti-angle-right"></i></span></li>
+                            <li class="disabled"><span><i class="ti-angle-double-right"></i></span></li>
+                        {% endif %}
                     </ul>
                 </div>
+                
             </div>
         </div>
     </div>
