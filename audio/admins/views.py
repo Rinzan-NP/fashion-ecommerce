@@ -311,12 +311,12 @@ def category_editng(request, id):
     category = Category.objects.get(id = id)
     if request.method == "POST":
         name = request.POST.get('name')
-        if Category.objects.filter(name = name).exists():
+        if Category.objects.filter(category_name = name).exists():
             messages.warning(request, 'Category already exist!')
             return redirect(reverse("category_editing"))
         else:
             try:
-                category.name = name
+                category.category_name = name
                 category.save()
                 return redirect(reverse('category_listing'))
             except Exception as e:

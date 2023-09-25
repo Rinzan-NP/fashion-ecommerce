@@ -5,7 +5,10 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 # Create your views here.
 def home(request):
     context = {}
-    latest_products = Product.objects.filter(is_selling = True).order_by('-created_at')[:8]
+    latest_products = Product.objects.filter(is_selling = True,
+        category__unlisted=False,
+        size__unlisted=False,
+        brand__unlisted=False).order_by('-created_at')[:8]
     context['products'] = latest_products
 
     if request.user.is_authenticated and request.user.is_staff is False:
@@ -16,14 +19,23 @@ def home(request):
 
 def shop_listing(request):
     context = {}
-    product_obj = Product.objects.filter(is_selling=True)
+    
+    # Filter products that are not unlisted in Category, Size, and Brand
+    product_obj = Product.objects.filter(
+        is_selling=True,
+        category__unlisted=False,
+        size__unlisted=False,
+        brand__unlisted=False
+    )
+    print(product_obj)
+
     categories = Category.objects.filter(unlisted=False)
     brands = Brand.objects.filter(unlisted=False)
-    sizes = Size.objects.all()
-    color = Color.objects.all()
+    sizes = Size.objects.filter(unlisted=False)
+    colors = Color.objects.all()
 
     # Initialize Paginator
-    paginator = Paginator(product_obj, 9)  # 12 products per page
+    paginator = Paginator(product_obj, 12)  # 12 products per page
 
     page = request.GET.get('page')  # Get the current page number from the request's GET parameters
     try:
@@ -38,13 +50,14 @@ def shop_listing(request):
     context['products'] = products
     context['categories'] = categories
     context['sizes'] = sizes
-    context['colors'] = color
+    context['colors'] = colors
     context['brands'] = brands
 
     if request.user.is_authenticated and not request.user.is_staff:
         context['wishlist'] = [item.product for item in Wishlist.objects.filter(user=request.user.profile)]
 
     return render(request, 'navbarpages/shop.html', context)
+
 
 def product_detail(request, uid):
     context = {}
