@@ -100,4 +100,19 @@ class Wishlist(BaseModel):
 
     def __str__(self) -> str:
         return f'{self.user.user.username} : {self.product.name}'
-    
+
+class Cart(BaseModel):
+    user = models.ForeignKey(Profile, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    quantity = models.IntegerField()
+    total_price = models.DecimalField(max_digits=7, decimal_places=2, default=0.00) 
+     
+    def save(self, *args, **kwargs):
+        # Calculate the total price based on quantity and selling_price
+        self.total_price = self.quantity * self.product.selling_price
+        super(Cart, self).save(*args, **kwargs)
+
+
+    def __str__(self) -> str:
+        return f'{self.user.user.username} : {self.product.name}'
+

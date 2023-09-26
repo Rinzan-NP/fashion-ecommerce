@@ -143,11 +143,17 @@
                         
                     </div>
                     <div class="quickview-plus-minus">
-                        <div class="cart-plus-minus">
-                            <input type="text" value="02" name="qtybutton" class="cart-plus-minus-box">
-                        </div>
+                        
                         <div class="quickview-btn-cart">
-                            <a class="btn-hover-black" href="#">add to cart</a>
+                            {% if request.user.is_authenticated and request.user.is_staff is False %} 
+                                {% if products in cart %}
+                                    <a class="btn-hover-black" href="/account/cart/{{user.profile.uid}}">Go to cart</a>
+                                {% else %}
+                                    <a class="btn-hover-black" href="/product/cart/{{user.profile.uid}}/{{products.uid}}">Add to cart</a>
+                                {% endif %}
+                            {% else %}
+                                <a class="btn-hover-black" href="/account/login/">Add to cart</a>
+                            {% endif %}
                         </div>
                         <div class="quickview-btn-wishlist">
                             {% if request.user.is_authenticated and request.user.is_staff is False %} 

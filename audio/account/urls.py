@@ -10,10 +10,11 @@ urlpatterns = [
    path('verify_account/',views.verify_account, name = "verify_account"),
    path('change_password/<forgot_password_token>',views.change_password, name = "check_account"),
    path('verify_email/',views.email_verification, name = "verify_email_account"),
+
    path('wishlist/<uid>/', views.wishlist_listing, name = "wishlisting_listing"),
+   path('cart/<uid>/', views.cart_listing, name = "cart_listing"),
    
 
-
-
+ 
     
 ]

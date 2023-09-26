@@ -5,7 +5,7 @@ from django.http import HttpResponseRedirect,HttpResponse
 from django.contrib.auth.models import User
 from django.contrib import messages
 from . models import Profile
-from products.models import Wishlist
+from products.models import Wishlist,Cart
 from django.urls import reverse
 from .utils import send_account_activation_email, send_forgot_pass_token
 from django.utils import timezone
@@ -196,4 +196,18 @@ def wishlist_listing(request, uid):
     except Exception as e:
         return HttpResponse(e)
     return render(request, 'accounts/wishlist.html',context)
+
+def cart_listing(request, uid):
+    context = {}
+    try:
+        profile = Profile.objects.get(uid=uid)
+        cart_products = Cart.objects.filter(user=profile).order_by('created_at')  
+        grand_total = sum(item.total_price for item in cart_products)
+
+        context['grand_total'] = grand_total
+        context['user'] = profile
+        context['products'] = cart_products
+    except Exception as e:
+        return HttpResponse(e)
+    return render(request, 'accounts/cart.html', context)
 

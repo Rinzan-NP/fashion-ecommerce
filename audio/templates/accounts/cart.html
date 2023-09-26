@@ -1,0 +1,349 @@
+{% extends 'base/base.html' %} {% load static %} {% block head %}
+
+<title>FASHION</title>
+
+{% endblock head %} {% block content %}
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark static-top">
+  <div class="container">
+    <a
+      class="navbar-brand text-white ml-3"
+      href="/"
+      height="36"
+      style="font-family: 'Oswald', sans-serif"
+    >
+      FASHION
+    </a>
+    <button
+      class="navbar-toggler"
+      type="button"
+      data-bs-toggle="collapse"
+      data-bs-target="#navbarSupportedContent"
+      aria-controls="navbarSupportedContent"
+      aria-expanded="false"
+      aria-label="Toggle navigation"
+    >
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item">
+          <a class="nav-link ml-3" aria-current="page" href="/">Home</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/shop">Shop</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/aboutus">About us</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/contact">Contact Us</a>
+        </li>
+        {% if request.user.is_authenticated %}
+        <li>
+          <a class="nav-link" href="/account/wishlist/{{request.user.profile.uid}}"
+            >Wishlist</a
+          >
+        </li>
+        <li>
+          <a class="nav-link active" href="#"
+            >Cart</a
+          >
+        </li>
+        <li><a class="nav-link" href="/account/logouting/">Logout</a></li>
+        {% else %}
+        <li><a class="nav-link" href="/account/register/">Sign Up</a></li>
+        <li><a class="nav-link" href="/account/login/">Log in</a></li>
+        {% endif %}
+      </ul>
+    </div>
+  </div>
+</nav>
+
+
+<!-- shopping-cart-area start -->
+<div class="cart-main-area pt-95 pb-100">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                {% include "base/message.html" %}
+                <h1 class="cart-heading">Cart</h1>
+                <form action="/checkout" method="post">
+                    <div class="table-content table-responsive">
+                        <table class="table-striped">
+                            <thead class="bg-dark">
+                                <tr>
+                                    <th class="text-white">remove</th>
+                                    <th class="text-white">images</th>
+                                    <th class="text-white">Product</th>
+                                    <th class="text-white">Price</th>
+                                    <th class="text-white">Quantity</th>
+                                    <th class="text-white">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if products %} 
+                                    {% for product in products %}
+                                <tr>
+                                    <td class="product-remove">
+                                        <a href="/product/carts/delete/{{product.uid}}"
+                                            ><i class="pe-7s-close text-bg-danger"></i
+                                        ></a>
+                                    </td>
+                                    <td class="product-thumbnail">
+                                        <a href="/product/detail/{{product.uid}}">
+                                           
+                                            <img
+                                                src="{{product.product.main_image.url}}"
+                                                alt="Thumbnail"
+                                                class="img-thumbnail"
+                                            />
+                                
+                                            
+                                        </a>
+                                    </td>
+
+                                    <td class="product-name">
+                                        <a href="/product/detail/{{product.uid}}">{{product.product.name}}</a>
+                                        {% if product.product.stock == 0 %}
+                                            <p class="text-danger" >Out of Stock</p>
+                                        {% endif %}
+                                    </td>
+                                    <td class="product-price-cart">
+                                        <span class="amount"
+                                            >₹ {{product.product.selling_price}}</span
+                                        >
+                                    </td>
+
+                                    <td class="text-center">
+                                        <div class="btn-group" role="group" aria-label="Quantity">
+                                            <a
+                                                href="/product/carts/dec/{{product.uid}}"
+                                                class="btn btn-danger h-auto"
+                                                id="minusBtn"
+                                            >
+                                                <i class="ti ti-minus"></i>
+                                            </a>
+                                            <span id="quantity" class="btn btn-light h-auto">{{product.quantity}}</span>
+                                            {% if product.quantity <  product.product.stock%}
+                                            <a
+                                                href="/product/carts/inc/{{product.uid}}"
+                                                class="btn btn-dark h-auto"
+                                                id="plusBtn"
+                                            >
+                                                <i class="ti ti-plus"></i>
+                                            </a>
+                                            {% else %}
+                                            <a
+                                                href="#"
+                                                class="btn btn-dark h-auto"
+                                                id="plusBtn"
+                                            >
+                                                <i class="ti ti-plus"></i>
+                                            </a>
+                                            {% endif %}
+                                            
+                                        </div>
+                                    </td>
+
+                                    <td class="product-subtotal">
+                                        ₹{{product.total_price}}
+                                    </td>
+                                </tr>
+                               {% endfor %}
+                               {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% if products %}
+                    <div class="row">
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                            <div class="coupon-all">
+                                <div class="coupon">
+                                    <input
+                                        id="coupon_code"
+                                        class="input-text"
+                                        name="coupon_code"
+                                        value=""
+                                        placeholder="Coupon code"
+                                        type="text"
+                                    />
+                                    <input class="button" name="apply_coupon" value="Apply coupon" type="submit" />
+                                </div>
+                                <div class="coupon2">
+                                    <input class="button" name="update_cart" value="Update cart" type="submit" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-5 ms-auto">
+                            <div class="cart-page-total">
+                                <h2>Cart totals</h2>
+                                <ul>
+                                    <li>Subtotal<span>₹{{grand_total}}</span></li>
+                                    <li>
+                                        Shipping Fee 
+                                        <span> ₹ 50 </span>
+                                    </li>
+                                    <li>Total<span>₹{{grand_total | add:50}}</span></li>
+                                </ul>
+                                {% if product%}
+                                    <button class="btn btn-secondary cursor-na" type="submit" disabled>
+                                        Out of Stock
+                                    </button>
+                                {% else %}
+                                    <button class="btn btn-dark h-auto " type="submit">
+                                        Proceed to checkout                                        
+                                    </button>
+                                {% endif %}
+
+                            </div>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="text-center">
+                        <p>No Items in the cart</p>
+                        <a href="/shop" class="btn btn-dark h-auto">Shop Now</a>
+                    </div>
+                    {% endif %}
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- shopping-cart-area end -->
+
+{% endblock %}
+
+{% comment %} 
+<div class="cart-main-area pt-95 pb-100 wishlist">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+          <h1 class="cart-heading">Cart</h1>
+          <form action="#">
+            <div class="table-content table-responsive">
+              <table>
+                <thead>
+                  <tr>
+                    <th>remove</th>
+                    <th>images</th>
+                    <th>Product</th>
+                    <th>Price</th>
+                    <th>Quantity</th>
+                    <th>Total</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% if products %} {% for product in products %}
+                  <tr>
+                    <td class="product-remove">
+                      <a href="/product/carts/delete/{{product.uid}}">
+                        <i class="pe-7s-close"></i>
+                      </a>
+                    </td>
+                    <td class="product-thumbnail">
+                      <a href="product/detail/{{product.product.uid}}"
+                        ><img
+                          style="height: 120px"
+                          src="{{product.product.main_image.url}}"
+                          alt=""
+                      /></a>
+                    </td>
+                    <td class="product-name">
+                      <a
+                        class="text-decoration-none text-black fs-5"
+                        href="/product/detail/{{product.product.uid}}"
+                        >{{product.product.name}}</a
+                      >
+                    </td>
+                    <td class="product-price-cart">
+                      <span class="amount fs-6"
+                        >Rs.{{product.product.selling_price}}</span
+                      >
+                    </td>
+                    <td class="product-quantity">
+                      <div class="btn-group" role="group" aria-label="Quantity">
+                        <a
+                          href="/product/carts/dec/{{product.uid}}"
+                          class="btn btn-dark h-auto w-auto"
+                          id="minusBtn"
+                        >
+                          <i class="ti ti-minus"></i>
+                        </a>
+                        <span id="quantity" class="btn border h-auto"
+                          >{{product.quantity}}</span
+                        >
+                        {% if product.quantity >= product.product.stock %}
+                        <a href="#" class="btn btn-dark h-auto" id="plusBtn">
+                          <i class="ti ti-plus"></i>
+                        </a>
+                        {% else %}
+                        <a
+                          href="/product/carts/inc/{{ product.uid }}"
+                          class="btn btn-dark h-auto"
+                          id="plusBtn"
+                        >
+                          <i class="ti ti-plus"></i>
+                        </a>
+  
+                        {% endif %}
+                      </div>
+                    </td>
+  
+                    <td
+                      class="product-total-price"
+                      data-product-price="{{ product.product.selling_price }}"
+                    >
+                      <span class="amount fs-6">Rs.{{product.total_price}}</span>
+                    </td>
+                  </tr>
+  
+                  {% endfor %}
+  
+                 
+                  {% else %}
+                  <tr>
+                    <td colspan="4 ">
+                      <h1 class="mt-5">No products in cart</h1>
+                    </td>
+                  </tr>
+                  {% endif %}
+                </tbody>
+              </table>
+            </div>
+          </form>
+          <div class="row">
+            <div class="ms-auto">
+              <div class="cart-page-total">
+                <h2>Cart totals</h2>
+                <ul>
+                  <li>
+                    Subtotal<span> {{grand_total}} </span>
+                  </li>
+                  <li>
+                    ProcessingFee<span>
+                      Nill
+                    </span>
+                  </li>
+                  <li>
+                    Tax Amount<span>
+                    htmldemo.net/ezone/ezone/wishlist.html
+                    </span>
+                  </li>
+                  <li>
+                    Total<span> {{grand_total}} </span>
+                  </li>
+                </ul>
+                <a href="/checkout">Proceed to checkout</a>
+              </div>
+            </div>
+          </div>
+     
+        </div>
+      </div>
+    </div>
+  </div>
+   {% endcomment %}

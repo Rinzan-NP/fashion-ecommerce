@@ -41,3 +41,4 @@ def send_email_tokent(sender,  instance, created, **kwargs):
 
     except Exception as e:
         return HttpResponse(e)
+

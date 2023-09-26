@@ -193,9 +193,17 @@
                   <i class="pe-7s-like"></i>
                   {% endif %}
                 </a>
-                <a class="animate-top" title="Add To Cart" href="#">
-                  <i class="pe-7s-cart"></i>
-                </a>
+               
+                  {% if product in cart %}
+                    <a class="animate-top" title="Add To Cart" href="/account/cart/{{user.profile.uid}}"> 
+                      <i class="pe-7s-cart text-info"></i>
+                    </a>
+                  {% else %}
+                  <a class="animate-top" title="Add To Cart" href="/product/cart/{{user.profile.uid}}/{{product.uid}}"> 
+                    <i class="pe-7s-cart"></i>
+                  </a>
+                  {% endif %}
+                
                 {% else %}
                 <a class="animate-left" title="Wishlist" href="/account/login/">
                   <i class="pe-7s-like"></i>
