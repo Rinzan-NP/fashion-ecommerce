@@ -16,7 +16,11 @@ class Profile(BaseModel):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="profile")
     email_verified = models.BooleanField(default=False)
     email_token = models.CharField(max_length=100, null = True, blank = True)
-    profile_image =models.CharField(null=True,default="https://i.imgur.com/KEVc5ox.jpg")
+    profile_image = models.ImageField(
+        null=True,
+        default="profile/dummy_profile.jpg",  # Relative path to the default image
+        upload_to='profile'
+    )
     is_blocked = models.BooleanField(default=False)
     forgot_password_token = models.CharField(max_length=100, null = True, blank = True)
     forgot_password_token_created_at = models.DateTimeField(default=timezone.now)

@@ -10,40 +10,7 @@
 
 
 
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark static-top">
-    <div class="container">
-      <a class="navbar-brand text-white ml-3 " href="/" height="36" style="font-family: 'Oswald', sans-serif;">
-        FASHION
-      </a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <ul class="navbar-nav ms-auto">
-          <li class="nav-item">
-            <a class="nav-link ml-3" aria-current="page" href="/">Home</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link active" href="#">Shop</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/aboutus">About us</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="/contact">Contact Us</a>
-          </li>
-          {% if request.user.is_authenticated %}
-          <li><a class="nav-link" href="/account/wishlist/{{user.profile.uid}}">Wishlist</a></li>
-          <li><a class="nav-link" href="/account/cart/{{user.profile.uid}}">Cart</a></li>
-          <li><a class="nav-link" href="/account/logouting/">Logout</a></li>
-          {% else %}
-            <li><a class="nav-link" href="/account/register/">Sign Up</a></li>
-            <li><a class="nav-link" href="/account/login/">Log in</a></li>
-          {% endif %}
-        </ul>
-      </div>
-    </div>
-  </nav>
+{% include "base/nav.html" %}
 
 <div class="shop-page-wrapper ptb-100">
     <div class="container">
@@ -172,7 +139,7 @@
                                                 
                                                 <div class="product-action">
                                                     {% if request.user.is_authenticated and request.user.is_staff is False%}
-                                                        <a class="animate-left" title="Wishlist" href="/product/wishlist/{{user.profile.uid}}/{{product.uid}}">
+                                                        <a class="animate-left" title="Wishlist" href="/product/wishlist/{{user.uid}}/{{product.uid}}">
                                                         {% if product in wishlist %}
                                                             <i class="pe-7s-like text-danger"></i>
                                                         {% else %}
@@ -181,10 +148,10 @@
                                                         </a>
                                                     
                                                         {% if product in cart %}
-                                                        <a class="animate-top" title="Add To Cart" href="/account/cart/{{user.profile.uid}}">
+                                                        <a class="animate-top" title="Add To Cart" href="/account/cart/{{user.uid}}">
                                                             <i class="pe-7s-cart text-info"></i>
                                                         {% else %}
-                                                        <a class="animate-top" title="Add To Cart" href="/product/cart/{{user.profile.uid}}/{{product.uid}}">
+                                                        <a class="animate-top" title="Add To Cart" href="/product/cart/{{user.uid}}/{{product.uid}}">
                                                             <i class="pe-7s-cart"></i>
                                                         {% endif %}
                                                       
@@ -245,22 +212,22 @@
                                                         
                                                         {% if request.user.is_authenticated and request.user.is_staff is False %} 
                                                             {% if product in cart %}
-                                                                <a class="btn-hover list-btn-style text-decoration-none" href="/account/cart/{{user.profile.uid}}">Go to cart</a>
+                                                                <a class="btn-hover list-btn-style text-decoration-none" href="/account/cart/{{user.uid}}">Go to cart</a>
                                                             {% else %}
-                                                                <a class="btn-hover list-btn-style text-decoration-none" href="/product/cart/{{user.profile.uid}}/{{products.uid}}">Add to cart</a>
+                                                                <a class="btn-hover list-btn-style text-decoration-none" href="/product/cart/{{user.uid}}/{{product.uid}}">Add to cart</a>
                                                             {% endif %}
                                                         {% else %}
                                                             <a class="btn-hover list-btn-style text-decoration-none" href="/account/login/">Add to cart</a>
                                                         {% endif %}
                                                     </div>
                                                     <div class="product-list-wishlist">
-                                                        {% if request.user.is_authenticated %} 
+                                                        {% if request.user.is_authenticated and request.user.is_staff is False%} 
                                                             {% if product in wishlist %}
-                                                                <a href="/product/wishlist/{{user.profile.uid}}/{{product.uid}}" class="btn-hover list-btn-wishlist text-danger">
+                                                                <a href="/product/wishlist/{{user.uid}}/{{product.uid}}" class="btn-hover list-btn-wishlist text-danger">
                                                                     <i class="pe-7s-like"></i>
                                                                 </a>
                                                             {% else %}
-                                                                <a href="/product/wishlist/{{user.profile.uid}}/{{product.uid}}" class="btn-hover list-btn-wishlist">
+                                                                <a href="/product/wishlist/{{user.uid}}/{{product.uid}}" class="btn-hover list-btn-wishlist">
                                                                     <i class="pe-7s-like"></i>
                                                                 </a>
                                                             {% endif %}

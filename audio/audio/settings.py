@@ -41,7 +41,8 @@ INSTALLED_APPS = [
     'account',
     'navbarpages',
     'admins',
-    'products'
+    'products',
+    'checkouts'
 
 ]
 

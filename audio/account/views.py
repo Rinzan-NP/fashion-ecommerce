@@ -10,6 +10,9 @@ from django.urls import reverse
 from .utils import send_account_activation_email, send_forgot_pass_token
 from django.utils import timezone
 from datetime import timedelta 
+import os
+from django.conf import settings
+from checkouts.models import Order
 
 # Create your views here.
 
@@ -200,10 +203,21 @@ def wishlist_listing(request, uid):
 def cart_listing(request, uid):
     context = {}
     try:
+        
         profile = Profile.objects.get(uid=uid)
-        cart_products = Cart.objects.filter(user=profile).order_by('created_at')  
+        cart_products = Cart.objects.filter(user=profile).order_by('created_at') 
         grand_total = sum(item.total_price for item in cart_products)
 
+        out_of_stock = False
+
+        for cart_product in  cart_products:
+            product_obj = cart_product.product
+            if cart_product.quantity > product_obj.stock:
+                out_of_stock =  True
+                break
+
+
+        context['out_of_stock'] = out_of_stock
         context['grand_total'] = grand_total
         context['user'] = profile
         context['products'] = cart_products
@@ -211,3 +225,58 @@ def cart_listing(request, uid):
         return HttpResponse(e)
     return render(request, 'accounts/cart.html', context)
 
+def profile(request, uid):
+    context = {}
+    profile = Profile.objects.get(uid=uid)
+
+    if request.method == "POST":
+        first_name = request.POST.get('fname')
+        last_name = request.POST.get('lname')
+        user_obj = request.user
+
+        # Update the user's first_name and last_name
+        user_obj.first_name = first_name
+        user_obj.last_name = last_name
+
+        # Handle profile image update
+        if 'profile' in request.FILES:
+            profile_image = request.FILES['profile']
+
+            # Get the path of the old image and delete it
+            old_image_path = os.path.join(settings.MEDIA_ROOT, str(profile.profile_image))
+            if os.path.exists(old_image_path):
+                os.remove(old_image_path)
+
+            # Save the new profile image
+            profile.profile_image = profile_image
+
+        user_obj.save()  # Save the updated user object
+        profile.save()  # Save the updated profile object
+
+    context['profiles'] = profile
+    return render(request, 'accounts/profile/profile.html', context)
+
+def order_listing(request, user_uid):
+    context = {}
+    profile = Profile.objects.get(uid = user_uid)
+    orders = Order.objects.filter(user = request.user).order_by('-created_at')
+
+    context['profiles'] = profile
+    context['orders'] = orders
+    return render(request, 'accounts/profile/orders.html',context)
+
+def order_detail(request, order_uid):
+    context = {}
+    order = Order.objects.get(uid = order_uid)
+    context['order'] = order
+    return render(request, 'accounts/profile/order_detail.html', context)
+
+def order_canceling(request, order_uid):
+    try:
+        order_obj = Order.objects.get(uid = order_uid)
+        order_obj.status = "Canceled"
+        order_obj.save()
+        return redirect('/account/order_cancel/request.user.profile.uid')
+    except Exception as e:
+        return HttpResponse(e)
+    

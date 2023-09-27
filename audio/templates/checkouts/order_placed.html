@@ -1,0 +1,22 @@
+{% extends "base/base.html" %}
+{% load static %}
+{% block content %}
+{% include "base/nav.html" %}
+<div class="checkout-area pt-5 pb-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12 col-md-12">
+                <div class="text-center">
+                    <img src="{% static 'assets/img/bg/order_placed.gif' %}" alt="">
+                    <div class="quickview-btn-cart mt-3">
+                        <a class="btn-hover-black border rounded" href="/shop">Continue Shopping</a>
+                        <a class="btn-hover-black border rounded" href="/account/order/{{user.profile.uid}}">View Orders</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}
+

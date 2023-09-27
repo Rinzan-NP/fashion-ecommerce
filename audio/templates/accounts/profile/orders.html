@@ -1,0 +1,40 @@
+{% extends "base/base.html" %}
+{% block head %}{% endblock head %}
+{% block content %}
+{% include "base/nav.html" %}
+<div class="container mt-4">
+    <h2>My Orders</h2>
+
+    <!-- Bootstrap List Group for Orders -->
+    <ul class="list-group mt-5">
+        {% for order in orders %}
+        <li class="list-group-item">
+            <div class="row">
+                <!-- Image on the right -->
+                <div class="col-md-3 aspect-ratio aspect-ratio-1x1">
+                    <img class="img-fluid" src="{{order.product.main_image.url}}" alt="Card image cap" />
+                </div>
+                <!-- Text on the left -->
+                <div class="col-md-6">
+                    <div class="card-body text-start mt-2">
+                        <!-- Center align text content -->
+                        <h5 class="card-title mb-3">Order Date: {{ order.created_at|date:"d F Y" }}</h5> 
+                        <h5 class="card-title mb-2">Order Created Time: {{ order.created_at|date:"h:i A" }}</h5>
+                        <p class="card-text">Order Number: {{order.uid}}</p>
+                        <p class="card-text">Ship To Name: <strong class="text-primary">{{order.user.first_name}}</strong></p>
+                        <p class="card-text">Order Status: {% if order.status != 'Canceled' %}<strong class="text-success">{{order.status}}</strong>{% else %}<strong class="text-danger">{{order.status}}</strong>{% endif %}</p>
+                        <p class="card-text">Product Price: <strong class="text-dark">₹{{order.amount_to_pay}}</strong></p>
+                        <p class="card-text">Product Name: <strong class="text-danger">{{order.product.name}}</strong></p>
+                        <a href="/account/order_detail/{{order.uid}}" class="btn btn-dark h-auto">View Order</a>
+                    </div>
+                </div>
+            </div>
+        </li>
+        {% endfor %}
+        
+    </ul>
+</div>
+
+
+
+{% endblock content %}

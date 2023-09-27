@@ -1,0 +1,86 @@
+{% extends "base/base.html" %}
+{% block content %}
+{% include "base/nav.html" %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-9">
+            <div class="order-card border border-dark rounded">
+                <h2>Order Details</h2>
+                <div class="row">
+                    <div class="col-md-4">
+                        <img src="{{order.product.main_image.url}}" alt="Product Image" class="product-image">
+                    </div>
+                    <div class="col-md-8">
+                        <div class="form-group">
+                            <label for="orderId">Order ID:</label>
+                            <span id="orderId">{{order.uid}}</span>
+                        </div>
+                        <div class="form-group">
+                            <label for="orderDate">Order Date:</label>
+                            <span id="orderDate">{{ order.created_at|date:"d F Y" }}</span>
+                        </div>
+                        <div class="form-group">
+                            <label for="orderTime">Order Time:</label>
+                            <span id="orderTime">{{ order.created_at|date:"h:i A" }}</span>
+                        </div>
+                        {% if order.status != "Canceled" %}
+                        <div class="form-group">
+                            <label for="orderTime">Payment method:</label>
+                            <span id="das">{{order.payment_method.method}}</span>
+                        </div>
+                        {% endif %}
+                        <div class="form-group">
+                            <label for="orderStatus">Order Status:</label>
+                            {% if order.status == "Canceled" %}
+                                <span id="orderStatus" class="text-danger"><b>{{order.status}}</b></span> 
+                            {% else %}
+                                <span id="orderStatus" class="text-info"><b>{{order.status}}</b></span>
+                            {% endif %}
+                        </div>
+                        <div class="form-group">
+                            <label for="quantity">Quantity:</label>
+                            <span id="quantity">{{order.quantity}}</span>
+                        </div>
+                        <div class="form-group">
+                            <label for="address">Address:</label>
+                                <span id="address">
+                                <p class="card-text">
+                                    {{order.address.street_address}}, {{order.address.local_place}}, {{order.address.city}}, {{order.address.district}},{{order.address.state}}
+                                    {{order.address.pincode}}
+                                </p>
+                                <p class="card-text">Mobile: +91 <b>{{ order.address.phone_number }}</b></p>
+
+                        </div>
+                        <div class="form-group">
+                            {% if order.status != "Canceled" %}
+                            <label for="deliveryDate">Delivery Date:</label>
+                            <span id="deliveryDate">{{order.delivery_date | date:"d F Y"}}</span>
+                            {% endif %}
+                        </div>
+                        {% if order.status != "Canceled" %}
+                        <a class="btn btn-danger h-auto" href="/account/order_cancel/{{order.uid}}">Cancel Order</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<style>
+    
+    .order-card {
+        background-color: #fff;
+        color: #000;
+        padding: 20px;
+        border-radius: 10px;
+        margin-top: 20px;
+        
+    }
+    .product-image {
+        max-width: 100%;
+        height: auto;
+        margin-top :10px;
+        margin-bottom: 10px;
+    }
+</style>
+{% endblock content %}

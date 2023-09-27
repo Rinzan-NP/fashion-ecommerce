@@ -43,23 +43,26 @@ def cart_deleting(request, uid):
 def quantity_decreasing(request, uid):
     try:
         cart_obj = Cart.objects.get(uid = uid)
-        if cart_obj.quantity > 1:
+        if cart_obj.quantity > 1 :
             new_quantity = cart_obj.quantity - 1
             cart_obj.quantity = new_quantity
             cart_obj.save()
         return redirect(request.META.get('HTTP_REFERER'))
     except Exception as e:
         return HttpResponse(e)
+    
 def quantity_increasing(request,uid):
     try:
         cart_obj = Cart.objects.get(uid = uid)
         product_uid = cart_obj.product.uid
         product = Product.objects.get(uid = product_uid)
 
-        if cart_obj.quantity <=  product.stock:
+        if cart_obj.quantity <  product.stock :
             new_quantity = cart_obj.quantity + 1
             cart_obj.quantity = new_quantity
             cart_obj.save()
         return redirect(request.META.get('HTTP_REFERER'))
     except Exception as e:
         return HttpResponse(e)
+    
+    

@@ -1,0 +1,122 @@
+{% load static %}
+<header>
+    <div class="header-top-furniture wrapper-padding-2 res-header-sm">
+      <div class="container-fluid">
+        <div class="header-bottom-wrapper">
+          <div class="logo-2 furniture-logo ptb-30">
+            <a href="/">
+              <img src="{% static '/assets/img/logo/fashion.png' %}" alt="" />
+            </a>
+          </div>
+          <div class="menu-style-2 furniture-menu menu-hover">
+            <nav>
+              <ul>
+                <li>
+                  <a href="/">Home</a>
+                </li>
+                <li>
+                  <a href="/shop">Shop</a>
+                </li>
+                <li>
+                  <a href="/aboutus">About us</a>
+                </li>
+                <li><a href="/contact">contact</a></li>
+                {% if request.user.is_authenticated and request.user.is_staff is False%}
+                  <li>
+                    <a href="#">{{request.user.first_name}}</a>
+                    <ul class="single-dropdown">
+                      <li><a href="/account/profile/{{request.user.profile.uid}}">Profile</a></li>
+                      <li><a href="/account/order/{{request.user.profile.uid}}">My Order</a></li>
+                      <li><a href="/account/logouting">Logoout</a></li>
+                    </ul>
+                  </li>
+                  {% else %}
+                  <li>
+                    <a href="#">Account</a>
+                        <ul class="single-dropdown">
+                            <li><a href="/account/register">Register</a></li>
+                            <li><a href="/account/login">Login</a></li>
+                        </ul>
+                  </li>
+                
+                {% endif %}
+                
+
+              </ul>
+            </nav>
+          </div>
+          <div class="header-cart">
+            {% if request.user.is_authenticated and  request.user.is_staff is False%}
+                <a class="icon-cart-furniture text-decoration-none" href="/account/cart/{{ request.user.profile.uid }}">
+                    <i class="ti-shopping-cart"></i>
+                </a>
+                <a href="/account/wishlist/{{ request.user.profile.uid }}" class="icon-cart-furniture text-decoration-none">
+                    <i class="ti-heart"></i>
+                </a>
+            {% else %}
+                <a href="/account/login" class="icon-cart-furniture text-decoration-none">
+                    <i class="ti-user"></i>
+                </a>
+            {% endif %}
+        </div>
+        
+        </div>
+        <div class="row">
+          <div class="mobile-menu-area d-md-block col-md-12 col-lg-12 col-12 d-lg-none d-xl-none">
+            <div class="mobile-menu">
+              <nav id="mobile-menu-active">
+                <ul class="menu-overflow">
+                  <li>
+                    <a href="/">HOME</a>
+                  </li>
+                  <li>
+                    <a href="/shop">Shop</a>
+                  </li>
+                  <li><a href="/aboutus">About us</a></li>
+                  <li><a href="/contact"> Contact </a></li>
+                  {% if request.user.is_authenticated and request.user.is_staff is False %}
+                  <li>
+                    <a href="#">{{request.user.first_name}}</a>
+                    <ul class="">
+                        <li><a href="/account/profile">Profile</a></li>
+                        <li><a href="/account/login">Logoout</a></li>
+                    </ul>
+                  </li>
+                  {% else %}
+                  <li>
+                    <a href="#">Account</a>
+                        <ul class="">
+                            <li><a href="/account/register">Register</a></li>
+                            <li><a href="/account/login">Login</a></li>
+                        </ul>
+                  </li>
+                
+                    {% endif %}
+                </ul>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+</header>
+<hr>
+
+    
+<style>
+    a{
+        text-decoration : none;
+    }
+    .header-cart {
+      display: flex;
+      align-items: center;
+    }
+  
+    .icon-cart-furniture {
+      margin-left: 20px; /* Adjust the margin as needed */
+    }
+  
+    .ti-heart {
+      font-size: 18px; /* Adjust the font size as needed */
+    }
+</style>
