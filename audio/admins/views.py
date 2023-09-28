@@ -8,7 +8,7 @@ from products.models import Product,Category,Size,Brand,Color,Product_image
 from account.models import Profile
 # Create your views here.
 def dashboard(request):
-    if  request.user.is_authenticated:
+    if  request.user.is_authenticated and request.user.is_staff:
         return render(request, 'admins/index.html')
     else:
         return redirect(logining)

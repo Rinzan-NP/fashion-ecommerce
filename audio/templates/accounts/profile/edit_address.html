@@ -1,0 +1,92 @@
+{% extends "base/base.html" %}
+{% block content %}
+
+{% include "base/nav.html" %}
+<div class="edit-address pb-10">
+    <div class="container">
+        <div class="row" style="margin-top: 4rem">
+            <div class="col-lg-8 offset-lg-2 col-md-10 offset-md-1 col-12">
+                <form method="POST" class="address-form">
+                    {% csrf_token %}
+                    <h3>Edit Address</h3>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="street_address">House / Apartment no</label>
+                                <input type="text" name="street_address" class="form-control" placeholder="Street Address" value="{{ address.street_address }}" required />
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="local_place">Local Address</label>
+                                <input type="text" name="local_place" class="form-control" placeholder="Local Address" value="{{ address.local_place }}" required />
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group mt-2">
+                                <label for="city">Town / City</label>
+                                <input type="text" name="city" class="form-control" placeholder="Town / City" value="{{ address.city }}" required />
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group mt-2">
+                                <label for="district">District</label>
+                                <input type="text" name="district" class="form-control" placeholder="District" value="{{ address.district }}" required />
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group mt-2">
+                                <label for="state">State</label>
+                                <input type="text" name="state" class="form-control" placeholder="State" value="{{ address.state }}" required />
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group mt-2">
+                                <label for="pin">Postcode / Zip</label>
+                                <input type="text" name="pin" class="form-control" placeholder="Postcode / Zip" value="{{ address.pin }}" required />
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group mt-2">
+                                <label for="phone_number">Phone</label>
+                                <input type="text" id="phone_number" name="phone_number" class="form-control" placeholder="Phone" value="{{ address.phone_number }}" required />
+                                <div id="phone_number_error" class="text-danger"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-dark my-3 h-auto">Save Address</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    // Function to validate phone number format
+    function isValidPhoneNumber(phoneNumber) {
+        // Regular expression to match exactly 10 digits
+        var phoneNumberPattern = /^\d{10}$/;
+        return phoneNumberPattern.test(phoneNumber);
+    }
+
+    // Function to handle form submission and perform phone number validation
+    function validateForm(event) {
+        var phoneNumberInput = document.getElementById('phone_number');
+        var phoneNumber = phoneNumberInput.value;
+        var phoneNumberError = document.getElementById('phone_number_error');
+
+        if (!isValidPhoneNumber(phoneNumber)) {
+            phoneNumberError.textContent = 'Please enter a valid 10-digit phone number.';
+            event.preventDefault(); // Prevent form submission if phone number is invalid
+        } else {
+            phoneNumberError.textContent = ''; // Clear any previous error message
+        }
+    }
+
+    // Add an event listener to the form for form submission
+    var form = document.querySelector('.address-form');
+    form.addEventListener('submit', validateForm);
+</script>
+
+
+{% endblock content %}
+

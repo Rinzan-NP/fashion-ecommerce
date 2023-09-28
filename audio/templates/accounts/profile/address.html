@@ -1,0 +1,100 @@
+{% extends "base/base.html" %}
+{% load static %}
+{% block head %}
+
+<link href="{% static 'admins/assets/css/main.css' %}" rel="stylesheet" type="text/css" />
+
+{% endblock head %}
+
+
+{% block content %}
+{% include "base/nav.html" %}
+<div class="container mt-5">
+    <div class="d-flex justify-content-between">
+        <h1 class="mb-4">Address List</h1>
+        {% if addresses %}
+            <a class="btn-hover list-btn-style h-auto d-flex align-items-center justify-content-center t" href="/account/add_address">Add Address</a>
+        {% endif %}
+    </div>
+    <div class="row">
+       {% if addresses %}
+            {% for element in addresses %}
+                <div class="col-md-4 mb-4">
+                    <div class="card">
+                        <!-- Card Header with Edit and Delete buttons -->
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="card-title">Address 
+                            </h5>
+                            <div>
+                                <div class="d-flex">
+                                    <a href="/account/edit_address/{{ element.uid }}" class="btn btn-info btn-sm mr-2 d-flex justify-content-center align-items-center text-white ">
+                                        <i class="material-icons md-edit"></i>
+                                    </a>
+                                    
+                                    <a href="/account/delete_address/{{ element.uid }}"  class="btn btn-danger btn-sm d-flex justify-content-center align-items-center text-white">
+                                        <i class="ti ti-trash"></i>
+                                    </a>
+                                    
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="p-2 bg-light text-dark mb-3">
+                                <p class="card-text bg-color-info align-items-center d-flex justify-content-center">
+                                    <b>{{ element.user.first_name }}</b>
+                                </p>
+                            </div>
+                            
+                            <p class="card-text">
+                                House/Flat Name : {{ element.street_address }}
+                            </p>
+                            <p class="card-text">
+                                Place : {{ element.local_place }}
+                            </p>
+                            <p class="card-text">
+                                City : {{ element.city }}
+                            </p>
+                            <p class="card-text">
+                                District : {{ element.district }}
+                            </p>
+                            <p class="card-text">
+                                State : {{ element.state }}
+                            </p>
+                            <p class="card-text">
+                               Pin : {{ element.pin }}
+                            </p>
+                            <p class="card-text">
+                                Phone : +91 <b>{{ element.phone_number }}</b>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+        <div class="text-center d-flex align-items-center justify-content-center mt-4">
+            <div>
+                <p class="mb-4 fs-5 text-dark">There are no addresses added!</p>
+            <a class="btn-hover list-btn-style h-auto d-flex align-items-center justify-content-center add-address" href="/account/add_address">Add Address</a>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+    .add-address{
+        width: 17rem;
+    }
+    .list-btn-style {
+  
+        max-height: 43px;
+    }
+
+    .fa-edit,
+    .fa-trash {
+        font-size: 14px;
+    }
+</style>
+
+
+{% endblock %}

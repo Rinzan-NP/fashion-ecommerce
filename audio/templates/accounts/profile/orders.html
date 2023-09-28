@@ -4,8 +4,9 @@
 {% include "base/nav.html" %}
 <div class="container mt-4">
     <h2>My Orders</h2>
-
+    {% include "base/message.html" %}
     <!-- Bootstrap List Group for Orders -->
+    {% if orders %}
     <ul class="list-group mt-5">
         {% for order in orders %}
         <li class="list-group-item">
@@ -18,9 +19,9 @@
                 <div class="col-md-6">
                     <div class="card-body text-start mt-2">
                         <!-- Center align text content -->
-                        <h5 class="card-title mb-3">Order Date: {{ order.created_at|date:"d F Y" }}</h5> 
-                        <h5 class="card-title mb-2">Order Created Time: {{ order.created_at|date:"h:i A" }}</h5>
-                        <p class="card-text">Order Number: {{order.uid}}</p>
+                        <h6 class="card-title mb-3">Order Number: {{order.uid}}</h5>
+                        <p class="card-text mb-2">Order Date: {{ order.created_at|date:"d F Y" }}</p> 
+                        <p class="card-text mb-2">Order Time: {{ order.created_at|date:"h:i A" }}</p>
                         <p class="card-text">Ship To Name: <strong class="text-primary">{{order.user.first_name}}</strong></p>
                         <p class="card-text">Order Status: {% if order.status != 'Canceled' %}<strong class="text-success">{{order.status}}</strong>{% else %}<strong class="text-danger">{{order.status}}</strong>{% endif %}</p>
                         <p class="card-text">Product Price: <strong class="text-dark">₹{{order.amount_to_pay}}</strong></p>
@@ -33,6 +34,12 @@
         {% endfor %}
         
     </ul>
+    {% else %}
+        <div class="text-center ">
+            <p class="fs-5 mt-50 ">You haven't placed any orders yet. Start shopping now!</p>
+            <a href="/shop" class="btn btn-dark h-auto">Shop Now</a>
+        </div>
+    {% endif %}
 </div>
 
 

@@ -14,7 +14,9 @@
                     <div class="checkbox-form">
                         <div class="d-flex">
                             <h3>Select Address</h3>
-                            <a href="/user/address/add" class="btn btn-sm btn-dark" title="Add New Address">Add</a>
+                            {% if  addresses %}
+                            <a href="/account/add_address" class="btn btn-sm btn-dark" title="Add New Address">Add</a>
+                            {% endif %}
                         </div>
 
                         <div class="different-address">
@@ -46,8 +48,12 @@
                                         </div>
                                     {% endfor %}
                                 {% else %}
-                                    No Address Found
-                                    <a class="btn btn-dark h-auto" href="/account/address/add/{{user.profile.uid}}">Add Address</a>
+                                <div class="d-flex justify-content-center align-items-center flex-column">
+                                   <p class="fs-6 text-dark">No Address Found! </p> 
+                                    <a class="btn btn-dark h-auto " href="/account/add_address" style="width : 10rem;">Add Address</a>
+
+                                </div>
+                                  
                                 {% endif %}
                                 
                                

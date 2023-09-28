@@ -99,85 +99,17 @@
 
 
 
-<!-- banner3 area start -->
-<div class="banner-area3 pt-120 pb-115">
-  <div class="pl-100 pr-100">
-    <div class="container">
-      <div class="row g-0">
-
-        <div class="col-md-12 col-lg-4 col-xl-4">
-          <div class="banner-wrapper mrgn-negative">
-            <a href="/shop"
-              ><img src="{% static 'assets/img/banner/banner1.jpg' %}" alt="" style="height:625px"
-            /></a>
-            <div class="banner-wrapper2-content" style="height : 315px">
-              <h3>Spatial</h3>
-              <h2>Style</h2>
-              
-            </div>
-          </div>
-        </div>
-        <div class="col-md-12 col-lg-8 col-xl-8">
-          <div class="row g-0 banner-mrg">
-            <div class="col-md-6">
-              <div class="banner-wrapper mrgn-b-5 mrgn-r-5">
-                <div class="aspect-ratio aspect-ratio-1x1">
-                  <img src="{% static 'assets/img/banner/9.jpg' %}" alt="" class="img-fluid" />
-                </div>
-                <div class="banner-wrapper3-content">
-                  <a href="/shop">Shop Now</a>
-                </div>
-              </div>
-            </div>
-            <div class="col-md-6">
-              <div class="banner-wrapper mrgn-b-5">
-                <div class="aspect-ratio aspect-ratio-1x1">
-                  <img src="{% static 'assets/img/banner/casual.jpeg' %}" alt="" class="img-fluid" />
-                </div>
-                <div class="banner-wrapper3-content ">
-                  <a href="/shop">Shop Now</a>
-                </div>
-              </div>
-            </div>
-            <div class="col-md-6">
-              <div class="banner-wrapper mrgn-r-5">
-                <div class="aspect-ratio aspect-ratio-1x1">
-                  <img src="{% static 'assets/img/banner/11.jpg' %}" alt="" class="img-fluid" />
-                </div>
-                <div class="banner-wrapper3-content">
-                  <a href="/shop">Shop Now</a>
-                </div>
-              </div>
-            </div>
-            <div class="col-md-6">
-              <div class="banner-wrapper">
-                <div class="aspect-ratio aspect-ratio-1x1">
-                  <img src="{% static 'assets/img/banner/12.jpg' %}" alt="" class="img-fluid" />
-                </div>
-                <div class="banner-wrapper3-content">
-                  <a href="/shop">Shop Now</a>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+<div class="section-title-4 text-center mb-45 mt-45">
+    <h2>New Products</h2>
 </div>
 
-<!-- banner3 area end -->
-
 <!-- all products area start -->
-<div class="all-products-area pb-70">
-  <div class="pl-100 pr-100">
-    <div class="container-fluid">
+<div class="fashion-banner-area pb-60">
+  <div class="container">
+    <div class="fashion-banner-wrapper">
       <div class="row">
         {% for product in products %}
-        <div class="col-lg-3 col-xl-3 col-md-6">
+        <div class="col-lg-3 col-xl-3 col-md-6 col-6">
           <div class="product-wrapper mb-45">
             <div class="product-img">
               <a href="/product/detail/{{ product.uid }}">
@@ -215,7 +147,7 @@
             </div>
             </div>
             <div class="product-content">
-              <h4><a href="/product/detail/{{ product.uid }}">{{ product.name }}</a></h4>
+              <h4><a href="/product/detail/{{ product.uid }}" class="text-decoration-none">{{ product.name }}</a></h4>
               <div class="product-category d-flex align-items-center">
                   <div class="color-circle rounded-circle mr-2" style="background-color: {{ product.color.hexcode }}; border: 1px solid #000; width: 20px; height: 20px;"></div>
                   <p class="mb-0">{{ product.category }}</p>
@@ -243,7 +175,7 @@
 
 <!-- all products area end -->
 <!-- fashion banner area start -->
-<div class="fashion-banner-area pb-120">
+<div class="fashion-banner-area pb-60">
   <div class="container">
     <div class="fashion-banner-wrapper">
       <img src="{% static 'assets/img/banner/35.jpg' %}" alt="" />
@@ -257,43 +189,14 @@
   </div>
 </div>
 
-<!-- brand logo area start -->
-<div class="brand-logo-area pl-100 pr-100 gray-bg">
-  <div class="ptb-135">
-    <div class="brand-logo-active owl-carousel">
-      <div class="single-brand">
-        <img src="{% static 'assets/img/brand-logo/1.png' %}" alt="" />
-      </div>
-      <div class="single-brand">
-        <img src="{% static 'assets/img/brand-logo/2.png' %}" alt="" />
-      </div>
-      <div class="single-brand">
-        <img src="{% static 'assets/img/brand-logo/1.png' %}" alt="" />
-      </div>
-      <div class="single-brand">
-        <img src="{% static 'assets/img/brand-logo/3.png' %}" alt="" />
-      </div>
-      <div class="single-brand">
-        <img src="{% static 'assets/img/brand-logo/4.png' %}" alt="" />
-      </div>
-      <div class="single-brand">
-        <img src="{% static 'assets/img/brand-logo/5.png' %}" alt="" />
-      </div>
-      <div class="single-brand">
-        <img src="{% static 'assets/img/brand-logo/6.png' %}" alt="" />
-      </div>
-    </div>
-  </div>
-</div>
 
-<!-- brand logo area end -->
 <!-- testimonials area start -->
-<div class="testimonials-area pt-105 pb">
-  <div class="container">
+<div class="testimonials-area pt-60 ">
+  <div class="container pb-60">
     <div class="section-title-2 text-center mb-35">
       <h2>Testimonial</h2>
     </div>
-    <div class="testimonials-active owl-carousel">
+    <div class="testimonials-active owl-carousel mb-30">
       <div class="single-testimonial-4 text-center">
         <img src="{% static 'assets/img/icon-img/42.png' %}" alt="" />
         <p>
@@ -316,39 +219,7 @@
 </div>
 
 <!-- testimonials area end -->
-<!-- insta feed start -->
-<div class="insta-feed ptb-120 gray-bg">
-  <div class="pl-185 pr-185">
-    <div class="section-title-2 text-center mb-50">
-      <h2>Insta Feed</h2>
-      <h4>Follow us on Instagram. <span>@rinzan</span></h4>
-    </div>
-    <div class="instafeed-wrapper">
-      <div class="instafeed-active owl-carousel">
-        <div class="instafeed-img">
-          <img src="{% static 'assets/img/instra/1.jpg' %}" alt="" />
-        </div>
-        <div class="instafeed-img">
-          <img src="{% static 'assets/img/instra/2.jpg' %}" alt="" />
-        </div>
-        <div class="instafeed-img">
-          <img src="{% static 'assets/img/instra/3.jpg' %}" alt="" />
-        </div>
-        <div class="instafeed-img">
-          <img src="{% static 'assets/img/instra/4.jpg' %}" alt="" />
-        </div>
-        <div class="instafeed-img">
-          <img src="{% static 'assets/img/instra/5.jpg' %}" alt="" />
-        </div>
-        <div class="instafeed-img">
-          <img src="{% static 'assets/img/instra/2.jpg' %}" alt="" />
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
 
-<!-- insta feed end -->
 <footer class="footer-area">
   <div
     class="footer-top-area bg-img pt-105 pb-65"
@@ -462,121 +333,6 @@
     </div>
   </div>
 </footer>
-<!-- modal -->
-<div
-  class="modal fade"
-  id="exampleModal"
-  tabindex="-1"
-  role="dialog"
-  aria-hidden="true"
->
-  <button
-    type="button"
-    class="close"
-    data-bs-dismiss="modal"
-    aria-label="Close"
-  >
-    <span class="pe-7s-close" aria-hidden="true"></span>
-  </button>
-  <div class="modal-dialog modal-quickview-width" role="document">
-    <div class="modal-content">
-      <div class="modal-body">
-        <div class="qwick-view-left">
-          <div class="quick-view-learg-img">
-            <div class="quick-view-tab-content tab-content">
-              <div
-                class="tab-pane active show fade"
-                id="modal1"
-                role="tabpanel"
-              >
-                <img src="{% static 'assets/img/quick-view/l1.jpg' %}" alt="" />
-              </div>
-              <div class="tab-pane fade" id="modal2" role="tabpanel">
-                <img src="{% static 'assets/img/quick-view/l2.jpg' %}" alt="" />
-              </div>
-              <div class="tab-pane fade" id="modal3" role="tabpanel">
-                <img src="{% static 'assets/img/quick-view/l3.jpg' %}" alt="" />
-              </div>
-            </div>
-          </div>
-          <div class="quick-view-list nav" role="tablist">
-            <a class="active" href="#modal1" data-bs-toggle="tab" role="tab">
-              <img src="{% static 'assets/img/quick-view/s1.jpg' %}" alt="" />
-            </a>
-            <a href="#modal2" data-bs-toggle="tab" role="tab">
-              <img src="{% static 'assets/img/quick-view/s2.jpg' %}" alt="" />
-            </a>
-            <a href="#modal3" data-bs-toggle="tab" role="tab">
-              <img src="{% static 'assets/img/quick-view/s3.jpg' %}" alt="" />
-            </a>
-          </div>
-        </div>
-
-        <div class="qwick-view-right">
-          <div class="qwick-view-content">
-            <h3>Handcrafted Supper Mug</h3>
-            <div class="price">
-              <span class="new">$90.00</span>
-              <span class="old">$120.00</span>
-            </div>
-            <div class="rating-number">
-              <div class="quick-view-rating">
-                <i class="pe-7s-star"></i>
-                <i class="pe-7s-star"></i>
-                <i class="pe-7s-star"></i>
-                <i class="pe-7s-star"></i>
-                <i class="pe-7s-star"></i>
-              </div>
-              <div class="quick-view-number">
-                <span>2 Rating(S)</span>
-              </div>
-            </div>
-            <p>
-              Lorem ipsum dolor sit amet, consectetur adip elit, sed do tempor
-              incididun ut labore et dolore magna aliqua. Ut enim ad mi, quis
-              nostrud veniam exercitation.
-            </p>
-            <div class="quick-view-select">
-              <div class="select-option-part">
-                <label>Size*</label>
-                <select class="select">
-                  <option value="">- Please Select -</option>
-                  <option value="">900</option>
-                  <option value="">700</option>
-                </select>
-              </div>
-              <div class="select-option-part">
-                <label>Color*</label>
-                <select class="select">
-                  <option value="">- Please Select -</option>
-                  <option value="">orange</option>
-                  <option value="">pink</option>
-                  <option value="">yellow</option>
-                </select>
-              </div>
-            </div>
-            <div class="quickview-plus-minus">
-              <div class="cart-plus-minus">
-                <input
-                  type="text"
-                  value="02"
-                  name="qtybutton"
-                  class="cart-plus-minus-box"
-                />
-              </div>
-              <div class="quickview-btn-cart">
-                <a class="btn-hover-black" href="#">add to cart</a>
-              </div>
-              <div class="quickview-btn-wishlist">
-                <a class="btn-hover" href="#"><i class="pe-7s-like"></i></a>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
 
 
 

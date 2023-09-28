@@ -12,7 +12,7 @@ from django.utils import timezone
 from datetime import timedelta 
 import os
 from django.conf import settings
-from checkouts.models import Order
+from checkouts.models import Order,Address
 
 # Create your views here.
 
@@ -275,8 +275,69 @@ def order_canceling(request, order_uid):
     try:
         order_obj = Order.objects.get(uid = order_uid)
         order_obj.status = "Canceled"
+        new_stock = order_obj.quantity + order_obj.product.stock
+        order_obj.product.stock = new_stock
+        order_obj.product.save()
         order_obj.save()
-        return redirect('/account/order_cancel/request.user.profile.uid')
+        messages.success(request, "Order canceled successfully!")
+        return redirect(f'/account/order/{request.user.profile.uid}')
     except Exception as e:
         return HttpResponse(e)
     
+def address_listing(request):
+    users = request.user
+    context = {}
+    context['addresses'] = Address.objects.filter(user = users,unlisted = False)
+    return render(request, 'accounts/profile/address.html',context)
+
+
+def address_adding(request):
+    if request.method == 'POST':
+        # Retrieve form data from POST request
+        user = request.user
+        street_address = request.POST.get('street_address')
+        local_place = request.POST.get('local_place')
+        city = request.POST.get('city')
+        district = request.POST.get('district')
+        state = request.POST.get('state')
+        pin = request.POST.get('pin')
+        phone_number = request.POST.get('phone_number')
+        
+        # Create a new Address object and save it
+        address = Address(user=user, street_address=street_address, local_place=local_place, city=city, district=district, state=state, pin=pin, phone_number=phone_number)
+        address.save()
+
+        # Redirect to a success or confirmation page
+        return redirect(reverse('address_listing'))  # Change the URL as needed
+
+    return render(request, 'accounts/profile/add_address.html')
+
+def address_editing(request, address_uid):
+    context = {}
+    address = Address.objects.get(uid=address_uid)
+
+    if request.method == 'POST':
+        # Update the address fields with the submitted values
+        address.street_address = request.POST['street_address']
+        address.local_place = request.POST['local_place']
+        address.city = request.POST['city']
+        address.district = request.POST['district']
+        address.state = request.POST['state']
+        address.pin = request.POST['pin']
+        address.phone_number = request.POST['phone_number']
+        address.save()  # Save the updated address
+
+        # Redirect to a success page or wherever you want after the update
+        return redirect(reverse('address_listing'))
+
+    context['address'] = address
+    return render(request, 'accounts/profile/edit_address.html', context)
+
+def address_deleting(request, address_uid):
+    try:
+        address = Address.objects.get(uid=address_uid)
+        address.unlisted = True
+        address.save()
+        return redirect(reverse('address_listing'))
+    except Exception as e:
+        return HttpResponse(e)
