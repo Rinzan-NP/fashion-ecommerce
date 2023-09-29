@@ -6,15 +6,17 @@ from django.contrib import messages
 from django.urls import reverse
 from products.models import Product,Category,Size,Brand,Color,Product_image
 from account.models import Profile
+from checkouts.models import Order
+from .decarator import admin_required
 # Create your views here.
 def dashboard(request):
-    if  request.user.is_authenticated and request.user.is_staff:
+    if  request.user.is_authenticated and request.user.is_staff is True:
         return render(request, 'admins/index.html')
     else:
         return redirect(logining)
 
 def logining(request):
-    if request.user.is_authenticated:
+    if request.user.is_authenticated and request.user.is_staff is True:
         return redirect('/admin/')  # Redirect if the user is already authenticated
 
     if request.method == "POST":
@@ -42,15 +44,18 @@ def logouting(request):
     
 def product_listing(request):
     context = {}
-    products = Product.objects.all()
-    categories = Category.objects.all()
-    sizes = Size.objects.all()
-    brands = Brand.objects.all()
-    context['categories'] = categories
-    context['products'] = products
-    context['brands'] = brands
-    context['sizes'] = sizes
-    return render(request, 'admins/products.html', context)
+    if  request.user.is_authenticated and request.user.is_staff is True:
+        products = Product.objects.all()
+        categories = Category.objects.all()
+        sizes = Size.objects.all()
+        brands = Brand.objects.all()
+        context['categories'] = categories
+        context['products'] = products
+        context['brands'] = brands
+        context['sizes'] = sizes
+        return render(request, 'admins/products.html', context)
+    else:
+        return redirect(logining)
 
 def product_adding(request):
     context={}
@@ -92,25 +97,31 @@ def product_adding(request):
             # except Exception as e:
             #     return HttpResponse(e)
 
-
-    categories = Category.objects.all()
-    sizes = Size.objects.all()
-    brands = Brand.objects.all()
-    colors = Color.objects.all()
-    context['categories'] = categories
-    context['brands'] = brands
-    context['sizes'] = sizes
-    context['colors'] = colors
-    return render(request, 'admins/add_product.html', context)
+    if  request.user.is_authenticated and request.user.is_staff is True:
+        categories = Category.objects.all()
+        sizes = Size.objects.all()
+        brands = Brand.objects.all()
+        colors = Color.objects.all()
+        context['categories'] = categories
+        context['brands'] = brands
+        context['sizes'] = sizes
+        context['colors'] = colors
+        return render(request, 'admins/add_product.html', context)
+    else:
+        return redirect(logining)
 
 def user_listing(request):
     context = {}
-    user_obj = User.objects.all()
-    profile_obj = Profile.objects.all()
-    context['users'] = user_obj
-    context['profiles'] = profile_obj
-    return render(request, 'admins/user.html', context)
+    if  request.user.is_authenticated and request.user.is_staff is True:
+        user_obj = User.objects.all()
+        profile_obj = Profile.objects.all()
+        context['users'] = user_obj
+        context['profiles'] = profile_obj
+        return render(request, 'admins/user.html', context)
+    else:
+        return redirect(logining)
 
+@admin_required
 def user_blocking(request, uid):
     try:
         profile_obj = Profile.objects.get(uid = uid)
@@ -124,6 +135,7 @@ def user_blocking(request, uid):
     except Exception as e:
         return HttpResponse(e)
 
+@admin_required
 def add_user(request):
     if request.method == "POST":
         first_name = request.POST.get('fname')
@@ -149,6 +161,7 @@ def add_user(request):
 
     return render(request, 'admins/user_register.html')
 
+@admin_required
 def staff_listing(request):
     context = {}
     
@@ -159,6 +172,7 @@ def staff_listing(request):
     
     return render(request, 'admins/staff.html', context)
 
+@admin_required
 def staff_blocking(request, id):
     try:
         user_obj = User.objects.get(id = id)
@@ -171,7 +185,8 @@ def staff_blocking(request, id):
         return redirect(staff_listing)
     except Exception as e:
         return HttpResponse(e)
-
+    
+@admin_required
 def staff_adding(request):
     if request.method == "POST":
         username = request.POST.get('username')
@@ -195,6 +210,7 @@ def staff_adding(request):
 
     return render(request, 'admins/staff_register.html')
 
+@admin_required
 def product_editing(request , uid): 
     context = {}
     products = Product.objects.get(uid = uid)
@@ -271,7 +287,7 @@ def product_editing(request , uid):
 
     return render(request, 'admins/product_editing.html', context)
 
-
+@admin_required
 def product_unlisting(request, uid):
     try:
         product = Product.objects.get(uid = uid)
@@ -285,12 +301,14 @@ def product_unlisting(request, uid):
     except Exception as e:
         return HttpResponse(e)
     
+@admin_required   
 def category_listing(request):
     context = {}
     categories = Category.objects.all()
     context['categories'] = categories
     return render(request, 'admins/category/category.html', context)
 
+@admin_required
 def category_adding(request):
     if request.method == "POST":
         name = request.POST.get('name')
@@ -305,7 +323,8 @@ def category_adding(request):
             except Exception as  e:
                 return HttpResponse(e)
     return render(request, 'admins/category/category_adding.html')
-    
+
+@admin_required   
 def category_editng(request, id):
     context = {}
     category = Category.objects.get(id = id)
@@ -324,6 +343,7 @@ def category_editng(request, id):
     context['category'] = category
     return render(request, 'admins/category/category_editing.html', context)
 
+@admin_required
 def category_deleting(request, id):
     category = Category.objects.get(id = id)
     if category.unlisted is True:
@@ -334,12 +354,14 @@ def category_deleting(request, id):
         category.save()
     return redirect(reverse('category_listing'))
 
+@admin_required
 def color_listing(request):
     context = {}
     colors = Color.objects.all()
     context['colors'] = colors
     return render(request, 'admins/color/color.html', context)
 
+@admin_required
 def color_adding(request):
     if request.method == "POST":
         name = request.POST.get('name')
@@ -356,6 +378,7 @@ def color_adding(request):
                 return HttpResponse(e)
     return render(request, 'admins/color/add_color.html')
 
+@admin_required
 def color_editing(request, id):
     context = {}
     color = Color.objects.get(id = id)
@@ -374,12 +397,14 @@ def color_editing(request, id):
 
     return render(request, 'admins/color/edit_color.html', context)
 
+@admin_required
 def brand(request):
     context = {}
     brands = Brand.objects.all()
     context['brands'] = brands
     return render(request, 'admins/brand/brand.html', context)
 
+@admin_required
 def brand_editing(request, id):
     context = {}
     brand = Brand.objects.get(id = id)
@@ -398,6 +423,7 @@ def brand_editing(request, id):
     context['brand'] = brand
     return render(request, 'admins/brand/brand_editing.html', context)
 
+@admin_required
 def brand_deleting(request, id):
     brand = Brand.objects.get(id = id)
     if brand.unlisted is True:
@@ -408,6 +434,7 @@ def brand_deleting(request, id):
         brand.save()
     return redirect(reverse('brand'))
 
+@admin_required
 def brand_adding(request):
     if request.method == "POST":
         name = request.POST.get('name')
@@ -423,3 +450,28 @@ def brand_adding(request):
                 return HttpResponse(e)
     return render(request, 'admins/brand/brand_add.html')
 
+@admin_required
+def order(request):
+    context = {}
+    orders = Order.objects.all()
+    
+    if request.method == "POST":
+        order_uid = request.POST.get('uid')
+        if order_uid:
+            orders = Order.objects.filter(uid=order_uid)
+    
+    context['orders'] = orders
+    return render(request, 'admins/order/order.html', context)
+
+@admin_required
+def order_detail(request, order_uid):
+    context = {}
+    orders = Order.objects.get(uid = order_uid)
+    context['order'] = orders
+    if request.method == "POST":
+        status  = request.POST.get('status')
+        orders.status = status
+        orders.save()
+        return redirect(reverse('admin_order_listing'))
+
+    return render(request, 'admins/order/order_detail.html', context)

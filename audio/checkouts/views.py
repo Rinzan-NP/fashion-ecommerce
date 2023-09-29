@@ -35,8 +35,8 @@ def checkout(request, user_uid):
                 product= cart_product.product,  
                 quantity=cart_product.quantity,
                 coupon=coupon,  # You can add coupon logic here if needed
-                price=grand_total,
-                amount_to_pay=grand_total,
+                price=cart_product.total_price,
+                amount_to_pay=cart_product.total_price,
             )
             
             # Save the order to the database

@@ -1,0 +1,205 @@
+{% extends "base/base.html" %}
+{% load static %}
+{% block head %}
+
+<style>
+    body {
+        background-color: #fff; /* White background color */
+        color: #088178; /* Text color using #088178 */
+        font-family: Arial, sans-serif; /* Specify your preferred font-family */
+        margin: 20px; /* Add some margin for better spacing */
+    }
+
+    .order-details {
+        border: 1px solid #088178; /* Border with #088178 color */
+        padding: 20px; /* Add padding for spacing */
+    }
+
+    h1 {
+        color: #088178; /* Heading color */
+    }
+
+    .order-info {
+        margin-top: 10px; /* Add margin between elements */
+    }
+
+    /* You can style other elements as needed */
+</style>
+
+{% endblock head %}
+{% block content %}
+<div class="screen-overlay"></div>
+<aside class="navbar-aside" id="offcanvas_aside">
+  <div class="aside-top">
+    <a href = "/admin" class="brand-wrap">
+      <img
+        src="{% static 'admins/assets/imgs/theme/logo.png' %}"
+        class="logo"
+        alt="Evara Dashboard"
+      />
+    </a>
+    <div>
+      <button class="btn btn-icon btn-aside-minimize">
+        <i class="text-muted material-icons md-menu_open"></i>
+      </button>
+    </div>
+  </div>
+  <nav>
+    <ul class="menu-aside">
+      <li class="menu-item">
+        <a class="menu-link" href="/admin/">
+          <i class="icon material-icons md-home"></i>
+          <span class="text">Dashboard</span>
+        </a>
+      </li>
+      <li class="menu-item">
+        <a class="menu-link" href="/admin/products">
+          <i class="icon material-icons md-shopping_bag"></i>
+          <span class="text">Products</span>
+        </a>
+      </li>
+      <li class="menu-item ">
+        <a class="menu-link" href="/admin/products/add_product">
+          <i class="icon material-icons md-add_box"></i>
+          <span class="text">Add product</span>
+        </a>
+      </li>
+      <li class="menu-item has-submenu">
+        <a class="menu-link" href="#">
+          <i class="icon material-icons md-person"></i>
+          <span class="text">Account</span>
+        </a>
+        <div class="submenu">
+          <a href="/admin/users">User</a>
+          <a href="/admin/staffs">Staff</a>
+        </div>
+      </li>
+      <li class="menu-item has-submenu ">
+        <a class="menu-link" href="#"> <i class="icon material-icons md-store"></i>
+            <span class="text">Category</span>
+        </a>
+        <div class="submenu">
+            <a href="/admin/category/add">Add</a>
+            <a href="/admin/category" >Listing</a>
+        </div>
+    </li>
+    <li class="menu-item has-submenu">
+      <a class="menu-link" href="#"><i class="icon material-icons md-stars"></i>
+          <span class="text">Color</span>
+      </a>
+      <div class="submenu">
+          <a href="/admin/color">Listing</a>
+          <a href="/admin/color/add">Add</a>
+      </div>
+  </li>
+      <li class="menu-item active">
+        <a class="menu-link" href="/admin/order">
+          <i class="icon material-icons md-shopping_cart"></i>
+          <span class="text">Orders</span>
+        </a>
+        
+      </li>
+      
+
+      
+
+      <li class="menu-item">
+        <a class="menu-link" href="page-reviews.html">
+          <i class="icon material-icons md-comment"></i>
+          <span class="text">Reviews</span>
+        </a>
+      </li>
+      <li class="menu-item">
+        <a class="menu-link" href="/admin/brand">
+          <i class="icon material-icons md-stars"></i>
+          <span class="text">Brands</span>
+        </a>
+      </li>
+      <li class="menu-item">
+        <a class="menu-link" disabled href="#">
+          <i class="icon material-icons md-pie_chart"></i>
+          <span class="text">Statistics</span>
+        </a>
+      </li>
+    </ul>
+    <hr />
+    <ul class="menu-aside">
+      <li class="menu-item has-submenu">
+        <a class="menu-link" href="#">
+          <i class="icon material-icons md-settings"></i>
+          <span class="text">Settings</span>
+        </a>
+        <div class="submenu">
+          <a href="page-settings-1.html">Setting sample 1</a>
+          <a href="page-settings-2.html">Setting sample 2</a>
+        </div>
+      </li>
+      <li class="menu-item">
+        <a class="menu-link" href="page-blank.html">
+          <i class="icon material-icons md-local_offer"></i>
+          <span class="text"> Starter page </span>
+        </a>
+      </li>
+    </ul>
+    <br />
+    <br />
+  </nav>
+</aside>
+<main class="main-wrap">
+  <header class="main-header navbar" style="display: flex; justify-content: flex-end;">
+    <div class="col-nav">
+        <ul class="nav">
+            <li class="nav-item">
+                <a class="nav-link btn-icon" href="/admin/logouting">Logout</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link btn-icon darkmode" href="#"><i class="material-icons md-nights_stay"></i></a>
+            </li>
+        </ul>
+    </div>
+</header>
+<section class="content-main">
+    <div class="content-header">
+        <div>
+            <h2 class="content-title card-title">Order Detail </h2>
+            
+        </div>
+        <div class="d-flex">
+            
+        </div>
+    </div>
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="order-info">
+                <img src="{{ order.product.main_image.url }}" alt="" class="product-image col-md-4 mb-4">
+                <p><strong>User:</strong> {{ order.user.username }}</p>
+                <p><strong>Address:</strong> {{ order.address }}</p>
+                <p><strong>Payment Method:</strong> {{ order.payment_method }}</p>
+                <p><strong>Status:</strong>
+                    <form method="POST">
+                        {% csrf_token %}
+                        <select name="status">
+                            <option value="Pending" {% if order.status == 'Pending' %} selected {% endif %}>Pending</option>
+                            <option value="Shipped" {% if order.status == 'Shipped' %} selected {% endif %}>Shipped</option>
+                            <option value="Delivered" {% if order.status == 'Delivered' %} selected {% endif %}>Delivered</option>
+                            <option value="Canceled" {% if order.status == 'Canceled' %} selected {% endif %}>Canceled</option>
+                        </select>
+                    
+                </p>
+                <p><strong>Product:</strong> {{ order.product.name }}</p>
+                <p><strong>Quantity:</strong> {{ order.quantity }}</p>
+                <p><strong>Coupon:</strong> {{ order.coupon }}</p>
+                <p><strong>Price:</strong> {{ order.product.selling_price }}</p>
+                <p><strong>Amount to Pay:</strong> {{ order.amount_to_pay }}</p>
+
+            </div>
+            <div class="d-flex justify-content-between flex-wrap mt-3">
+                <button class="btn btn-primary mt-3 mt-md-0 h-auto" type="submit" id="saveChangesButton">Save Changes</button>
+            </div>
+            </form>
+        </div> <!-- card-body end// -->
+    </div> <!-- card end// -->
+
+</section>
+{% endblock content %}
+

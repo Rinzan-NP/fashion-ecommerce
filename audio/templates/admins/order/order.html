@@ -1,0 +1,275 @@
+{% extends "base/base.html" %}
+{% load static %}
+{% block head %}
+
+<link rel="shortcut icon" type="image/x-icon" href=" {% static 'admins/assets/imgs/theme/favicon.svg' %}">
+<!-- Template CSS -->
+<link href="{% static 'admins/assets/css/main.css' %}" rel="stylesheet" type="text/css" />
+</head>
+{% endblock head %}
+{% block content %}
+
+
+
+
+<div class="screen-overlay"></div>
+<aside class="navbar-aside" id="offcanvas_aside">
+  <div class="aside-top">
+    <a href = "/admin" class="brand-wrap">
+      <img
+        src="{% static 'admins/assets/imgs/theme/logo.png' %}"
+        class="logo"
+        alt="Evara Dashboard"
+      />
+    </a>
+    <div>
+      <button class="btn btn-icon btn-aside-minimize">
+        <i class="text-muted material-icons md-menu_open"></i>
+      </button>
+    </div>
+  </div>
+  <nav>
+    <ul class="menu-aside">
+      <li class="menu-item">
+        <a class="menu-link" href="/admin/">
+          <i class="icon material-icons md-home"></i>
+          <span class="text">Dashboard</span>
+        </a>
+      </li>
+      <li class="menu-item">
+        <a class="menu-link" href="/admin/products">
+          <i class="icon material-icons md-shopping_bag"></i>
+          <span class="text">Products</span>
+        </a>
+      </li>
+      <li class="menu-item ">
+        <a class="menu-link" href="/admin/products/add_product">
+          <i class="icon material-icons md-add_box"></i>
+          <span class="text">Add product</span>
+        </a>
+      </li>
+      <li class="menu-item has-submenu">
+        <a class="menu-link" href="#">
+          <i class="icon material-icons md-person"></i>
+          <span class="text">Account</span>
+        </a>
+        <div class="submenu">
+          <a href="/admin/users">User</a>
+          <a href="/admin/staffs">Staff</a>
+        </div>
+      </li>
+      <li class="menu-item has-submenu ">
+        <a class="menu-link" href="#"> <i class="icon material-icons md-store"></i>
+            <span class="text">Category</span>
+        </a>
+        <div class="submenu">
+            <a href="/admin/category/add">Add</a>
+            <a href="/admin/category" >Listing</a>
+        </div>
+    </li>
+    <li class="menu-item has-submenu">
+      <a class="menu-link" href="#"><i class="icon material-icons md-stars"></i>
+          <span class="text">Color</span>
+      </a>
+      <div class="submenu">
+          <a href="/admin/color">Listing</a>
+          <a href="/admin/color/add">Add</a>
+      </div>
+  </li>
+      <li class="menu-item active">
+        <a class="menu-link" href="/admin/order">
+          <i class="icon material-icons md-shopping_cart"></i>
+          <span class="text">Orders</span>
+        </a>
+        
+      </li>
+      
+
+      
+
+      <li class="menu-item">
+        <a class="menu-link" href="page-reviews.html">
+          <i class="icon material-icons md-comment"></i>
+          <span class="text">Reviews</span>
+        </a>
+      </li>
+      <li class="menu-item">
+        <a class="menu-link" href="/admin/brand">
+          <i class="icon material-icons md-stars"></i>
+          <span class="text">Brands</span>
+        </a>
+      </li>
+      <li class="menu-item">
+        <a class="menu-link" disabled href="#">
+          <i class="icon material-icons md-pie_chart"></i>
+          <span class="text">Statistics</span>
+        </a>
+      </li>
+    </ul>
+    <hr />
+    <ul class="menu-aside">
+      <li class="menu-item has-submenu">
+        <a class="menu-link" href="#">
+          <i class="icon material-icons md-settings"></i>
+          <span class="text">Settings</span>
+        </a>
+        <div class="submenu">
+          <a href="page-settings-1.html">Setting sample 1</a>
+          <a href="page-settings-2.html">Setting sample 2</a>
+        </div>
+      </li>
+      <li class="menu-item">
+        <a class="menu-link" href="page-blank.html">
+          <i class="icon material-icons md-local_offer"></i>
+          <span class="text"> Starter page </span>
+        </a>
+      </li>
+    </ul>
+    <br />
+    <br />
+  </nav>
+</aside>
+<main class="main-wrap">
+  <header class="main-header navbar" style="display: flex; justify-content: flex-end;">
+    <div class="col-nav">
+        <ul class="nav">
+            <li class="nav-item">
+                <a class="nav-link btn-icon" href="/admin/logouting">Logout</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link btn-icon darkmode" href="#"><i class="material-icons md-nights_stay"></i></a>
+            </li>
+        </ul>
+    </div>
+</header>
+<section class="content-main">
+    <div class="content-header">
+        <div>
+            <h2 class="content-title card-title">Order List </h2>
+            
+        </div>
+        <div class="d-flex">
+            <form method="post" class="d-flex">
+                {% csrf_token %}
+                <input type="text" placeholder="Search order ID" class="form-control me-2 bg-white" name="uid">
+                <button class="btn btn-dark h-auto" type="submit"><i class="ti ti-search"></i></button>
+            </form>
+        </div>
+    </div>
+    <div class="card mb-4">
+        
+        <div class="card-body">
+            <div class="table-responsive">
+                {% if orders %}
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            
+                            
+                            <th scope="col">Email</th>
+                            <th scope="col">Product</th>
+
+                            <th scope="col">Price</th>
+
+                            <th scope="col">Status</th>
+                           
+                            <th scope="col" class="text-end"> Action </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for order in  orders %}
+                        <tr>
+                            
+                  
+                            <td>{{order.user.email}}</td>
+                            <td>{{order.product.name}}</td>
+
+                            <td>{{order.product.price}}</td>
+                   
+                            <td>
+                                {% if order.status == 'Canceled' %}
+                                    <span class="badge rounded-pill alert-danger d-flex justify-content-center align-items-center" style="font-size: 14px">{{ order.status }}</span>
+                                {% elif order.status == 'Delivered' %}
+                                    <span class="badge rounded-pill alert-success d-flex justify-content-center align-items-center" style="font-size: 14px">{{ order.status }}</span>
+                                {% elif order.status == 'Pending' %}
+                                    <span class="badge rounded-pill alert-info d-flex justify-content-center align-items-center" style="font-size: 14px">{{ order.status }}</span>
+                                {% else %}
+                                    <span class="badge rounded-pill alert-warning d-flex justify-content-center align-items-center" style="font-size: 14px">{{ order.status }}</span>
+                                {% endif %}
+                            </td>
+                      
+                            <td class="text-end">
+                                <a href="/admin/order_detail/{{order.uid}}" class="btn btn-success rounded font-sm h-auto">Detail</a>
+                                
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% endif %}
+            </div> <!-- table-responsive //end -->
+        </div> <!-- card-body end// -->
+    </div> <!-- card end// -->
+
+</section>
+    <style>
+        /* Style the table */
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+    
+        /* Style the table headers */
+        .table thead th {
+            background-color: #F8F9FA;
+            color: #000;
+            font-weight: bold;
+            text-align: left;
+        }
+    
+        /* Style the table rows */
+        .table tbody tr:nth-child(odd) {
+            background-color: #f8f9fa;
+        }
+    
+        /* Style the table cell padding and text */
+        .table td, .table th {
+            padding: 10px;
+            text-align: left;
+        }
+    
+        /* Style the "Detail" button */
+        .btn-success {
+            background-color: #088178;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            padding: 5px 10px;
+            text-transform: uppercase;
+        }
+    
+    
+        /* Style the dropdown button */
+        .dropdown .btn-light {
+            background-color: transparent;
+            color: #000;
+        }
+    
+        /* Style the dropdown menu */
+        .dropdown-menu {
+            background-color: #f8f9fa;
+            border: none;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+    
+        /* Style the dropdown menu items */
+        .dropdown-menu a {
+            color: #333;
+        }
+    </style>
+    
+    
+{% endblock content %}
