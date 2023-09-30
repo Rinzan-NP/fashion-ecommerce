@@ -12,7 +12,7 @@ from django.utils import timezone
 from datetime import timedelta 
 import os
 from django.conf import settings
-from checkouts.models import Order,Address
+from checkouts.models import Address,OrderItems,Order
 from django.shortcuts import get_object_or_404
 
 # Create your views here.
@@ -264,24 +264,22 @@ def profile(request, uid):
 def order_listing(request, user_uid):
     context = {}
     profile = Profile.objects.get(uid = user_uid)
-    orders = Order.objects.filter(user = request.user).order_by('-created_at')
-
+    orders = OrderItems.objects.filter(order__user=request.user).order_by('-created_at')
     context['profiles'] = profile
     context['orders'] = orders
     return render(request, 'accounts/profile/orders.html',context)
 
 def order_detail(request, order_uid):
     context = {}
-    order = Order.objects.get(uid = order_uid)
+    order = OrderItems.objects.get(uid = order_uid)
     context['order'] = order
     return render(request, 'accounts/profile/order_detail.html', context)
 
 def order_canceling(request, order_uid):
     try:
-        order_obj = Order.objects.get(uid = order_uid)
+        order_obj = OrderItems.objects.get(uid = order_uid)
         order_obj.status = "Canceled"
-        new_stock = order_obj.quantity + order_obj.product.stock
-        order_obj.product.stock = new_stock
+        order_obj.product.stock -= order_obj.quantity
         order_obj.product.save()
         order_obj.save()
         messages.success(request, "Order canceled successfully!")
@@ -294,7 +292,6 @@ def address_listing(request):
     context = {}
     context['addresses'] = Address.objects.filter(user = users,unlisted = False)
     return render(request, 'accounts/profile/address.html',context)
-
 
 def address_adding(request):
     if request.method == 'POST':

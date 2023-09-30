@@ -83,7 +83,7 @@ WSGI_APPLICATION = 'audio.wsgi.application'
 DATABASES = {
    'default': {
        'ENGINE': 'django.db.backends.postgresql',
-       'NAME': 'fashion',
+       'NAME': 'ecommerce',
        'USER': 'postgres',
        'PASSWORD': 'root',
        'HOST': 'localhost',
