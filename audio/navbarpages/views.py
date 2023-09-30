@@ -1,5 +1,5 @@
 from django.shortcuts import render,render
-from products.models import Product,Product_image,Category,Size,Color,Brand,Wishlist,Cart,Profile
+from products.models import Product,Product_image,Category,Size,Color,Brand,Wishlist,Cart,Profile,CartItems
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 # Create your views here.
@@ -13,8 +13,8 @@ def home(request):
 
     if request.user.is_authenticated and request.user.is_staff is False:
         context['wishlist'] = [item.product for item in Wishlist.objects.filter(user=request.user.profile)]
-        context['cart'] = [item.product for item in Cart.objects.filter(user=request.user.profile)]
-
+        user_cart_items = CartItems.objects.filter(cart__user=request.user.profile)
+        context['cart'] = [item.product for item in user_cart_items]
     return render(request, 'navbarpages/index.html', context)
 
 
@@ -56,7 +56,8 @@ def shop_listing(request):
 
     if request.user.is_authenticated and not request.user.is_staff:
         context['wishlist'] = [item.product for item in Wishlist.objects.filter(user=request.user.profile)]
-        context['cart'] = [item.product for item in Cart.objects.filter(user=request.user.profile)]
+        user_cart_items = CartItems.objects.filter(cart__user=request.user.profile)
+        context['cart'] = [item.product for item in user_cart_items]
         context['user'] = Profile.objects.get(user = request.user)
 
     return render(request, 'navbarpages/shop.html', context)
@@ -70,7 +71,8 @@ def product_detail(request, uid):
     products_with_category = Product.objects.filter(category = category_obj)
     if request.user.is_authenticated and request.user.is_staff is False:
         context['wishlist'] = [item.product for item in Wishlist.objects.filter(user=request.user.profile)]
-        context['cart'] = [item.product for item in Cart.objects.filter(user=request.user.profile)]
+        user_cart_items = CartItems.objects.filter(cart__user=request.user.profile)
+        context['cart'] = [item.product for item in user_cart_items]
         context['user'] = Profile.objects.get(user = request.user)
     context['products'] = product_obj
     context['images'] = product_img_obj

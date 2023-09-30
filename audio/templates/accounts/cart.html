@@ -36,7 +36,7 @@
                                         ></a>
                                     </td>
                                     <td class="product-thumbnail">
-                                        <a href="/product/detail/{{product.uid}}">
+                                        <a href="/product/detail/{{product.product.uid}}">
                                            
                                             <img
                                                 src="{{product.product.main_image.url}}"
@@ -49,7 +49,7 @@
                                     </td>
 
                                     <td class="product-name">
-                                        <a href="/product/detail/{{product.uid}}">{{product.product.name}}</a>
+                                        <a href="/product/detail/{{product.product.uid}}">{{product.product.name}}</a>
                                         {% if product.product.stock < product.quantity %}
                                             <p class="text-danger" >Out of Stock</p>
                                         {% endif %}
@@ -93,7 +93,7 @@
                                     </td>
 
                                     <td class="product-subtotal">
-                                        ₹{{product.total_price}}
+                                        ₹{{product.sub_total}}
                                     </td>
                                 </tr>
                                {% endfor %}

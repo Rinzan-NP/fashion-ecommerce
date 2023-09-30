@@ -5,7 +5,7 @@ from django.http import HttpResponseRedirect,HttpResponse
 from django.contrib.auth.models import User
 from django.contrib import messages
 from . models import Profile
-from products.models import Wishlist,Cart
+from products.models import Wishlist,Cart,CartItems
 from django.urls import reverse
 from .utils import send_account_activation_email, send_forgot_pass_token
 from django.utils import timezone
@@ -13,6 +13,7 @@ from datetime import timedelta
 import os
 from django.conf import settings
 from checkouts.models import Order,Address
+from django.shortcuts import get_object_or_404
 
 # Create your views here.
 
@@ -203,27 +204,31 @@ def wishlist_listing(request, uid):
 def cart_listing(request, uid):
     context = {}
     try:
+        # Get the user profile using the provided uid.
+        profile = get_object_or_404(Profile, uid=uid)
+
+        # Try to retrieve the user's cart, create one if it doesn't exist.
+        cart, created = Cart.objects.get_or_create(user=profile)
+
+        # Retrieve the cart items associated with the user's cart.
+        cart_items = CartItems.objects.filter(cart=cart)
+
+        # Calculate the grand total of the cart items.
         
-        profile = Profile.objects.get(uid=uid)
-        cart_products = Cart.objects.filter(user=profile).order_by('created_at') 
-        grand_total = sum(item.total_price for item in cart_products)
 
-        out_of_stock = False
+        # Check if any of the products are out of stock.
+        out_of_stock = any(item.product.stock < item.quantity for item in cart_items)
 
-        for cart_product in  cart_products:
-            product_obj = cart_product.product
-            if cart_product.quantity > product_obj.stock:
-                out_of_stock =  True
-                break
 
 
         context['out_of_stock'] = out_of_stock
-        context['grand_total'] = grand_total
+        context['grand_total'] = cart.total_price
         context['user'] = profile
-        context['products'] = cart_products
+        context['products'] = cart_items
     except Exception as e:
         return HttpResponse(e)
     return render(request, 'accounts/cart.html', context)
+
 
 def profile(request, uid):
     context = {}
