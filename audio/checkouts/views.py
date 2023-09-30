@@ -1,7 +1,7 @@
 from django.shortcuts import render,redirect
 from django.contrib.auth.models import User
 from django.urls import reverse
-from products.models import Cart,Product,Profile
+from products.models import Cart,Product,Profile,CartItems
 from django.http import HttpResponse
 from . models import Address,Coupon
 
@@ -11,13 +11,14 @@ from .models import Profile, Cart, Address, PaymentMethod, Order
 
 def checkout(request, user_uid):
     context = {}
-    
+    profile = Profile.objects.get(uid=user_uid)
+    cart = Cart.objects.get(user = profile)
+    cart_objs = CartItems.objects.filter(cart__user = user_uid)
+    addresses = Address.objects.filter(unlisted=False, user=request.user)
    
     if request.method == "POST":
         # Get user profile and cart items
-        profile = Profile.objects.get(uid=user_uid)
-        cart_objs = Cart.objects.filter(user=profile)
-        grand_total = sum(cart_product.total_price for cart_product in cart_objs)
+       
         
         # Get selected address and payment method from the form
         address_id = request.POST.get('addressId')
@@ -51,12 +52,9 @@ def checkout(request, user_uid):
         
         
         # If it's not a POST request, retrieve data for the checkout page
-    profile = Profile.objects.get(uid=user_uid)
-    cart_objs = Cart.objects.filter(user=profile)
-    grand_total = sum(cart_product.total_price for cart_product in cart_objs)
-    addresses = Address.objects.filter(unlisted=False, user=request.user)
+
     context['products'] = cart_objs
-    context['grand_total'] = grand_total
+    context['grand_total'] = cart.total_price
     context['user'] = profile
     context['addresses'] = addresses
     
