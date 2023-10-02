@@ -7,7 +7,7 @@ def home(request):
     context = {}
     latest_products = Product.objects.filter(is_selling = True,
         category__unlisted=False,
-        size__unlisted=False,
+        
         brand__unlisted=False).order_by('-created_at')[:8]
     context['products'] = latest_products
 
@@ -25,14 +25,13 @@ def shop_listing(request):
     product_obj = Product.objects.filter(
         is_selling=True,
         category__unlisted=False,
-        size__unlisted=False,
         brand__unlisted=False
     )
     
 
     categories = Category.objects.filter(unlisted=False)
     brands = Brand.objects.filter(unlisted=False)
-    sizes = Size.objects.filter(unlisted=False)
+    sizes = Size.objects.all()
     colors = Color.objects.all()
 
     # Initialize Paginator

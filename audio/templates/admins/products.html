@@ -143,10 +143,10 @@
                 </div>
             </div>
             <div class="card mb-4 table-responsive p-3">
-                <table class="w-100 " id="productTable">
-                    <thead class="">
+                <table class="" id="productTable">
+                    <thead class="w-100 ">
                         <tr class="row align-items-center m-2">
-                            <th class="col-lg-1 col-sm-4 col-8 ">
+                            <th class="col-md-1 col-sm-4 col-8 ">
                                 <a class="text-decoration-none" href="#">
                                     <div class="">
                                         <h6 class="m-0 text-black ">Image</h6>
@@ -154,7 +154,7 @@
                                     
                                 </a>
                             </th>
-                            <th class="col-lg-3 col-sm-4 col-8 col-name">
+                            <th class="col-md-3 col-sm-4 col-8 col-name">
                                 <a class="itemside" href="#">
                                    
                                     <div class="info">
@@ -162,16 +162,14 @@
                                     </div>
                                 </a>
                             </th>
-                            <th class="col-lg-1 col-sm-2 col-4 col-price"> 
+                            <th class="col-md-1 col-sm-2 col-4 col-price"> 
                                 <span>Price</span> 
                             </th>
-                            <th class="col-lg-2 col-sm-2 col-4 col-status">
+                            <th class="col-md-2 col-sm-2 col-4 col-status">
                                 <span class="alert">Availability</span>
                             </th>
-                            <th class="col-lg-1 col-sm-2 col-4 ">
-                                <span class="w-auto">Qty</span>
-                            </th>
-                            <th class="col-lg-1 col-sm-2 col-4 col-action text-center ">
+                           
+                            <th class="col-md-2 col-sm-2 col-4 col-action text-center ">
                                 <a href="#" class="text-decoration-none text-secondary font-sm  rounded">
                                     Actions
                                 </a>
@@ -184,14 +182,14 @@
                     <tbody class="card-body">
                         {% for product in products %}
                         <tr class="row align-items-center">
-                            <td class="col-lg-1 col-sm-4 col-8 flex-grow-1 col-name">
+                            <td class="col-md-1 col-sm-4 col-8 flex-grow-1 col-name">
                                 <a class="itemside" href="#">
                                     <div class="left m-2">
                                         <img src="{{product.main_image.url}}" class="img-sm img-thumbnail" alt="Item">
                                     </div>
                                 </a>
                             </td>
-                            <td class="col-lg-3 col-sm-4 col-8 flex-grow-1 col-name">
+                            <td class="col-md-3 col-sm-4 col-8 flex-grow-1 col-name">
                                 <a class="itemside" href="#">
         
                                     <div class="info ">
@@ -199,20 +197,18 @@
                                     </div>
                                 </a>
                             </td>
-                            <td class="col-lg-1 col-sm-2 col-4 col-price "> 
+                            <td class="col-md-1 col-sm-2 col-4 col-price "> 
                                 <span class="text-black fs-6">₹{{product.selling_price}}</span> 
                             </td>
-                            <td class="col-lg-2 col-sm-2 col-4 col-status">
+                            <td class="col-md-2 col-sm-2 col-4 col-status">
                                 {% if product.is_selling %}
                                 <span class="badge rounded-pill alert-success fs-6">Available </span>
                                 {% else %}
                                 <span class="badge rounded-pill alert-danger fs-6">Not available</span>
                                 {% endif %}
                             </td>
-                            <td class="col-lg-1 col-sm-2 col-4 ">
-                                <span class="text-black fs-6 ">{{product.stock}}</span>
-                            </td>
-                            <td class="col-lg-2 col-sm-2 col-4 col-action text-end d-flex gap-2">
+                            
+                            <td class="col-md-3 col-sm-2 col-4 col-action text-end d-flex gap-2">
                                 <a href="/admin/product/edit/{{product.uid}}" class="btn btn-sm font-sm rounded btn-info text-white d-flex justify-content-center align-items-center fs-4">
                                    <i class="material-icons md-edit"></i> 
                                 </a>

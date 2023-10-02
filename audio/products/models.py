@@ -17,7 +17,7 @@ class Category(models.Model):
 
 class Size(models.Model):
     size = models.IntegerField()
-    unlisted = models.BooleanField(default=False)
+    
 
     def __str__(self):
         str_size = str(self.size)
@@ -48,8 +48,6 @@ class Product(BaseModel):
     selling_price = models.DecimalField(max_digits=7, decimal_places=2)
     brand = models.ForeignKey(Brand, related_name='brand_of_product', on_delete=models.CASCADE)
     category = models.ForeignKey(Category, related_name='category_of_product', on_delete=models.CASCADE)
-    size = models.ForeignKey(Size, related_name='size_of_product', on_delete=models.CASCADE)
-    stock = models.IntegerField()
     is_selling = models.BooleanField(default=True)
     color = models.ForeignKey(Color, related_name='color_of_product', on_delete=models.CASCADE)
 
@@ -57,7 +55,13 @@ class Product(BaseModel):
 
     def __str__(self):
         return self.name
-    
+class ProductVarient(BaseModel):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    stock = models.IntegerField()
+    size = models.ForeignKey(Size, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return f"{self.product.name} : {self.Size}"
 
 class Product_image(models.Model):
     product = models.OneToOneField(Product, on_delete=models.CASCADE)
