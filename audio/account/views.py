@@ -277,11 +277,13 @@ def order_detail(request, order_uid):
 
 def order_canceling(request, order_uid):
     try:
-        order_obj = OrderItems.objects.get(uid = order_uid)
+        order_obj = Order.objects.get(uid = order_uid)
         order_obj.status = "Canceled"
-        order_obj.product.stock -= order_obj.quantity
-        order_obj.product.save()
         order_obj.save()
+        order = OrderItems.objects.filter(order = order_obj)
+        for item in order:
+            item.product.stock += item.quantity
+            item.product.save()
         messages.success(request, "Order canceled successfully!")
         return redirect(f'/account/order/{request.user.profile.uid}')
     except Exception as e:

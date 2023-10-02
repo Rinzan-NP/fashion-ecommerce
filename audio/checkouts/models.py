@@ -39,6 +39,7 @@ class Order(BaseModel):
     products = models.ManyToManyField(Product, through="OrderItems")    
     bill_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     amount_to_pay = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    status = models.CharField(max_length=40, default="Pending")
 
     def calculate_bill_amount(self):
         # Calculate the bill_amount as the sum of sub_total for all OrderItems
@@ -49,7 +50,6 @@ class Order(BaseModel):
 
 class OrderItems(BaseModel):
     order = models.ForeignKey(Order,related_name='orderitems', on_delete=models.CASCADE)
-    status = models.CharField(max_length=50)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.IntegerField()
     product_price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)

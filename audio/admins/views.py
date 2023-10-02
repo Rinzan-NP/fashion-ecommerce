@@ -6,7 +6,7 @@ from django.contrib import messages
 from django.urls import reverse
 from products.models import Product,Category,Size,Brand,Color,Product_image
 from account.models import Profile
-from checkouts.models import Order
+from checkouts.models import Order,OrderItems
 from .decarator import admin_required
 # Create your views here.
 def dashboard(request):
@@ -466,12 +466,15 @@ def order(request):
 @admin_required
 def order_detail(request, order_uid):
     context = {}
-    orders = Order.objects.get(uid = order_uid)
-    context['order'] = orders
+    order = Order.objects.get(uid = order_uid)
+    orders = OrderItems.objects.filter(order =order)
+    context['orders'] = orders
+    context['order'] = order
     if request.method == "POST":
         status  = request.POST.get('status')
-        orders.status = status
-        orders.save()
+        order.status = status
+        order.save()
         return redirect(reverse('admin_order_listing'))
 
     return render(request, 'admins/order/order_detail.html', context)
+

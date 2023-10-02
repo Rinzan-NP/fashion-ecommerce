@@ -165,13 +165,12 @@
                     <thead>
                         <tr>
                             
-                            
+                            <th scope="col">Order ID</th>
                             <th scope="col">Email</th>
-                            <th scope="col">Product</th>
+                            
 
                             <th scope="col">Price</th>
 
-                            <th scope="col">Status</th>
                            
                             <th scope="col" class="text-end"> Action </th>
                         </tr>
@@ -180,23 +179,13 @@
                         {% for order in  orders %}
                         <tr>
                             
-                  
+                            <td>{{order.uid}}</td>
                             <td>{{order.user.email}}</td>
-                            <td>{{order.product.name}}</td>
+                            
 
-                            <td>{{order.product.price}}</td>
+                            <td>{{order.amount_to_pay}}</td>
                    
-                            <td>
-                                {% if order.status == 'Canceled' %}
-                                    <span class="badge rounded-pill alert-danger d-flex justify-content-center align-items-center" style="font-size: 14px">{{ order.status }}</span>
-                                {% elif order.status == 'Delivered' %}
-                                    <span class="badge rounded-pill alert-success d-flex justify-content-center align-items-center" style="font-size: 14px">{{ order.status }}</span>
-                                {% elif order.status == 'Pending' %}
-                                    <span class="badge rounded-pill alert-info d-flex justify-content-center align-items-center" style="font-size: 14px">{{ order.status }}</span>
-                                {% else %}
-                                    <span class="badge rounded-pill alert-warning d-flex justify-content-center align-items-center" style="font-size: 14px">{{ order.status }}</span>
-                                {% endif %}
-                            </td>
+                            
                       
                             <td class="text-end">
                                 <a href="/admin/order_detail/{{order.uid}}" class="btn btn-success rounded font-sm h-auto">Detail</a>

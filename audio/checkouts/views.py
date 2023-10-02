@@ -29,6 +29,7 @@ def checkout(request, user_uid):
             user=request.user,
             address=selected_address,
             payment_method=payment_method,
+            status="Pending", 
               # You can adjust this as needed
         )
 
@@ -41,10 +42,10 @@ def checkout(request, user_uid):
             # Create an order item
             order_item = OrderItems.objects.create(
                 order=order,  # We'll set this after creating the order
-                status="Pending",  # You can set the initial status as needed
+                 # You can set the initial status as needed
                 product=cart_product.product,
                 quantity=cart_product.quantity,
-                product_price=cart_product.product.price,
+                product_price=cart_product.product.selling_price,
                 sub_total=sub_total,
             )
 

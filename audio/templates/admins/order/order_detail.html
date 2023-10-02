@@ -170,33 +170,52 @@
     </div>
     <div class="card mb-4">
         <div class="card-body">
+      
             <div class="order-info">
                 <img src="{{ order.product.main_image.url }}" alt="" class="product-image col-md-4 mb-4">
                 <p><strong>User:</strong> {{ order.user.username }}</p>
                 <p><strong>Address:</strong> {{ order.address }}</p>
                 <p><strong>Payment Method:</strong> {{ order.payment_method }}</p>
                 <p><strong>Status:</strong>
-                    <form method="POST">
-                        {% csrf_token %}
-                        <select name="status">
-                            <option value="Pending" {% if order.status == 'Pending' %} selected {% endif %}>Pending</option>
-                            <option value="Shipped" {% if order.status == 'Shipped' %} selected {% endif %}>Shipped</option>
-                            <option value="Delivered" {% if order.status == 'Delivered' %} selected {% endif %}>Delivered</option>
-                            <option value="Canceled" {% if order.status == 'Canceled' %} selected {% endif %}>Canceled</option>
-                        </select>
+                <form method="POST">
+                  {% csrf_token %}
+                  <select name="status">
+                    {% if order.status == "Canceled" or order.status == "Delivered"%}
+                      <option value ="{{order.status}}">{{order.status}}</option>
+                      
+                    {% else %}
+                    <option value="Pending" {% if order.status == 'Pending' %} selected {% endif %}>Pending</option>
+                    <option value="Shipped" {% if order.status == 'Shipped' %} selected {% endif %}>Shipped</option>
+                    <option value="Delivered" {% if order.status == 'Delivered' %} selected {% endif %}>Delivered</option>
+                    <option value="Canceled" {% if order.status == 'Canceled' %} selected {% endif %}>Canceled</option>
+                    {% endif %}
                     
-                </p>
-                <p><strong>Product:</strong> {{ order.product.name }}</p>
-                <p><strong>Quantity:</strong> {{ order.quantity }}</p>
-                <p><strong>Coupon:</strong> {{ order.coupon }}</p>
-                <p><strong>Price:</strong> {{ order.product.selling_price }}</p>
+                  </select>
+                
+              </p>
+                {% for item in orders%}
+                <hr>
+                
+                <p><strong>Product:</strong> {{ item.product.name }}</p>
+                <p><strong>Quantity:</strong> {{ item.quantity }}</p>
+                
+                 
+                      
+              
+                <p><strong>Price:</strong> {{ item.product_price }}</p>
+                
+                {% endfor %}
+                <hr>
                 <p><strong>Amount to Pay:</strong> {{ order.amount_to_pay }}</p>
 
+                
+                      <div class="d-flex justify-content-between flex-wrap mt-3">
+                        <button class="btn btn-primary mt-3 mt-md-0 h-auto" type="submit" id="saveChangesButton">Save Changes</button>
+                    </div>
+                  </form>
+                      
             </div>
-            <div class="d-flex justify-content-between flex-wrap mt-3">
-                <button class="btn btn-primary mt-3 mt-md-0 h-auto" type="submit" id="saveChangesButton">Save Changes</button>
-            </div>
-            </form>
+            
         </div> <!-- card-body end// -->
     </div> <!-- card end// -->
 

@@ -45,9 +45,9 @@
                         <div class="form-group">
                             <label for="orderStatus">Order Status :</label>
                             {% if order.status == "Canceled" %}
-                                <span id="orderStatus" class="text-danger"><b>{{order.status}}</b></span> 
+                                <span id="orderStatus" class="text-danger"><b>{{order.order.status}}</b></span> 
                             {% else %}
-                                <span id="orderStatus" class="text-info"><b>{{order.status}}</b></span>
+                                <span id="orderStatus" class="text-info"><b>{{order.order.status}}</b></span>
                             {% endif %}
                         </div>
                         <div class="form-group">
@@ -73,7 +73,7 @@
                             <span id="deliveryDate">{{order.delivery_date | date:"d F Y"}}</span>
                             {% endif %}
                         </div>
-                        {% if order.status != "Canceled" %}
+                        {% if order.order.status != "Canceled" %}
                             <a class="btn btn-danger h-auto" href="#" data-toggle="modal" data-target="#cancelOrderModal">Cancel Order</a>
                         {% endif %}
                     </div>
@@ -98,7 +98,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary h-auto" data-dismiss="modal">Cancel</button>
-                <a class="btn btn-danger h-auto" href="/account/order_cancel/{{ order.uid }}">Confirm Cancellation</a>
+                <a class="btn btn-danger h-auto" href="/account/order_cancel/{{ order.order.uid }}">Confirm Cancellation</a>
             </div>
         </div>
     </div>
