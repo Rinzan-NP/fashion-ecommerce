@@ -123,6 +123,7 @@ class Cart(BaseModel):
 class CartItems(BaseModel):
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    size = models.ForeignKey(Size, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField(default=1)
     sub_total = models.DecimalField(max_digits=20, decimal_places=2, default=0.00)  # Add sub_total field
 

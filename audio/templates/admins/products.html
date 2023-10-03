@@ -143,91 +143,66 @@
                 </div>
             </div>
             <div class="card mb-4 table-responsive p-3">
-                <table class="" id="productTable">
-                    <thead class="w-100 ">
-                        <tr class="row align-items-center m-2">
-                            <th class="col-md-1 col-sm-4 col-8 ">
-                                <a class="text-decoration-none" href="#">
-                                    <div class="">
-                                        <h6 class="m-0 text-black ">Image</h6>
-                                    </div>
-                                    
-                                </a>
-                            </th>
-                            <th class="col-md-3 col-sm-4 col-8 col-name">
-                                <a class="itemside" href="#">
-                                   
-                                    <div class="info">
-                                        <h6 class="mb-0">Name</h6>
-                                    </div>
-                                </a>
-                            </th>
-                            <th class="col-md-1 col-sm-2 col-4 col-price"> 
-                                <span>Price</span> 
-                            </th>
-                            <th class="col-md-2 col-sm-2 col-4 col-status">
-                                <span class="alert">Availability</span>
-                            </th>
-                           
-                            <th class="col-md-2 col-sm-2 col-4 col-action text-center ">
-                                <a href="#" class="text-decoration-none text-secondary font-sm  rounded">
-                                    Actions
-                                </a>
-                            </th>
-                        </tr> <!-- row .// -->
-                    </thead>
+                <div class="">
+                    <table class="table" id="productTable" >
+                        <thead>
+                            <tr>
+                                <th>
+                                    <h6>Image</h6>
+                                </th>
+                                <th>
+                                    <h6>Name</h6>
+                                </th>
+                                <th>
+                                    <span>Price</span>
+                                </th>
+                                <th>
+                                    <span>Availability</span>
+                                </th>
+                                <th>
+                                    <span>Actions</span>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for product in products %}
+                            <tr>
+                                <td>
+                                    <img class="img-sm img-thumbnail" src="{{ product.main_image.url }}" alt="Item">
+                                </td>
+                                <td>
+                                    <h6>{{ product.name }}</h6>
+                                </td>
+                                <td>
+                                    <span>₹{{ product.selling_price }}</span>
+                                </td>
+                                <td>
+                                    {% if product.is_selling %}
+                                    <span class="badge rounded-pill alert-success">Available</span>
+                                    {% else %}
+                                    <span class="badge rounded-pill alert-danger">Not available</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <a href="/admin/product/edit/{{ product.uid }}" class="btn btn-info text-white h-auto">
+                                        <i class="material-icons md-edit"></i>
+                                    </a>
+                                    {% if product.is_selling is False %}
+                                    <a href="/admin/product/delete/{{ product.uid }}" class="btn btn-success h-auto">
+                                        List
+                                    </a>
+                                    {% else %}
+                                    <a href="/admin/product/delete/{{ product.uid }}" class="btn btn-danger h-auto">
+                                        Unlist
+                                    </a>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
                 
-              
-              
-                    <tbody class="card-body">
-                        {% for product in products %}
-                        <tr class="row align-items-center">
-                            <td class="col-md-1 col-sm-4 col-8 flex-grow-1 col-name">
-                                <a class="itemside" href="#">
-                                    <div class="left m-2">
-                                        <img src="{{product.main_image.url}}" class="img-sm img-thumbnail" alt="Item">
-                                    </div>
-                                </a>
-                            </td>
-                            <td class="col-md-3 col-sm-4 col-8 flex-grow-1 col-name">
-                                <a class="itemside" href="#">
-        
-                                    <div class="info ">
-                                        <h6 class="mb-0">{{product.name}}</h6>
-                                    </div>
-                                </a>
-                            </td>
-                            <td class="col-md-1 col-sm-2 col-4 col-price "> 
-                                <span class="text-black fs-6">₹{{product.selling_price}}</span> 
-                            </td>
-                            <td class="col-md-2 col-sm-2 col-4 col-status">
-                                {% if product.is_selling %}
-                                <span class="badge rounded-pill alert-success fs-6">Available </span>
-                                {% else %}
-                                <span class="badge rounded-pill alert-danger fs-6">Not available</span>
-                                {% endif %}
-                            </td>
-                            
-                            <td class="col-md-3 col-sm-2 col-4 col-action text-end d-flex gap-2">
-                                <a href="/admin/product/edit/{{product.uid}}" class="btn btn-sm font-sm rounded btn-info text-white d-flex justify-content-center align-items-center fs-4">
-                                   <i class="material-icons md-edit"></i> 
-                                </a>
-                                {% if product.is_selling is False %}
-                                <a href="/admin/product/delete/{{product.uid}}" class="btn btn-sm font-sm btn-success h-auto d-flex justify-content-center align-items-center rounded">
-                                    List
-                                </a>
-                                {% else %}
-                                <a href="/admin/product/delete/{{product.uid}}" class="btn btn-sm font-sm btn-danger rounded">
-                                    Unlist
-                                </a>
-                                {% endif %}
-                            </td>
-                        </tr> <!-- row .// -->
-                        {% endfor %}
-                    </tbody>
-                           
-                
-            </table> 
         </section> <!-- content-main end// -->
 
         

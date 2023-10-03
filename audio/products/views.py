@@ -1,8 +1,12 @@
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render,redirect
 from django.urls import reverse
 from account.models import Profile
-from .models import Wishlist,Product,Cart,CartItems
+from .models import Wishlist,Product,Cart,CartItems,Size,ProductVarient
+from django.http import HttpResponse, HttpResponseRedirect
+from django.contrib import messages
+from django.shortcuts import get_object_or_404
+
 # Create your views here.
 def wishlist_management(request,user_uid, product_uid):
     try:
@@ -17,35 +21,32 @@ def wishlist_management(request,user_uid, product_uid):
         return HttpResponse(e)
     
         
-def cart_management(request, user_uid, product_uid):
+
+def add_to_cart(request, product_uid, size_id):
     try:
-        # Get the user and product objects based on the provided IDs.
-        user = Profile.objects.get(uid=user_uid)
-        product = Product.objects.get(uid=product_uid)
+        product_obj = Product.objects.get(uid=product_uid)
+        size = Size.objects.get(id=size_id)
 
-        # Check if a cart already exists for the user.
-        cart, created = Cart.objects.get_or_create(user=user)
+        cart, created = Cart.objects.get_or_create(user=request.user.profile)
 
-        # Check if the product is already in the cart.
-        cart_item, item_created = CartItems.objects.get_or_create(cart=cart, product=product)
-
+        # Check if the item already exists in the cart
+        cart_item, item_created = CartItems.objects.get_or_create(cart=cart, product=product_obj, size=size)
+        product_varient = ProductVarient.objects.get(product =product_obj,size = size)
+        print(product_varient.stock)
         if not item_created:
-            # If the item already exists in the cart, redirect to the cart listing page for this user.
-            return redirect(f'/account/cart/{user.uid}')
+            # If the item already exists, increment the quantity
+            if cart_item.quantity < product_varient.stock:
+                cart_item.quantity += 1
+                cart_item.save()
+                messages.success(request, "Added to cart")
+            else:
+                messages.warning(request, "Out of stock")
 
-        # Calculate the total price of the cart and update it.
-        cart.calculate_total_price()
-
-        # Save the changes to the cart.
-        cart.save()
-
-        # Return a success indicator or relevant data.
+        
         return redirect(request.META.get('HTTP_REFERER'))
 
     except Exception as e:
-        # Handle exceptions (e.g., user or product not found) and return an error message.
-        return {'success': False, 'message': str(e)}
-    
+        return HttpResponse(e)
 
 def cart_deleting(request, uid):
     try:
