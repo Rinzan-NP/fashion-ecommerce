@@ -32,10 +32,7 @@
                             <label for="orderDate">Order Date:</label>
                             <span id="orderDate">{{ order.created_at|date:"d F Y" }}</span>
                         </div>
-                        <div class="form-group">
-                            <label for="orderTime">Order Time:</label>
-                            <span id="orderTime">{{ order.created_at|date:"h:i A" }}</span>
-                        </div>
+                        
                         {% if order.status != "Canceled" %}
                         <div class="form-group">
                             <label for="orderTime">Payment method:</label>
@@ -43,37 +40,41 @@
                         </div>
                         {% endif %}
                         <div class="form-group">
-                            <label for="orderStatus">Order Status :</label>
+                            <label for="orderStatus">Order Status:</label>
                             {% if order.status == "Canceled" %}
-                                <span id="orderStatus" class="text-danger"><b>{{order.order.status}}</b></span> 
+                                <span id="orderStatus" class="text-danger"><b>{{order.status}}</b></span> 
                             {% else %}
-                                <span id="orderStatus" class="text-info"><b>{{order.order.status}}</b></span>
+                                <span id="orderStatus" class="text-info"><b>{{order.status}}</b></span>
                             {% endif %}
                         </div>
                         <div class="form-group">
-                            <label for="quantity">Quantity :</label>
+                            <label for="quantity">Quantity:</label>
                             <span id="quantity">{{order.quantity}}</span>
                         </div>
                         <div class="form-group">
+                            <label for="quantity">Size:</label>
+                            <span id="quantity">{{order.size.size}}</span>
+                        </div>
+                        <div class="form-group">
                             <div class="d-flex">
-                                <label for="address">Address : </label>
+                                <label for="address">Address:</label>
                                 <span id="address">
                                 <p class="card-text">
                                     {{order.order.address.street_address}}, {{order.order.address.local_place}}, {{order.order.address.city}}, {{order.order.address.district}},{{order.order.address.state}}
                                     {{order.order.address.pincode}}
                                 </p>
-                               </div>
-                               <p class="card-text">Mobile: +91 <b>{{ order.order.address.phone_number }}</b></p>
-                            
+                                
+                            </div>
+                            <p class="card-text">Mobile: +91 <b>{{ order.order.address.phone_number }}</b></p>
 
                         </div>
                         <div class="form-group">
                             {% if order.status != "Canceled" %}
                             <label for="deliveryDate">Delivery Date:</label>
-                            <span id="deliveryDate">{{order.delivery_date | date:"d F Y"}}</span>
+                            <span id="deliveryDate">{{ order.created_at | date:"d F Y" }}</span>
                             {% endif %}
                         </div>
-                        {% if order.order.status != "Canceled" %}
+                        {% if order.status != "Canceled" %}
                             <a class="btn btn-danger h-auto" href="#" data-toggle="modal" data-target="#cancelOrderModal">Cancel Order</a>
                         {% endif %}
                     </div>
@@ -98,7 +99,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary h-auto" data-dismiss="modal">Cancel</button>
-                <a class="btn btn-danger h-auto" href="/account/order_cancel/{{ order.order.uid }}">Confirm Cancellation</a>
+                <a class="btn btn-danger h-auto" href="/account/order_cancel/{{ order.uid }}">Confirm Cancellation</a>
             </div>
         </div>
     </div>
