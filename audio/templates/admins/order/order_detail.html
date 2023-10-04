@@ -172,48 +172,46 @@
         <div class="card-body">
       
             <div class="order-info">
-                <img src="{{ order.product.main_image.url }}" alt="" class="product-image col-md-4 mb-4">
+                <p><strong>Order Id:</strong>ORD{{ order.order_id }}</p>
                 <p><strong>User:</strong> {{ order.user.username }}</p>
                 <p><strong>Address:</strong> {{ order.address }}</p>
                 <p><strong>Payment Method:</strong> {{ order.payment_method }}</p>
-                <p><strong>Status:</strong>
                 <form method="POST">
                   {% csrf_token %}
-                  <select name="status">
-                    {% if order.status == "Canceled" or order.status == "Delivered"%}
-                      <option value ="{{order.status}}">{{order.status}}</option>
-                      
-                    {% else %}
-                    <option value="Pending" {% if order.status == 'Pending' %} selected {% endif %}>Pending</option>
-                    <option value="Shipped" {% if order.status == 'Shipped' %} selected {% endif %}>Shipped</option>
-                    <option value="Delivered" {% if order.status == 'Delivered' %} selected {% endif %}>Delivered</option>
-                    <option value="Canceled" {% if order.status == 'Canceled' %} selected {% endif %}>Canceled</option>
-                    {% endif %}
-                    
-                  </select>
-                
-              </p>
-                {% for item in orders%}
-                <hr>
-                
-                <p><strong>Product:</strong> {{ item.product.name }}</p>
-                <p><strong>Quantity:</strong> {{ item.quantity }}</p>
-                
-                 
-                      
-              
-                <p><strong>Price:</strong> {{ item.product_price }}</p>
-                
-                {% endfor %}
-                <hr>
-                <p><strong>Amount to Pay:</strong> {{ order.amount_to_pay }}</p>
-
-                
-                      <div class="d-flex justify-content-between flex-wrap mt-3">
-                        <button class="btn btn-primary mt-3 mt-md-0 h-auto" type="submit" id="saveChangesButton">Save Changes</button>
+                  <input type="hidden" name="order_uid" value="{{ order.uid }}">
+                  {% for item in orders %}
+                  <hr>
+                  <div class="d-flex">
+                    <div class="col-md-2">
+                      <img src="{{ item.product.main_image.url }}" alt="">
                     </div>
-                  </form>
-                      
+                    <div class="col-md-8">
+                      <p><strong>Product:</strong> {{ item.product.name }}</p>
+                      <p><strong>Quantity:</strong> {{ item.quantity }}</p>
+                      <p><strong>Size:</strong> {{ item.size.size }}</p>
+                      <p><strong>Price:</strong> {{ item.product_price }}</p>
+                      <p><strong>Status:</strong></p>
+                      <select name='status-{{ item.uid }}'>
+                        {% if item.status == "Canceled" or item.status == "Delivered"%}
+                          <option value="{{item.status}}"  selected >{{item.status}}</option>
+                        {% else %}
+                        <option value="Pending" {% if item.status == 'Pending' %} selected {% endif %}>Pending</option>
+                        <option value="Shipped" {% if item.status == 'Shipped' %} selected {% endif %}>Shipped</option>
+                        <option value="Delivered" {% if item.status == 'Delivered' %} selected {% endif %}>Delivered</option>
+                        <option value="Canceled" {% if item.status == 'Canceled' %} selected {% endif %}>Canceled</option>
+                        {% endif %}
+                      </select>
+                    </div>
+                  </div>
+                  {% endfor %}
+                  <hr>
+                  <p><strong>Shipping Fee:</strong> 50</p>
+                  <p><strong>Amount to Pay:</strong> {{ order.amount_to_pay }}</p>
+                  <div class="d-flex justify-content-between flex-wrap mt-3">
+                    <button class="btn btn-primary mt-3 mt-md-0 h-auto" type="submit" id="saveChangesButton">Save Changes</button>
+                  </div>
+                </form>
+                
             </div>
             
         </div> <!-- card-body end// -->

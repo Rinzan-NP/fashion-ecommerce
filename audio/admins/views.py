@@ -484,7 +484,7 @@ def order(request):
     if request.method == "POST":
         order_uid = request.POST.get('uid')
         if order_uid:
-            orders = Order.objects.filter(uid=order_uid)
+            orders = Order.objects.filter(order_id__contains =order_uid)
     
     context['orders'] = orders
     return render(request, 'admins/order/order.html', context)
@@ -492,14 +492,31 @@ def order(request):
 @admin_required
 def order_detail(request, order_uid):
     context = {}
-    order = Order.objects.get(uid = order_uid)
-    orders = OrderItems.objects.filter(order =order)
+    order = Order.objects.get(uid=order_uid)
+    orders = OrderItems.objects.filter(order=order)
     context['orders'] = orders
     context['order'] = order
+
     if request.method == "POST":
-        status  = request.POST.get('status')
-        order.status = status
+        for item in orders:
+            status = request.POST.get(f'status-{item.uid}')
+            item.status = status
+            item.save()
+
+        # Update the overall order status based on the order items
+        new_order_status = "Delivered"  # Set a default status, change it as needed
+        for item in orders:
+            if item.status == "Pending":
+                new_order_status = "Pending"
+                break
+            elif item.status == "Shipped":
+                new_order_status = "Shipped"
+                
+            # You can add more logic here for other status combinations if needed
+        
+        order.status = new_order_status
         order.save()
+
         return redirect(reverse('admin_order_listing'))
 
     return render(request, 'admins/order/order_detail.html', context)
