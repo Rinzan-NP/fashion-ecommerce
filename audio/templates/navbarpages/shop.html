@@ -116,12 +116,7 @@
                             </div>
                             <div class="shop-filter-tab">
                                 <div class="shop-tab nav" role=tablist>
-                                    <a class="active" href="#grid-sidebar7" data-bs-toggle="tab" role="tab" aria-selected="false">
-                                        <i class="ti-layout-grid4-alt"></i>
-                                    </a>
-                                    <a href="#grid-sidebar8" data-bs-toggle="tab" role="tab" aria-selected="true">
-                                        <i class="ti-menu"></i>
-                                    </a>
+                                    
                                 </div>
                             </div>
                         </div>
@@ -147,22 +142,12 @@
                                                         {% endif %}
                                                         </a>
                                                     
-                                                        {% if product in cart %}
-                                                        <a class="animate-top" title="Add To Cart" href="/account/cart/{{user.uid}}">
-                                                            <i class="pe-7s-cart text-info"></i>
-                                                        {% else %}
-                                                        <a class="animate-top" title="Add To Cart" href="/product/cart/{{user.uid}}/{{product.uid}}">
-                                                            <i class="pe-7s-cart"></i>
-                                                        {% endif %}
-                                                      
-                                                    </a>
+                                                        
                                                     {% else %}
                                                         <a class="animate-left" title="Wishlist" href="/account/login/">
                                                         <i class="pe-7s-like"></i>
                                                         </a>
-                                                        <a class="animate-top" title="Add To Cart" href="/account/login/">
-                                                        <i class="pe-7s-cart"></i>
-                                                        </a>
+                                                        
                                                     {% endif %}
                                                 </div>
                                             </div>
@@ -208,18 +193,7 @@
                                                     <p>{{product.description}}</p>
                                                 </div>
                                                 <div class="product-list-cart-wishlist">
-                                                    <div class="product-list-cart">
-                                                        
-                                                        {% if request.user.is_authenticated and request.user.is_staff is False %} 
-                                                            {% if product in cart %}
-                                                                <a class="btn-hover list-btn-style text-decoration-none" href="/account/cart/{{user.uid}}">Go to cart</a>
-                                                            {% else %}
-                                                                <a class="btn-hover list-btn-style text-decoration-none" href="/product/cart/{{user.uid}}/{{product.uid}}">Add to cart</a>
-                                                            {% endif %}
-                                                        {% else %}
-                                                            <a class="btn-hover list-btn-style text-decoration-none" href="/account/login/">Add to cart</a>
-                                                        {% endif %}
-                                                    </div>
+                                                    
                                                     <div class="product-list-wishlist">
                                                         {% if request.user.is_authenticated and request.user.is_staff is False%} 
                                                             {% if product in wishlist %}

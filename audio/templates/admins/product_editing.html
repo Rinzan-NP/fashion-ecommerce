@@ -193,17 +193,7 @@
                       {% endfor %}
                     </select>
                   </div>
-                  <div class="mb-4">
-                    <label class="form-label">Size</label>
-                    <select class="form-select" name="size" required>
-                      <option value={{ product.size.size }}>{{ product.size.size }}</option>
-                      {% for size in sizes %}
-                      {% if size.size != product.size.size %}
-                      <option value={{ size.size }}>{{ size.size }}</option>
-                      {% endif %}
-                      {% endfor %}
-                    </select>
-                  </div>
+                  
                   <div class="mb-4">
                     <label class="form-label">Color</label>
                     <select class="form-select" name="color" required>
@@ -219,25 +209,63 @@
                       {% endfor %}
                     </select>
                   </div>
-                  <div class="mb-4 mt-2">
-                    <label class="form-label">Stock</label>
-                    <input
-                      type="number"
-                      placeholder="Type here"
-                      class="form-control"
-                      name="stock"
-                      required
-                      value = "{{product.stock}}"
-                    />
-                  </div>
+                 
                 </div>
                 <!-- col-md-9 end -->
               </div>
+              <hr class="mb-4 mt-0" />
+               <div class="row">
+                 <div class="col-md-3">
+                   <h6>2. Stock</h6>
+                 </div>
+                 <div class="col-md-9">
+                   <div class="mb-4">
+                     <label class="form-label">Stock of size 8 :</label>
+                     <input
+                       type="number"
+                       placeholder="size 8"
+                       class="form-control"
+                       name="stock8"
+                       required
+                       value = "{{stock_8}}"
+                     />
+                   </div>
+                 </div>
+                 <div class="col-md-3">
+                 </div>
+                 <div class="col-md-9">
+                   <div class="mb-4">
+                     <label class="form-label">Stock of size 9 :</label>
+                     <input
+                       type="number"
+                       placeholder="size 9"
+                       class="form-control"
+                       name="stock9"
+                       required
+                       value = "{{stock_9}}"
+                     />
+                   </div>
+                 </div>
+                 <div class="col-md-3">
+                </div>
+                <div class="col-md-9">
+                  <div class="mb-4">
+                    <label class="form-label">Stock of size 10 :</label>
+                    <input
+                      type="number"
+                      placeholder="size 10"
+                      class="form-control"
+                      name="stock10"
+                      required
+                      value = "{{stock_10}}"
+                    />
+                  </div>
+                </div>
               <!-- row end -->
               <hr class="mb-4 mt-0" />
               <div class="row">
                 <div class="col-md-3">
-                  <h6>2. Pricing</h6>
+                  <h6>3. Pricing</h6>
                 </div>
                 <div class="col-md-9">
                   <div class="mb-4">
@@ -271,32 +299,32 @@
               </div>
               <!-- row end -->
               <hr class="mb-4 mt-0" />
-              <div class="row">
-                <div class="col-md-3">
-                  <h6>3. Category</h6>
-                </div>
-                <div class="col-md-9">
-                  <div class="mb-4">
-                    {% for category in categories %}
-                    <label
-                      class="mb-2 form-check form-check-inline"
-                      style="width: 45%"
-                    >
-                      <input
-                        class="form-check-input"
-                        name="category"
-                        type="radio"
-                        value="{{ category.category_name }}"
-                        required
-                      />
-                      <span class="form-check-label">{{ category.category_name }}</span
-                      >
-                    </label>
-                    {% endfor %}
+              
+                <div class="row">
+                  <div class="col-md-3">
+                      <h6>4. Category</h6>
                   </div>
-                </div>
-                <!-- col-md-9 end -->
+                  <div class="col-md-9">
+                      <div class="mb-4">
+                          {% for category in categories %}
+                          <label class="mb-2 form-check form-check-inline" style="width: 45%">
+                              <input
+                                  class="form-check-input"
+                                  name="category"
+                                  type="radio"
+                                  value="{{ category.category_name }}"
+                                  {% if category.category_name == product.category.category_name %}
+                                      checked
+                                  {% endif %}
+                                  required
+                              />
+                              <span class="form-check-label">{{ category.category_name }}</span>
+                          </label>
+                          {% endfor %}
+                      </div>
+                  </div>
               </div>
+              
               <!-- row end -->
               <style>
                 .media_image{

@@ -1,4 +1,4 @@
-from django.shortcuts import render,render
+from django.shortcuts import redirect, render,render
 from products.models import Product,Product_image,Category,Size,Color,Brand,Wishlist,Cart,Profile,CartItems
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
@@ -7,7 +7,7 @@ def home(request):
     context = {}
     latest_products = Product.objects.filter(is_selling = True,
         category__unlisted=False,
-        size__unlisted=False,
+        
         brand__unlisted=False).order_by('-created_at')[:8]
     context['products'] = latest_products
 
@@ -25,14 +25,13 @@ def shop_listing(request):
     product_obj = Product.objects.filter(
         is_selling=True,
         category__unlisted=False,
-        size__unlisted=False,
         brand__unlisted=False
     )
     
 
     categories = Category.objects.filter(unlisted=False)
     brands = Brand.objects.filter(unlisted=False)
-    sizes = Size.objects.filter(unlisted=False)
+    sizes = Size.objects.all()
     colors = Color.objects.all()
 
     # Initialize Paginator
@@ -68,13 +67,21 @@ def product_detail(request, uid):
     product_obj = Product.objects.get(uid = uid)
     product_img_obj = Product_image.objects.get(product = product_obj)
     category_obj = product_obj.category
+    sizes = Size.objects.all()
     products_with_category = Product.objects.filter(category = category_obj)
+
+    if request.method == "POST":
+        size = request.POST.get('size')
+        size_obj  = Size.objects.get(id = size)
+        return redirect(f'/product/cart/{product_obj.uid}/{size_obj.id}')
+
     if request.user.is_authenticated and request.user.is_staff is False:
         context['wishlist'] = [item.product for item in Wishlist.objects.filter(user=request.user.profile)]
         user_cart_items = CartItems.objects.filter(cart__user=request.user.profile)
         context['cart'] = [item.product for item in user_cart_items]
         context['user'] = Profile.objects.get(user = request.user)
     context['products'] = product_obj
+    context['sizes'] = sizes
     context['images'] = product_img_obj
     context['category_products'] = products_with_category
     return render(request, 'navbarpages/product_detail.html', context)

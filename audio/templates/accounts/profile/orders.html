@@ -1,5 +1,7 @@
 {% extends "base/base.html" %}
-{% block head %}{% endblock head %}
+{% block head %}
+
+{% endblock head %}
 {% block content %}
 {% include "base/nav.html" %}
 <div class="container mt-4">
@@ -19,11 +21,11 @@
                 <div class="col-md-6">
                     <div class="card-body text-start mt-2">
                         <!-- Center align text content -->
-                        <h6 class="card-title mb-3">Order Number: {{order.order.uid}}</h5>
+                        <h6 class="card-title mb-3">Order Number: ORD{{order.order.order_id}}</h5>
                         <p class="card-text mb-2">Order Date: {{ order.created_at|date:"d F Y" }}</p> 
-                        <p class="card-text mb-2">Order Time: {{ order.created_at|date:"h:i A" }}</p>
                         <p class="card-text">Ship To Name: <strong class="text-primary">{{order.order.user.first_name}}</strong></p>
-                        <p class="card-text">Order Status: {% if order.order.status != 'Canceled' %}<strong class="text-success">{{order.order.status}}</strong>{% else %}<strong class="text-danger">{{order.order.status}}</strong>{% endif %}</p>
+                        <p class="card-text">Order Status: {% if order.status != 'Canceled' %}<strong class="text-success">{{order.status}}</strong>{% else %}<strong class="text-danger">{{order.status}}</strong>{% endif %}</p>
+                        <p class="card-text">Size: <strong class="text-dark">{{order.size}}</strong></p>
                         <p class="card-text">Product Price: <strong class="text-dark">₹{{order.product_price}}</strong></p>
                         <p class="card-text">Product Name: <strong class="text-danger">{{order.product.name}}</strong></p>
                         <a href="/account/order_detail/{{order.uid}}" class="btn btn-dark h-auto">View Order</a>

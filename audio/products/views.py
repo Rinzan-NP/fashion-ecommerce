@@ -1,8 +1,12 @@
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render,redirect
 from django.urls import reverse
 from account.models import Profile
-from .models import Wishlist,Product,Cart,CartItems
+from .models import Wishlist,Product,Cart,CartItems,Size,ProductVarient
+from django.http import HttpResponse, HttpResponseRedirect
+from django.contrib import messages
+from django.shortcuts import get_object_or_404
+
 # Create your views here.
 def wishlist_management(request,user_uid, product_uid):
     try:
@@ -17,35 +21,32 @@ def wishlist_management(request,user_uid, product_uid):
         return HttpResponse(e)
     
         
-def cart_management(request, user_uid, product_uid):
+
+def add_to_cart(request, product_uid, size_id):
     try:
-        # Get the user and product objects based on the provided IDs.
-        user = Profile.objects.get(uid=user_uid)
-        product = Product.objects.get(uid=product_uid)
+        product_obj = Product.objects.get(uid=product_uid)
+        size = Size.objects.get(id=size_id)
 
-        # Check if a cart already exists for the user.
-        cart, created = Cart.objects.get_or_create(user=user)
+        cart, created = Cart.objects.get_or_create(user=request.user.profile)
 
-        # Check if the product is already in the cart.
-        cart_item, item_created = CartItems.objects.get_or_create(cart=cart, product=product)
-
+        # Check if the item already exists in the cart
+        cart_item, item_created = CartItems.objects.get_or_create(cart=cart, product=product_obj, size=size)
+        product_varient = ProductVarient.objects.get(product =product_obj,size = size)
+        
         if not item_created:
-            # If the item already exists in the cart, redirect to the cart listing page for this user.
-            return redirect(f'/account/cart/{user.uid}')
+            # If the item already exists, increment the quantity
+            if cart_item.quantity < product_varient.stock:
+                cart_item.quantity += 1
+                cart_item.save()
+                messages.success(request, "Added to cart")
+            else:
+                messages.warning(request, "Out of stock")
 
-        # Calculate the total price of the cart and update it.
-        cart.calculate_total_price()
-
-        # Save the changes to the cart.
-        cart.save()
-
-        # Return a success indicator or relevant data.
+        
         return redirect(request.META.get('HTTP_REFERER'))
 
     except Exception as e:
-        # Handle exceptions (e.g., user or product not found) and return an error message.
-        return {'success': False, 'message': str(e)}
-    
+        return HttpResponse(e)
 
 def cart_deleting(request, uid):
     try:
@@ -59,24 +60,56 @@ def cart_deleting(request, uid):
 
 def quantity_decreasing(request, uid):
     try:
-        cart_obj = CartItems.objects.get(uid = uid)
-        if cart_obj.quantity > 1 :
+        cart_obj = CartItems.objects.get(uid=uid)
+        cart = Cart.objects.get(user=request.user.profile)
+        cart_objs = CartItems.objects.filter(cart=cart)
+        if cart_obj.quantity > 1:
             cart_obj.quantity -= 1
             cart_obj.save()
-            cart_obj.cart.calculate_total_price()
-        return redirect(request.META.get('HTTP_REFERER'))
+            subTotal = cart_obj.calculate_sub_total()
+
+        grand_total = 0  # Initialize grand_total outside the loop
+        for cart_item in cart_objs:
+            sub_total = cart_item.calculate_sub_total()
+            grand_total += sub_total  # Accumulate subtotals
+
+        # Return updated data as JSON response after the loop
+        response_data = {
+            'quantity': cart_obj.quantity,
+            'subTotal': subTotal,
+            'grandTotal': grand_total,  # Include the correct grand_total value
+        }
+        return JsonResponse(response_data)
     except Exception as e:
-        return HttpResponse(e)
-    
-def quantity_increasing(request,uid):
+        return JsonResponse({'error': str(e)})
+
+
+def quantity_increasing(request, uid):
     try:
-        cart_obj = CartItems.objects.get(uid = uid)
-        if cart_obj.quantity <  cart_obj.product.stock :
+        cart_obj = CartItems.objects.get(uid=uid)
+        size_stock = ProductVarient.objects.get(size=cart_obj.size)
+        cart = Cart.objects.get(user=request.user.profile)
+        cart_objs = CartItems.objects.filter(cart=cart)
+
+        if cart_obj.quantity < size_stock.stock:
             cart_obj.quantity += 1
             cart_obj.save()
-            cart_obj.cart.calculate_total_price()
-        return redirect(request.META.get('HTTP_REFERER'))
+
+        grand_total = 0  # Initialize grand_total outside the loop
+        for cart_item in cart_objs:
+            sub_total = cart_item.calculate_sub_total()
+            grand_total += sub_total  # Accumulate subtotals
+
+        # Return updated data as JSON response after the loop
+        response_data = {
+            'quantity': cart_obj.quantity,
+            'subTotal': cart_obj.calculate_sub_total(),  # Calculate subTotal for the updated cart_obj
+            'grandTotal': grand_total,  # Include the correct grand_total value
+        }
+        return JsonResponse(response_data)
     except Exception as e:
-        return HttpResponse(e)
+        return JsonResponse({'error': str(e)})
+
+
     
     

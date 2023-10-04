@@ -5,7 +5,7 @@ from django.http import HttpResponseRedirect,HttpResponse
 from django.contrib.auth.models import User
 from django.contrib import messages
 from . models import Profile
-from products.models import Wishlist,Cart,CartItems
+from products.models import ProductVarient, Wishlist,Cart,CartItems
 from django.urls import reverse
 from .utils import send_account_activation_email, send_forgot_pass_token
 from django.utils import timezone
@@ -211,24 +211,28 @@ def cart_listing(request, uid):
         cart, created = Cart.objects.get_or_create(user=profile)
 
         # Retrieve the cart items associated with the user's cart.
-        cart_items = CartItems.objects.filter(cart=cart)
+        cart_items = CartItems.objects.filter(cart=cart).order_by("-created_at")
 
         # Calculate the grand total of the cart items.
         
 
         # Check if any of the products are out of stock.
-        out_of_stock = any(item.product.stock < item.quantity for item in cart_items)
-
-
+        out_of_stock = any(
+            item.quantity > ProductVarient.objects.get(product=item.product, size=item.size).stock
+            for item in cart_items
+        )
+        grand_total = 0
+        for cart_item in cart_items:
+            sub_total = cart_item.calculate_sub_total()
+            grand_total += sub_total
 
         context['out_of_stock'] = out_of_stock
-        context['grand_total'] = cart.total_price
+        context['grand_total'] = grand_total
         context['user'] = profile
         context['products'] = cart_items
     except Exception as e:
         return HttpResponse(e)
     return render(request, 'accounts/cart.html', context)
-
 
 def profile(request, uid):
     context = {}
@@ -277,13 +281,12 @@ def order_detail(request, order_uid):
 
 def order_canceling(request, order_uid):
     try:
-        order_obj = Order.objects.get(uid = order_uid)
+        order_obj = OrderItems.objects.get(uid = order_uid)
         order_obj.status = "Canceled"
         order_obj.save()
-        order = OrderItems.objects.filter(order = order_obj)
-        for item in order:
-            item.product.stock += item.quantity
-            item.product.save()
+        product_stock = ProductVarient.objects.get(size = order_obj.size)
+        product_stock.stock += order_obj.quantity
+        product_stock.save()
         messages.success(request, "Order canceled successfully!")
         return redirect(f'/account/order/{request.user.profile.uid}')
     except Exception as e:

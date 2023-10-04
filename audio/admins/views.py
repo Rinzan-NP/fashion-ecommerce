@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate,login,logout
 from django.contrib import messages
 from django.urls import reverse
-from products.models import Product,Category,Size,Brand,Color,Product_image
+from products.models import Product,Category,Size,Brand,Color,Product_image,ProductVarient
 from account.models import Profile
 from checkouts.models import Order,OrderItems
 from .decarator import admin_required
@@ -65,10 +65,12 @@ def product_adding(request):
         description = request.POST.get('description')
         price = request.POST.get('price')
         selling_price = request.POST.get('selling_price')
-        stock = request.POST.get('stock')
+        stock_8 = request.POST.get('stock8')
+        stock_9 = request.POST.get('stock9')
+        stock_10  = request.POST.get('stock10')
         color = request.POST.get('color')
         brand = request.POST.get('brand')
-        size = request.POST.get('size')
+       
         category = request.POST.get('category')
         
         image = request.FILES.get('main_image')
@@ -79,19 +81,24 @@ def product_adding(request):
         try:
             color_obj = Color.objects.get(color_name = color)
             brand_obj = Brand.objects.get(brand_name = brand)
-            size_obj = Size.objects.get(size = size)
+            size_obj_8 = Size.objects.get(size = 8)
+            size_obj_9 = Size.objects.get(size = 9)
+            size_obj_10 = Size.objects.get(size = 10)
             category_obj = Category.objects.get(category_name = category)
-            product_obj = Product.objects.filter(name = name,description = description,selling_price = selling_price, color = color_obj,brand = brand_obj, size =size_obj,main_image =image, category = category_obj)
+            product_obj = Product.objects.filter(name = name,description = description,selling_price = selling_price, color = color_obj,brand = brand_obj,main_image =image, category = category_obj)
         except Exception as e:
             return HttpResponse(e)
-        if Product.objects.filter(name = name,description = description,selling_price = selling_price, color = color_obj,brand = brand_obj, size =size_obj,main_image =image, category = category_obj).exists():
+        if Product.objects.filter(name = name,description = description,selling_price = selling_price, color = color_obj,brand = brand_obj,main_image =image, category = category_obj).exists():
             messages.warning(request, 'Product already exist!')
             return redirect(reverse('product_adding'))
         elif not product_obj.exists():
             # try:
-            Product.objects.create(name = name, description = description, price = price, selling_price = selling_price, stock = stock,color = color_obj,brand = brand_obj,main_image = image,category = category_obj,size = size_obj)
-            product_obj = Product.objects.get(name = name, description = description, price = price, selling_price = selling_price, stock = stock,color = color_obj,brand = brand_obj,category = category_obj,size = size_obj)
+            Product.objects.create(name = name, description = description, price = price, selling_price = selling_price,color = color_obj,brand = brand_obj,main_image = image,category = category_obj)
+            product_obj = Product.objects.get(name = name, description = description, price = price, selling_price = selling_price,color = color_obj,brand = brand_obj,category = category_obj)
             Product_image.objects.create(product = product_obj, image_side = image_side, image_back = image_back, image_up = image_up)
+            ProductVarient.objects.create(product = product_obj,size = size_obj_8, stock = stock_8)
+            ProductVarient.objects.create(product = product_obj,size = size_obj_9, stock = stock_9)
+            ProductVarient.objects.create(product = product_obj,size = size_obj_10, stock = stock_10)
             messages.success(request, 'Product added successfully!')
             return redirect(reverse('product_adding'))
             # except Exception as e:
@@ -219,16 +226,20 @@ def product_editing(request , uid):
     sizes = Size.objects.all()
     brands = Brand.objects.all()
     colors = Color.objects.all()
+    size_obj_8 = Size.objects.get(size = 8)
+    size_obj_9 = Size.objects.get(size = 9)
+    size_obj_10 = Size.objects.get(size = 10)
 
     if request.method == "POST":
         name = request.POST.get('name')
         description = request.POST.get('description')
         price = request.POST.get('price')
         selling_price = request.POST.get('selling_price')
-        stock = request.POST.get('stock')
         color = request.POST.get('color')
         brand = request.POST.get('brand')
-        size = request.POST.get('size')
+        stock8 =request.POST.get('stock8')
+        stock9 =request.POST.get('stock9')
+        stock10 =request.POST.get('stock10')
         main_image = request.FILES.get('main_image') if 'main_image' in request.FILES else None
         category = request.POST.get('category')
         side_image = request.FILES.get('side_image') if 'side_image' in request.FILES else None
@@ -236,17 +247,29 @@ def product_editing(request , uid):
         up_image = request.FILES.get('up_image') if 'up_image' in request.FILES else None
 
         try:
-            size_instance = Size.objects.get(size=size)
+            
+            sizess = [size_obj_8,size_obj_9,size_obj_10]
+            quantity_of_8 =  ProductVarient.objects.get(product = products, size = size_obj_8)  
+            quantity_of_9 = ProductVarient.objects.get(product = products, size = size_obj_9)
+            quantity_of_10 = ProductVarient.objects.get(product = products, size = size_obj_10)
+            quantity_of_8.stock = stock8
+            quantity_of_9.stock = stock9
+            quantity_of_10.stock = stock10
+            quantity_of_10.save()
+            quantity_of_8.save()
+            quantity_of_9.save()  
             color_instance = Color.objects.get(color_name=color)
             brand_instance = Brand.objects.get(brand_name=brand)
             category_instance = Category.objects.get(category_name=category)
-
+            
+                
+            
             products.name = name
             products.description = description
-            products.size = size_instance
+            
             if main_image is not None:
                 products.main_image = main_image
-            products.stock = stock
+            
             products.color = color_instance
             products.brand = brand_instance
             products.category = category_instance
@@ -277,10 +300,13 @@ def product_editing(request , uid):
             
         except Exception as e:
             return HttpResponse(e)
-        
+   
     context['categories'] = categories
     context['brands'] = brands
     context['sizes'] = sizes
+    context['stock_8'] = ProductVarient.objects.get(product = products, size = size_obj_8).stock
+    context['stock_9'] = ProductVarient.objects.get(product = products, size = size_obj_9).stock
+    context['stock_10'] = ProductVarient.objects.get(product = products, size = size_obj_10).stock
     context['colors'] = colors
     context['product'] = products
     context['image'] = image
@@ -458,7 +484,7 @@ def order(request):
     if request.method == "POST":
         order_uid = request.POST.get('uid')
         if order_uid:
-            orders = Order.objects.filter(uid=order_uid)
+            orders = Order.objects.filter(order_id__contains =order_uid)
     
     context['orders'] = orders
     return render(request, 'admins/order/order.html', context)
@@ -466,14 +492,31 @@ def order(request):
 @admin_required
 def order_detail(request, order_uid):
     context = {}
-    order = Order.objects.get(uid = order_uid)
-    orders = OrderItems.objects.filter(order =order)
+    order = Order.objects.get(uid=order_uid)
+    orders = OrderItems.objects.filter(order=order)
     context['orders'] = orders
     context['order'] = order
+
     if request.method == "POST":
-        status  = request.POST.get('status')
-        order.status = status
+        for item in orders:
+            status = request.POST.get(f'status-{item.uid}')
+            item.status = status
+            item.save()
+
+        # Update the overall order status based on the order items
+        new_order_status = "Delivered"  # Set a default status, change it as needed
+        for item in orders:
+            if item.status == "Pending":
+                new_order_status = "Pending"
+                break
+            elif item.status == "Shipped":
+                new_order_status = "Shipped"
+                
+            # You can add more logic here for other status combinations if needed
+        
+        order.status = new_order_status
         order.save()
+
         return redirect(reverse('admin_order_listing'))
 
     return render(request, 'admins/order/order_detail.html', context)

@@ -198,14 +198,7 @@
                       {% endfor %}
                     </select>
                   </div>
-                  <div class="mb-4">
-                    <label class="form-label">Size</label>
-                    <select class="form-select" name="size" required>
-                      {% for size in sizes %}
-                      <option value="{{ size.size }}">{{ size.size }}</option>
-                      {% endfor %}
-                    </select>
-                  </div>
+                  
                   <div class="mb-4">
                     <label class="form-label">Color</label>
                     <select class="form-select" name="color" required>
@@ -216,24 +209,63 @@
                       {% endfor %}
                     </select>
                   </div>
-                  <div class="mb-4 mt-2">
-                    <label class="form-label">Stock</label>
+                  
+                </div>
+                <!-- col-md-9 end -->
+              </div>
+               <!-- row end -->
+               <hr class="mb-4 mt-0" />
+               <div class="row">
+                 <div class="col-md-3">
+                   <h6>2. Stock</h6>
+                 </div>
+                 <div class="col-md-9">
+                   <div class="mb-4">
+                     <label class="form-label">Stock of size 8 :</label>
+                     <input
+                       type="number"
+                       placeholder="size 8"
+                       class="form-control"
+                       name="stock8"
+                       required
+                     />
+                   </div>
+                 </div>
+                 <div class="col-md-3">
+                 </div>
+                 <div class="col-md-9">
+                   <div class="mb-4">
+                     <label class="form-label">Stock of size 9 :</label>
+                     <input
+                       type="number"
+                       placeholder="size 9"
+                       class="form-control"
+                       name="stock9"
+                       required
+                     />
+                   </div>
+                 </div>
+                 <div class="col-md-3">
+                </div>
+                <div class="col-md-9">
+                  <div class="mb-4">
+                    <label class="form-label">Stock of size 10 :</label>
                     <input
                       type="number"
-                      placeholder="Type here"
+                      placeholder="size 10"
                       class="form-control"
-                      name="stock"
+                      name="stock10"
                       required
                     />
                   </div>
                 </div>
-                <!-- col-md-9 end -->
-              </div>
+                 <!-- col-md-9 end -->
+               </div>
               <!-- row end -->
               <hr class="mb-4 mt-0" />
               <div class="row">
                 <div class="col-md-3">
-                  <h6>2. Pricing</h6>
+                  <h6>3. Pricing</h6>
                 </div>
                 <div class="col-md-9">
                   <div class="mb-4">
@@ -267,7 +299,7 @@
               <hr class="mb-4 mt-0" />
               <div class="row">
                 <div class="col-md-3">
-                  <h6>3. Category</h6>
+                  <h6>4. Category</h6>
                 </div>
                 <div class="col-md-9">
                   <div class="mb-4">
@@ -296,7 +328,7 @@
               <hr class="mb-4 mt-0" />
               <div class="row">
                 <div class="col-md-3">
-                  <h6>4. Media</h6>
+                  <h6>5. Media</h6>
                 </div>
                 <div class="col-md-9">
                   <div class="mb-4">
