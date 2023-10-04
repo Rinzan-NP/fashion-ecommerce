@@ -32,7 +32,7 @@ def add_to_cart(request, product_uid, size_id):
         # Check if the item already exists in the cart
         cart_item, item_created = CartItems.objects.get_or_create(cart=cart, product=product_obj, size=size)
         product_varient = ProductVarient.objects.get(product =product_obj,size = size)
-        print(product_varient.stock)
+        
         if not item_created:
             # If the item already exists, increment the quantity
             if cart_item.quantity < product_varient.stock:
@@ -60,24 +60,56 @@ def cart_deleting(request, uid):
 
 def quantity_decreasing(request, uid):
     try:
-        cart_obj = CartItems.objects.get(uid = uid)
-        if cart_obj.quantity > 1 :
+        cart_obj = CartItems.objects.get(uid=uid)
+        cart = Cart.objects.get(user=request.user.profile)
+        cart_objs = CartItems.objects.filter(cart=cart)
+        if cart_obj.quantity > 1:
             cart_obj.quantity -= 1
             cart_obj.save()
-            cart_obj.cart.calculate_total_price()
-        return redirect(request.META.get('HTTP_REFERER'))
+            subTotal = cart_obj.calculate_sub_total()
+
+        grand_total = 0  # Initialize grand_total outside the loop
+        for cart_item in cart_objs:
+            sub_total = cart_item.calculate_sub_total()
+            grand_total += sub_total  # Accumulate subtotals
+
+        # Return updated data as JSON response after the loop
+        response_data = {
+            'quantity': cart_obj.quantity,
+            'subTotal': subTotal,
+            'grandTotal': grand_total,  # Include the correct grand_total value
+        }
+        return JsonResponse(response_data)
     except Exception as e:
-        return HttpResponse(e)
-    
-def quantity_increasing(request,uid):
+        return JsonResponse({'error': str(e)})
+
+
+def quantity_increasing(request, uid):
     try:
-        cart_obj = CartItems.objects.get(uid = uid)
-        if cart_obj.quantity <  cart_obj.product.stock :
+        cart_obj = CartItems.objects.get(uid=uid)
+        size_stock = ProductVarient.objects.get(size=cart_obj.size)
+        cart = Cart.objects.get(user=request.user.profile)
+        cart_objs = CartItems.objects.filter(cart=cart)
+
+        if cart_obj.quantity < size_stock.stock:
             cart_obj.quantity += 1
             cart_obj.save()
-            cart_obj.cart.calculate_total_price()
-        return redirect(request.META.get('HTTP_REFERER'))
+
+        grand_total = 0  # Initialize grand_total outside the loop
+        for cart_item in cart_objs:
+            sub_total = cart_item.calculate_sub_total()
+            grand_total += sub_total  # Accumulate subtotals
+
+        # Return updated data as JSON response after the loop
+        response_data = {
+            'quantity': cart_obj.quantity,
+            'subTotal': cart_obj.calculate_sub_total(),  # Calculate subTotal for the updated cart_obj
+            'grandTotal': grand_total,  # Include the correct grand_total value
+        }
+        return JsonResponse(response_data)
     except Exception as e:
-        return HttpResponse(e)
+        return JsonResponse({'error': str(e)})
+
+
     
     

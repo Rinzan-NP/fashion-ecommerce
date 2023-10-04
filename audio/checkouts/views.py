@@ -37,7 +37,7 @@ def checkout(request, user_uid):
 
         for cart_product in cart_items:
             # Calculate the sub-total for the order item
-            sub_total = cart_product.quantity * cart_product.product.price
+            sub_total = cart_product.quantity * cart_product.product.selling_price
 
             # Create an order item
             order_item = OrderItems.objects.create(

@@ -22,6 +22,7 @@
                                     <th class="text-white">images</th>
                                     <th class="text-white">Product</th>
                                     <th class="text-white">Price</th>
+                                    <th class="text-white">Size</th>
                                     <th class="text-white">Quantity</th>
                                     <th class="text-white">Total</th>
                                 </tr>
@@ -49,51 +50,46 @@
                                     </td>
 
                                     <td class="product-name">
-                                        <a href="/product/detail/{{product.product.uid}}">{{product.product.name}}</a>
-                                        {% if product.product.stock < product.quantity %}
-                                            <p class="text-danger" >Out of Stock</p>
+                                        <a href="/product/detail/{{ product.product.uid }}">{{ product.product.name }}</a>
+                                        {% if product.is_out_of_stock %}
+                                            <p class="text-danger">Out of Stock</p>
                                         {% endif %}
                                     </td>
+                                    
+                                    
                                     <td class="product-price-cart">
                                         <span class="amount"
                                             >₹ {{product.product.selling_price}}</span
                                         >
                                     </td>
-
+                                    <td class="product-price-cart">
+                                        <span class="amount"
+                                            >{{product.size.size}}</span
+                                        >
+                                    </td>
                                     <td class="text-center">
                                         <div class="btn-group" role="group" aria-label="Quantity">
-                                            <a
-                                                href="/product/carts/dec/{{product.uid}}"
-                                                class="btn btn-danger h-auto"
-                                                id="minusBtn"
-                                            >
-                                                <i class="ti ti-minus"></i>
-                                            </a>
-                                            <span id="quantity" class="btn btn-light h-auto">{{product.quantity}}</span>
-                                            {% if product.quantity <  product.product.stock%}
-                                            <a
-                                                href="/product/carts/inc/{{product.uid}}"
-                                                class="btn btn-dark h-auto"
-                                                id="plusBtn"
-                                            >
-                                                <i class="ti ti-plus"></i>
-                                            </a>
-                                            {% else %}
-                                            <a
-                                                href="#"
-                                                class="btn btn-dark h-auto"
-                                                id="plusBtn"
-                                                style="pointer-events : none"
-                                            >
-                                                <i class="ti ti-plus"></i>
-                                            </a>
-                                            {% endif %}
-                                            
+                                          <a
+                                            href="javascript:void(0);"
+                                            class="btn btn-danger h-auto minusBtn"
+                                            onclick="updateQuantity('{{ product.uid }}', 'dec')"
+                                          >
+                                            <i class="ti ti-minus"></i>
+                                          </a>
+                                          <span id="quantity-{{ product.uid }}" class="btn btn-light h-auto">{{ product.quantity }}</span>
+                                          <a
+                                            href="javascript:void(0);"
+                                            class="btn btn-dark h-auto plusBtn"
+                                            onclick="updateQuantity('{{ product.uid }}', 'inc')"
+                                          >
+                                            <i class="ti ti-plus"></i>
+                                          </a>
                                         </div>
-                                    </td>
+                                      </td>
+                                      
 
-                                    <td class="product-subtotal">
-                                        ₹{{product.sub_total}}
+                                    <td class="product-subtotal" >
+                                        <span>₹</span><span id="total-{{ product.uid }}" >{{product.calculate_sub_total}}</span>
                                     </td>
                                 </tr>
                                {% endfor %}
@@ -109,12 +105,12 @@
                             <div class="cart-page-total">
                                 <h2>Cart totals</h2>
                                 <ul>
-                                    <li>Subtotal<span>₹{{grand_total}}</span></li>
+                                    <li>Subtotal<span id="grandTotal">{{grand_total}}</span><span>₹</span></li>
                                     <li>
                                         Shipping Fee 
                                         <span> ₹ 50 </span>
                                     </li>
-                                    <li>Total<span>₹{{grand_total | add:50}}</span></li>
+                                   
                                 </ul>
                                 {% if out_of_stock is False %}
                                   <a href="/checkout/user/{{request.user.profile.uid}}" class="btn btn-dark h-auto">Proeed to checkout</a>
@@ -142,5 +138,56 @@
     </div>
 </div>
 <!-- shopping-cart-area end -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    function updateQuantity(productUid, action) {
+        // Send an AJAX request to update the quantity
+        $.ajax({
+            url: `/product/carts/${action}/${productUid}`,
+            type: 'GET',
+            success: function (data) {
+                if (data.quantity !== undefined && data.subTotal !== undefined && data.grandTotal !== undefined) {
+                    // Update the quantity displayed on the page
+                    const quantityElement = $('#quantity-' + productUid);
+                    quantityElement.text(data.quantity);
 
+                    // Update the subTotal displayed on the page
+                    const subTotal = $('#total-' + productUid);
+                    subTotal.text(data.subTotal);
+
+                    // Update the grandTotal displayed on the page
+                    const grandTotal = $('#grandTotal');
+                    grandTotal.text(data.grandTotal);
+
+                    // Handle enabling/disabling the buttons based on stock
+                    const plusBtn = $('#plusBtn-' + productUid);
+                    if (data.is_out_of_stock) {
+                        plusBtn.prop('disabled', true);
+                    } else {
+                        plusBtn.prop('disabled', false);
+                    }
+
+                    // Disable the "decrease" button if the quantity is at its minimum
+                    const minusBtn = $('#minusBtn-' + productUid);
+                    if (data.quantity <= 1) {
+                        minusBtn.prop('disabled', true);
+                    } else {
+                        minusBtn.prop('disabled', false);
+                    }
+                } else if (data.error) {
+                    console.log('Error:', data.error);
+                } else {
+                    console.log('Invalid response data:', data);
+                }
+            },
+            error: function (error) {
+                console.log(error);
+            }
+        });
+    }
+</script>
+
+
+  
+  
 {% endblock %}      

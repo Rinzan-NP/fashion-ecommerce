@@ -108,13 +108,8 @@ class Wishlist(BaseModel):
 class Cart(BaseModel):
     user = models.OneToOneField(Profile, on_delete=models.CASCADE)
     products = models.ManyToManyField(Product, through="CartItems")
-    total_price = models.DecimalField(max_digits=20, decimal_places=2, default=0.00)
-
-    def calculate_total_price(self):
-        # Calculate the total price as the sum of sub_total values of associated CartItems.
-        total = sum(cart_item.sub_total for cart_item in self.cartitems_set.all())
-        self.total_price = total
-        self.save()
+    
+    
 
     def __str__(self) -> str:
         return f'{self.user.user.username} : Cart'
@@ -125,13 +120,14 @@ class CartItems(BaseModel):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     size = models.ForeignKey(Size, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField(default=1)
-    sub_total = models.DecimalField(max_digits=20, decimal_places=2, default=0.00)  # Add sub_total field
-
+    
     def __str__(self):
         return f'{self.quantity} x {self.product.name} in Cart'
     
-    def save(self, *args, **kwargs):
-    # Calculate the sub_total based on quantity and product's selling price.
-        self.sub_total = self.quantity * self.product.selling_price
-        super().save(*args, **kwargs)  # Call the parent class's save method
+    @property
+    def is_out_of_stock(self):
+        return self.quantity > ProductVarient.objects.get(product=self.product, size=self.size).stock
+
+    def calculate_sub_total(self):
+        return self.product.selling_price * self.quantity
 
