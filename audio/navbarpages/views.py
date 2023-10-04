@@ -1,7 +1,7 @@
 from django.shortcuts import redirect, render,render
 from products.models import Product,Product_image,Category,Size,Color,Brand,Wishlist,Cart,Profile,CartItems
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-
+from django.db.models import Q
 # Create your views here.
 def home(request):
     context = {}
@@ -20,31 +20,50 @@ def home(request):
 
 def shop_listing(request):
     context = {}
-    
-    # Filter products that are not unlisted in Category, Size, and Brand
+    query = request.GET.get('q')
+    brand_filter = request.GET.get('brand')
+    category_filter = request.GET.get('category')
+    sort_option = request.GET.get('sort')
+
     product_obj = Product.objects.filter(
         is_selling=True,
         category__unlisted=False,
         brand__unlisted=False
     )
-    
 
     categories = Category.objects.filter(unlisted=False)
     brands = Brand.objects.filter(unlisted=False)
     sizes = Size.objects.all()
     colors = Color.objects.all()
 
-    # Initialize Paginator
-    paginator = Paginator(product_obj, 9)  # 12 products per page
+    if category_filter:
+        product_obj = product_obj.filter(category = category_filter)
 
-    page = request.GET.get('page')  # Get the current page number from the request's GET parameters
+
+    if query:
+   
+        product_obj = product_obj.filter(
+            Q(name__icontains=query) |
+            Q(description__icontains=query)
+        )
+
+    if brand_filter:
+       
+        product_obj = product_obj.filter(brand=brand_filter)
+
+    if sort_option == 'low_to_high':
+        product_obj = product_obj.order_by('price')
+    elif sort_option == 'high_to_low':
+        product_obj = product_obj.order_by('-price')
+
+    paginator = Paginator(product_obj, 9)
+    page = request.GET.get('page')
+
     try:
         products = paginator.page(page)
     except PageNotAnInteger:
-        # If page is not an integer, deliver the first page
         products = paginator.page(1)
     except EmptyPage:
-        # If page is out of range (e.g., 9999), deliver the last page of results
         products = paginator.page(paginator.num_pages)
 
     context['products'] = products
@@ -55,9 +74,7 @@ def shop_listing(request):
 
     if request.user.is_authenticated and not request.user.is_staff:
         context['wishlist'] = [item.product for item in Wishlist.objects.filter(user=request.user.profile)]
-        user_cart_items = CartItems.objects.filter(cart__user=request.user.profile)
-        context['cart'] = [item.product for item in user_cart_items]
-        context['user'] = Profile.objects.get(user = request.user)
+        context['user'] = Profile.objects.get(user=request.user)
 
     return render(request, 'navbarpages/shop.html', context)
 

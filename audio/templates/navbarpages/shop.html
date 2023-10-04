@@ -20,40 +20,10 @@
                     <div class="sidebar-widget mb-50">
                         <h3 class="sidebar-title">Search Products</h3>
                         <div class="sidebar-search">
-                            <form action="#">
-                                <input placeholder="Search Products..." type="text">
-                                <button><i class="ti-search"></i></button>
+                            <form action="{% url 'shop_listing' %}" method="GET">
+                                <input placeholder="Search Products..." type="text" name="q">
+                                <button type="submit"><i class="ti-search"></i></button>
                             </form>
-                        </div>
-                    </div>
-                    <div class="sidebar-widget mb-40">
-                        <h3 class="sidebar-title">Filter by Price</h3>
-                        <div class="price_filter">
-                            
-                            <div class="container">
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label for="min_price">Min Price:</label>
-                                            <input type="text" class="form-control" id="min_price" name="min_price" placeholder="Enter Min Price">
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label for="max_price">Max Price:</label>
-                                            <input type="text" class="form-control" id="max_price" name="max_price" placeholder="Enter Max Price">
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4 col-lg-12">
-                                        <div class="form-group">
-                                            <label for="filter_button"></label>
-                                            <button type="button" class="btn btn-secondary h-auto btn-block" id="filter_button" onclick="filterProducts()">Filter</button>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            
                         </div>
                     </div>
                     <div class="sidebar-widget mb-45">
@@ -61,7 +31,7 @@
                         <div class="sidebar-categories">
                             <ul>
                                 {% for category in categories %}
-                                <li><a href="#">{{category.category_name}} </a></li>
+                                <li><a href="?category={{ category.id}}">{{category.category_name}} </a></li>
                                 {% endfor %}
                             </ul>
                         </div>
@@ -71,59 +41,36 @@
                         <div class="sidebar-categories">
                             <ul>
                                 {% for brand in brands %}
-                                <li><a href="#">{{brand.brand_name}} </a></li>
+                                <li><a href="?brand={{ brand.id }}">{{ brand.brand_name }}</a></li>
                                 {% endfor %}
                             </ul>
                         </div>
                     </div>
-                    <div class="sidebar-widget sidebar-overflow mb-45">
-                        <h3 class="sidebar-title">color</h3>
-                        <div class="product-color">
+                    <div class="sidebar-widget mb-45">
+                        <h3 class="sidebar-title">Sort by :</h3>
+                        <div class="sidebar-categories">
                             <ul>
-                                {% for color in colors %}
-                                <li class="{{color}} border rounded" style="background-color : {{color.hexcode}}"></li>
-                                {% endfor %}
-                            </ul>
-                        </div>
-                    </div>
-                    <div class="sidebar-widget mb-40">
-                        <h3 class="sidebar-title">size</h3>
-                        <div class="product-size">
-                            <ul>
-                                {% for size in sizes %}
-                                <li><a href="#">{{size}}</a></li>
-                                {% endfor %}
+                                <li><a href="?sort=default">Default</a></li>
+                                <li><a href="?sort=low_to_high">Price: Low to High</a></li>
+                                <li><a href="?sort=high_to_low">Price: High to Low</a></li>
                             </ul>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="col-lg-9 order-1 order-lg-2">
+            <div class="col-lg-9 order-1 order-lg-3">
                 <div class="shop-product-wrapper">
                     <div class="shop-bar-area">
                         <div class="shop-bar pb-60">
-                            <div class="shop-found-selector">
-                                
-                                <div class="shop-selector">
-                                    <label>Sort By : </label>
-                                    <select name="select">
-                                        <option value="">Default</option>
-                                        <option value="">A to Z</option>
-                                        <option value=""> Z to A</option>
-                                        <option value="">In stock</option>
-                                    </select>
-                                </div>
-                            </div>
                             <div class="shop-filter-tab">
-                                <div class="shop-tab nav" role=tablist>
-                                    
+                                <div class="shop-tab nav" role=tablist> 
                                 </div>
                             </div>
                         </div>
                         <div class="shop-product-content tab-content">
                             <div id="grid-sidebar7" class="tab-pane fade active show">
                                 <div class="row">
-
+                                    {% if products %}
                                     {% for product in products %}
                                     <div class="col-lg-4 col-md-6">
                                         <div class="product-wrapper product-box-style mb-30">
@@ -169,7 +116,12 @@
                                         </div>
                                    </div>
                                    {% endfor %}
-
+                                   {% else %}
+                                   <div class="d-flex justify-content-center align-items-center">
+                                       <h2>NO PRODUCTS FOUND</h2>
+                                   </div>
+                                   
+                                   {% endif %}
                                 </div>
                             </div>
                             <div id="grid-sidebar8" class="tab-pane fade">
