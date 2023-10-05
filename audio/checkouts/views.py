@@ -6,7 +6,7 @@ from django.http import HttpResponse
 from . models import Address,Coupon
 
 # Create your views here.
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from .models import Profile, Cart, Address, PaymentMethod, Order,OrderItems
 
 def checkout(request, user_uid):
@@ -79,3 +79,17 @@ def checkout(request, user_uid):
 def order_placed(request):
     return render(request, 'checkouts/order_placed.html')
 
+def check_cart(request):
+    if request.method == "POST":
+        current_cart_data = request.POST.get("current_cart")
+        
+        
+        server_cart_data = CartItems.objects.filter(cart__user = request.user.profile)
+        
+        
+        cart_matched = (current_cart_data == server_cart_data)
+        
+        response_data = {"cart_matched": cart_matched}
+        return JsonResponse(response_data)
+    else:
+        return JsonResponse({"error": "Invalid request method"})
