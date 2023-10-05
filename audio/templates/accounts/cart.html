@@ -72,7 +72,7 @@
                                           <a
                                             href="javascript:void(0);"
                                             class="btn btn-danger h-auto minusBtn"
-                                            onclick="updateQuantity('{{ product.uid }}', 'dec')"
+                                            onclick="updateQuantity('{{ product.uid }}', 'dec', '{{product.product.uid}}')"
                                           >
                                             <i class="ti ti-minus"></i>
                                           </a>
@@ -80,7 +80,7 @@
                                           <a
                                             href="javascript:void(0);"
                                             class="btn btn-dark h-auto plusBtn"
-                                            onclick="updateQuantity('{{ product.uid }}', 'inc')"
+                                            onclick="updateQuantity('{{ product.uid }}', 'inc', '{{product.product.uid}}')"
                                           >
                                             <i class="ti ti-plus"></i>
                                           </a>
@@ -140,10 +140,10 @@
 <!-- shopping-cart-area end -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-    function updateQuantity(productUid, action) {
+    function updateQuantity(productUid, action, productid) {
         // Send an AJAX request to update the quantity
         $.ajax({
-            url: `/product/carts/${action}/${productUid}`,
+            url: `/product/carts/${action}/${productUid}/${productid}`,
             type: 'GET',
             success: function (data) {
                 if (data.quantity !== undefined && data.subTotal !== undefined && data.grandTotal !== undefined) {

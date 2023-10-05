@@ -73,6 +73,8 @@
                                     </tr>
                                 </thead>
                                 <tbody>
+                                    {% csrf_token %}
+                                    <input type="hidden" id="current-cart" name="current_cart" value="{{ products }}">
                                     {% for product in products %}
                                     <tr class="cart_item">
                                         <td class="product-name">
@@ -134,5 +136,40 @@
     </div>
 </div>
 <!-- checkout-area end -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $("form").on("submit", function(event) {
+            event.preventDefault();  
+            
+            var currentCartData = $("#current-cart").val();
+            var csrfToken = $("input[name=csrfmiddlewaretoken]").val();  // Get the CSRF token
+            
+            $.ajax({
+                url: "/checkout/check_cart/",
+                type: "POST",
+                data: {
+                    current_cart: currentCartData,
+                    csrfmiddlewaretoken: csrfToken  // Include the CSRF token in the data
+                },
+                dataType: "json",
+                success: function(response) {
+                    if (response.cart_matched) {
+                        // Cart matches, proceed with order placement
+                        $("form").unbind("submit").submit();  // Submit the form
+                    } else {
+                        // Cart does not match, display an alert and reload the page
+                        alert("The cart has changed. Please review your order.");
+                        location.reload();
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error(xhr.responseText);
+                }
+            });
+        });
+    });
+</script>
 
+    
 {% endblock %}

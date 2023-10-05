@@ -58,9 +58,10 @@ def cart_deleting(request, uid):
     except Exception as e:
         return HttpResponse(str(e))
 
-def quantity_decreasing(request, uid):
+def quantity_decreasing(request, uid, product_uid):
     try:
         cart_obj = CartItems.objects.get(uid=uid)
+        product = Product.objects.get(uid = product_uid)
         cart = Cart.objects.get(user=request.user.profile)
         cart_objs = CartItems.objects.filter(cart=cart)
         if cart_obj.quantity > 1:
@@ -84,10 +85,11 @@ def quantity_decreasing(request, uid):
         return JsonResponse({'error': str(e)})
 
 
-def quantity_increasing(request, uid):
+def quantity_increasing(request, uid, product_uid):
     try:
         cart_obj = CartItems.objects.get(uid=uid)
-        size_stock = ProductVarient.objects.get(size=cart_obj.size)
+        product = Product.objects.get(uid = product_uid)
+        size_stock = ProductVarient.objects.get(size=cart_obj.size, product = product)
         cart = Cart.objects.get(user=request.user.profile)
         cart_objs = CartItems.objects.filter(cart=cart)
 
