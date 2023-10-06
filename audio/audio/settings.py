@@ -149,3 +149,6 @@ EMAIL_USE_TLS = True
 EMAIL_PORT = 587
 EMAIL_HOST_USER = 'audioecommmerce@gmail.com'
 EMAIL_HOST_PASSWORD = 'bwdevetrvzdswqhg'
+
+razor_pay_key_id = "rzp_test_Ifix3V7vZkKXnm"
+razor_secret = "fapS8eqgmYvGhbv8RaFo5Pc8"

@@ -4,10 +4,24 @@ from django.urls import reverse
 from products.models import Cart,Product,Profile,CartItems,ProductVarient
 from django.http import HttpResponse
 from . models import Address,Coupon
-
-# Create your views here.
+import json
+from django.contrib.sessions.models import Session
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from .models import Profile, Cart, Address, PaymentMethod, Order,OrderItems
+
+def serialize_cart_items(cart_items):
+    serialized_items = []
+    for cart_item in cart_items:
+        serialized_item = {
+            'product_id': cart_item.product.name,
+            'quantity': cart_item.quantity,
+            'size': cart_item.size.size,
+        }
+        serialized_items.append(serialized_item)
+    return serialized_items
+
+def compare_cart_items(initial_cart_items, current_cart_items):
+    return initial_cart_items == serialize_cart_items(current_cart_items)
 
 def checkout(request, user_uid):
     context = {}
@@ -23,10 +37,24 @@ def checkout(request, user_uid):
 
     if request.method == "POST":
         # Get selected address and payment method from the form
-        address_id = request.POST.get('addressId')
+        initial_cart_items = request.session.get('initial_cart_items', [])
+        
+        if not compare_cart_items(initial_cart_items, cart_items):
+            context['cart_changed'] = True
+            # For example, you can redirect back to the checkout page with an error message
+            context['error_message'] = "Cart items have changed. Please review your order."
+            context['products'] = cart_items
+            context['grand_total'] = grand_total
+            context['user'] = profile
+            context['addresses'] = addresses
+            return render(request, 'checkouts/checkout.html', context)
+
         payment_method_id = request.POST.get('payment_method')
+        if payment_method_id == "Razor_pay":
+            return redirect('payment')
         
         # Create a new order
+        address_id = request.POST.get('addressId')
         selected_address = Address.objects.get(uid=address_id)
         payment_method = PaymentMethod.objects.get(method=payment_method_id)
 
@@ -73,23 +101,13 @@ def checkout(request, user_uid):
     context['grand_total'] = grand_total
     context['user'] = profile
     context['addresses'] = addresses
+    request.session['initial_cart_items'] = serialize_cart_items(cart_items)
 
     return render(request, 'checkouts/checkout.html', context)
 
 def order_placed(request):
     return render(request, 'checkouts/order_placed.html')
 
-def check_cart(request):
-    if request.method == "POST":
-        current_cart_data = request.POST.get("current_cart")
-        
-        
-        server_cart_data = CartItems.objects.filter(cart__user = request.user.profile)
-        
-        
-        cart_matched = (current_cart_data == server_cart_data)
-        
-        response_data = {"cart_matched": cart_matched}
-        return JsonResponse(response_data)
-    else:
-        return JsonResponse({"error": "Invalid request method"})
+
+def payment(request):
+    return render(request, 'checkouts/payment.html')
