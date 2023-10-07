@@ -169,9 +169,9 @@
 </script>
 {% endif %}
 <script>
-    document.getElementById('rzp-button1').onclick = function(e){
+    document.getElementById('rzp-button1').onclick = function (e) {
         e.preventDefault();
-        
+
         var selectedAddressId = $("input[name='addressId']:checked").val();
         console.log(selectedAddressId)
         // Check if an address is selected
@@ -179,7 +179,7 @@
             alert("Please select an address.");
             return;
         }
-        
+
         $.ajax({
             type: "POST",
             url: "/checkout/place_order/",  // Replace with the actual endpoint for creating orders
@@ -187,74 +187,92 @@
                 csrfmiddlewaretoken: '{{ csrf_token }}', // Include the CSRF token
                 addressId: selectedAddressId, // Include the selected address ID
             },
-            success: function(response) {
+            success: function (response) {
                 // Check if the order creation was successful
-                
+
                 if (response.payment) {
                     // Open the Razorpay payment modal
-                    console.log(response.payment)
+                    console.log(response.payment);
                     razorpaycalling(response);
-                    
+
                 } else {
                     // Handle error in order creation
                     alert("Failed to create the order.");
                 }
             },
-            error: function() {
+            error: function () {
                 // Handle AJAX error
                 alert("An error occurred while creating the order.");
             }
         });
-   
 
-    
+        function razorpaycalling(response) {
+            var options = {
+                "key": "rzp_test_UAqDQGJ5B2qwiK", // Enter the Key ID generated from the Dashboard
+                "amount": response.payment.amount, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
+                "currency": "INR",
+                "name": "Fashion corporate",
+                "description": "Transaction",
+                "image": "https://example.com/your_logo",
+                "order_id": response.payment.id, // This is a sample Order ID. Pass the `id` obtained in the response of Step 1
+                "handler": function (razorpay_response) {
+                    var paymentData = {
+                        razorpay_payment_id: razorpay_response.razorpay_payment_id,
+                        razorpay_order_id: razorpay_response.razorpay_order_id,
+                        razorpay_signature: razorpay_response.razorpay_signature,
+                    };
+                    console.log(paymentData)
+                    $.ajax({
+                        type: 'POST',
+                        url: '/checkout/verify_payment/', // Replace with the actual URL for payment verification
+                        data: JSON.stringify({
+                            paymentData: {
+                                razorpay_payment_id: razorpay_response.razorpay_payment_id,
+                                razorpay_order_id: razorpay_response.razorpay_order_id,
+                                razorpay_signature: razorpay_response.razorpay_signature
+                            }
+                        }),
+                        
+                        success: function (verificationResponse) {
+                            if (verificationResponse.success) {
+                                // Payment is verified, you can redirect to the order_placed page
+                                window.location.href = '/checkout/sucess_page';
+                            } else {
+                                alert('Payment verification failed. Please contact support.');
+                            }
+                        },
+                        error: function () {
+                            alert('Error verifying payment. Please try again later.');
+                        }
+                    });
+                },
+                "prefill": {
+                    "name": "Gaurav Kumar",
+                    "email": "gaurav.kumar@example.com",
+                    "contact": "9000090000"
+                },
+                "notes": {
+                    "address": "Razorpay Corporate Office"
+                },
+                "theme": {
+                    "color": "#000000"
+                }
+            };
 
-    function  razorpaycalling(response){
-
-        var options = {
-            "key": "rzp_test_UAqDQGJ5B2qwiK", // Enter the Key ID generated from the Dashboard
-            "amount": response.payment.amount, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
-            "currency": "INR",
-            "name": "Fashion corporate",
-            "description": "Transaction",
-            "image": "https://example.com/your_logo",
-            "order_id": response.payment.id, //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
-            "handler": function (response){
-            
-            
-            
-            
-            
-            alert(response.razorpay_payment_id);
-            alert(response.razorpay_order_id);
-            alert(response.razorpay_signature);
-            window.location.href = '/checkout/sucess_page/'
-        },
-        "prefill": {
-            "name": "Gaurav Kumar",
-            "email": "gaurav.kumar@example.com",
-            "contact": "9000090000"
-        },
-        "notes": {
-            "address": "Razorpay Corporate Office"
-        },
-        "theme": {
-            "color": "#000000"
+            var rzp1 = new Razorpay(options);
+            rzp1.on('payment.failed', function (response) {
+                alert(response.error.code);
+                alert(response.error.description);
+                alert(response.error.source);
+                alert(response.error.step);
+                alert(response.error.reason);
+                alert(response.error.metadata.order_id);
+                alert(response.error.metadata.payment_id);
+            });
+            rzp1.open();
         }
-    };
-    var rzp1 = new Razorpay(options);
-    rzp1.on('payment.failed', function (response){
-        alert(response.error.code);
-        alert(response.error.description);
-        alert(response.error.source);
-        alert(response.error.step);
-        alert(response.error.reason);
-        alert(response.error.metadata.order_id);
-        alert(response.error.metadata.payment_id);
-    });
-    rzp1.open();
     }
-}
 </script>
+
     
 {% endblock %}

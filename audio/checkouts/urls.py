@@ -9,4 +9,6 @@ urlpatterns = [
 
     path('sucess_page/', views.success, name = "success"),
 
+    path('verify_payment/', views.verify_payment, name = "verify_payment")
+
 ]

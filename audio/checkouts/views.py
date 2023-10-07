@@ -10,6 +10,8 @@ from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from .models import Profile, Cart, Address, PaymentMethod, Order,OrderItems,Razor_pay
 import razorpay
 from django.conf import settings
+from django.views.decorators.csrf import csrf_exempt
+
 
 def serialize_cart_items(cart_items):
     serialized_items = []
@@ -70,13 +72,12 @@ def checkout(request, user_uid):
             
 
             for cart_product in cart_items:
-                # Calculate the sub-total for the order item
+                
                 sub_total = cart_product.quantity * cart_product.product.selling_price
 
                 # Create an order item
                 order_item = OrderItems.objects.create(
-                    order=order,  # We'll set this after creating the order
-                    # You can set the initial status as needed
+                    order=order,  
                     product=cart_product.product,
                     quantity=cart_product.quantity,
                     product_price=cart_product.product.selling_price,
@@ -84,12 +85,17 @@ def checkout(request, user_uid):
                     sub_total=sub_total,
                 )
 
+                
                 # Calculate the total for the current order item
                 
                 order_item.save()
+                product_stock = ProductVarient.objects.get(product = cart_product.product,size = cart_product.size)
+                product_stock.stock -= cart_product.quantity
+                product_stock.save()
+
+
 
             order.calculate_bill_amount()
-
 
             # Clear the user's cart
             cart_items.delete()
@@ -134,6 +140,10 @@ def create_order(request):
                 'sub_total': sub_total_in_paise,
             })
 
+            product_stock = ProductVarient.objects.get(product = cart_item.product,size = cart_item.size)
+            product_stock.stock -= cart_item.quantity
+            product_stock.save()
+
         # Create all order items
         OrderItems.objects.bulk_create([
             OrderItems(order=order, **item) for item in order_items
@@ -141,7 +151,7 @@ def create_order(request):
 
         # Calculate the bill amount
         order.calculate_bill_amount()
-        cart_items.delete()
+        
 
         # Initialize the Razorpay client
         client = razorpay.Client(auth=(settings.KEY, settings.SECRET))
@@ -151,11 +161,45 @@ def create_order(request):
 
         # Create the Razorpay payment
         payment = client.order.create({'amount': grand_total_in_paise, "currency": "INR", "payment_capture": 1})
-        print("########################")
-        print(payment)
+        
         return JsonResponse({'payment': payment}, safe=False)
 
     return JsonResponse({'error': 'Invalid request'}, status=400)
 
 def success(request):
+    cart_items = CartItems.objects.filter(cart__user=request.user.profile)
+    cart_items.delete()
     return  render(request, 'checkouts/order_placed.html')
+
+
+@csrf_exempt
+def verify_payment(request):
+    if request.method == 'POST':
+      
+        
+        client = razorpay.Client(auth=(settings.KEY, settings.SECRET))
+        
+        json_data = list(request.POST.keys())[0]
+
+        try:
+            data = json.loads(json_data)
+
+            razorpay_payment_id = data.get('paymentData', {}).get('razorpay_payment_id', '')
+            razorpay_order_id = data.get('paymentData', {}).get('razorpay_order_id', '')
+            razorpay_signature = data.get('paymentData', {}).get('razorpay_signature', '')
+
+            client.utility.verify_payment_signature({
+                                                    'razorpay_order_id': razorpay_order_id,
+                                                    'razorpay_payment_id': razorpay_payment_id,
+                                                    'razorpay_signature': razorpay_signature
+                                                    })
+
+            return JsonResponse({'success': True})
+       
+
+        except razorpay.errors.SignatureVerificationError as e:
+            
+            return JsonResponse({'success': False, 'error_message': 'Payment verification failed'})
+
+    return JsonResponse({'success': False, 'error_message': 'Invalid request'})
+
