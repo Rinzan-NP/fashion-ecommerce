@@ -9,6 +9,12 @@ urlpatterns = [
 
     path('sucess_page/', views.success, name = "success"),
 
-    path('verify_payment/', views.verify_payment, name = "verify_payment")
+    path('verify_payment/', views.verify_payment, name = "verify_payment"),
+
+    path('update_order_status/', views.update_status, name = "order_status"),
+
+    path('payment_failed/', views.payment_failed, name = "payment_failed"),
+
+    path('delete_order/', views.delete_order, name = "delete_order")
 
 ]

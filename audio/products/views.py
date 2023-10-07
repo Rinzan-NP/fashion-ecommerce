@@ -26,12 +26,15 @@ def add_to_cart(request, product_uid, size_id):
     try:
         product_obj = Product.objects.get(uid=product_uid)
         size = Size.objects.get(id=size_id)
-
+        product_varient = ProductVarient.objects.get(product =product_obj,size = size)
         cart, created = Cart.objects.get_or_create(user=request.user.profile)
 
+        if product_varient.stock <= 1:
+            messages.warning(request, "Out of stock")
+            return redirect(request.META.get('HTTP_REFERER'))
         # Check if the item already exists in the cart
         cart_item, item_created = CartItems.objects.get_or_create(cart=cart, product=product_obj, size=size)
-        product_varient = ProductVarient.objects.get(product =product_obj,size = size)
+        
         
         if not item_created:
             # If the item already exists, increment the quantity

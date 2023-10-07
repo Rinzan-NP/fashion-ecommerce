@@ -118,11 +118,14 @@ def create_order(request):
         payment_method = PaymentMethod.objects.get(method="Razor_pay")
         cart_items = CartItems.objects.filter(cart__user=request.user.profile)
 
+
+
         # Create the order first
         order = Order.objects.create(
             user=request.user,
             address=Address.objects.get(uid=address_id),
             payment_method=payment_method,
+            
         )
 
         grand_total = 0
@@ -162,6 +165,9 @@ def create_order(request):
         # Create the Razorpay payment
         payment = client.order.create({'amount': grand_total_in_paise, "currency": "INR", "payment_capture": 1})
         
+        order.razor_pay_id = payment['id']
+        order.save()
+        
         return JsonResponse({'payment': payment}, safe=False)
 
     return JsonResponse({'error': 'Invalid request'}, status=400)
@@ -175,7 +181,7 @@ def success(request):
 @csrf_exempt
 def verify_payment(request):
     if request.method == 'POST':
-      
+        
         
         client = razorpay.Client(auth=(settings.KEY, settings.SECRET))
         
@@ -194,6 +200,11 @@ def verify_payment(request):
                                                     'razorpay_signature': razorpay_signature
                                                     })
 
+            print(razorpay_order_id)
+            order = Order.objects.get(razor_pay_id = razorpay_order_id)
+            order.is_paid = True
+            order.save()
+            
             return JsonResponse({'success': True})
        
 
@@ -203,3 +214,37 @@ def verify_payment(request):
 
     return JsonResponse({'success': False, 'error_message': 'Invalid request'})
 
+@csrf_exempt
+def update_status(request):
+    if request.method == 'POST':
+        razorpay_order_id = request.POST.get('razorpay_order_id')
+        try:
+            order = Order.objects.get(razor_pay_id=razorpay_order_id)
+            orders = OrderItems.objects.filter(order = order)
+            for item in orders:
+                item.status = "Canceled"
+                item.save()
+            # Respond with a success JSON response
+            return JsonResponse({'success': True})
+        except Order.DoesNotExist:
+            return JsonResponse({'success': False, 'error_message': 'Order not found'})
+    return JsonResponse({'success': False, 'error_message': 'Invalid request method'})
+
+def payment_failed(request):
+    return render(request, 'checkouts/payment_failed.html')
+
+@csrf_exempt
+def delete_order(request):
+    if request.method == 'POST':
+        razorpay_order_id = request.POST.get('razorpay_order_id')
+        try:            
+            order = Order.objects.get(razor_pay_id=razorpay_order_id)
+       
+            order.delete()
+
+            return JsonResponse({'success': True})
+
+        except Order.DoesNotExist:
+            return JsonResponse({'success': False, 'error_message': 'Order not found'})
+
+    return JsonResponse({'success': False, 'error_message': 'Invalid request method'})    

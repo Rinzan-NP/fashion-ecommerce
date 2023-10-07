@@ -43,6 +43,8 @@ class Order(BaseModel):
     products = models.ManyToManyField(Product, through="OrderItems")    
     bill_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     amount_to_pay = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    is_paid = models.BooleanField(default=False)
+    razor_pay_id = models.CharField(blank=True, null=True, max_length=100)
     
     def save(self, *args, **kwargs):
         if not self.pk:  # Check if this is a new instance
@@ -70,6 +72,7 @@ class OrderItems(BaseModel):
     product_price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     sub_total = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     status = models.CharField(max_length=40, default="Pending")
+
 
 @receiver(pre_save, sender=Order)
 def generate_unique_six_digit_field(sender, instance, **kwargs):

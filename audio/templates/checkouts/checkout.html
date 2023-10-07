@@ -142,12 +142,18 @@
                         <div class="payment-method">
                             <div class="payment-accordion">
                                 {% if addresses %}
-                                <div class="order-button-payment">
-                                    <input type="submit" name="submit_cod" value="Place order (Cash on Delivery)" />
+                                <div class="container">
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3 pr-md-2">
+                                            <input type="submit" name="submit_cod" class="btn btn-dark btn-block h-auto" value="Place order (Cash on Delivery)" />
+                                        </div>
+                                        <div class="col-md-6 pl-md-2">
+                                            <button id="rzp-button1" type="submit" name="submit_razorpay" class="btn btn-dark btn-block h-auto">Pay with Razorpay</button>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="order_button-payment">
-                                    <button  id="rzp-button1" type="submit" name="submit_razorpay">Pay with Razorpay</button>
-                                </div>
+                                
+                                
                                 {% else %} 
                                     <span class="text-danger">Please Add an Address</span> 
                                 {% endif %}
@@ -246,6 +252,32 @@
                         }
                     });
                 },
+                "modal": {
+                    "ondismiss": function () {
+                        function deleteOrder(orderId) {
+                            // Make an AJAX request to delete the order
+                            $.ajax({
+                                type: 'POST',
+                                url: '/checkout/delete_order/',
+                                data: {
+                                    razorpay_order_id: orderId  // Include the Razorpay order ID in the data
+                                },
+                                success: function (response) {
+                                    if (response.success) {
+                                        location.reload();
+                                    } else {
+                                        alert('Failed to delete the order. Please contact support.');
+                                    }
+                                },
+                                error: function () {
+                                    alert('Error deleting the order. Please try again later.');
+                                }
+                            });
+                        }
+                        deleteOrder(response.payment.id);
+                    }
+                    
+                },
                 "prefill": {
                     "name": "Gaurav Kumar",
                     "email": "gaurav.kumar@example.com",
@@ -257,17 +289,35 @@
                 "theme": {
                     "color": "#000000"
                 }
+
             };
 
             var rzp1 = new Razorpay(options);
             rzp1.on('payment.failed', function (response) {
-                alert(response.error.code);
-                alert(response.error.description);
-                alert(response.error.source);
-                alert(response.error.step);
-                alert(response.error.reason);
-                alert(response.error.metadata.order_id);
-                alert(response.error.metadata.payment_id);
+                function updateOrderStatus(razorpayOrderId) {
+                    // Make an AJAX request to update the order status
+                    $.ajax({
+                        type: 'POST',
+                        url: '/checkout/update_order_status/',
+                        data: {
+                            razorpay_order_id: razorpayOrderId
+                        },
+                        success: function (response) {
+                            if (response.success) {
+                                
+                                window.location.href = '/checkout/payment_failed/'
+                            } else {
+                                alert('Failed to update order status. Please contact support.');
+                            }
+                        },
+                        error: function () {
+                            alert('Error updating order status. Please try again later.');
+                        }
+                    });
+                }
+                alert("Payment failed for order ID: " + response.error.metadata.order_id);
+                var razorpayOrderId = response.error.metadata.order_id;
+                updateOrderStatus(razorpayOrderId);
             });
             rzp1.open();
         }
