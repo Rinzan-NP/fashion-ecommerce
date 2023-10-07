@@ -80,3 +80,9 @@ def generate_unique_six_digit_field(sender, instance, **kwargs):
             if not Order.objects.filter(order_id=six_digit_number).exists():
                 instance.order_id = six_digit_number
                 break
+
+class Razor_pay(BaseModel):
+    order = models.OneToOneField(Order, on_delete=models.CASCADE)
+    razor_pay_order_id  = models.CharField(max_length=100, null =  True, blank= True)
+    razor_pay_payment_id = models.CharField(max_length= 100, null= True, blank=True)
+    razor_pay_payment_signature = models.CharField(max_length= 100, null=True, blank=True)

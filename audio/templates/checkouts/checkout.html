@@ -141,21 +141,12 @@
                         </div>
                         <div class="payment-method">
                             <div class="payment-accordion">
-                                <div class="payment-method">
-                                    <label for="payment-method-select">Select Payment Method:</label>
-                                    <div class="form-check">
-                                        <input type="radio" id="payment-cod" name="payment_method" value="COD" class="form-check-input" checked>
-                                        <label for="payment-cod" class="form-check-label">Cash on Delivery</label>
-                                    </div>
-                                    <div class="form-check">
-                                        <input type="radio" id="payment-razorpay" name="payment_method" value="Razor_pay" class="form-check-input">
-                                        <label for="payment-razorpay" class="form-check-label">Razorpay</label>
-                                    </div>
-                                </div>
-
                                 {% if addresses %}
                                 <div class="order-button-payment">
-                                    <input type="submit" value="Place order" />
+                                    <input type="submit" name="submit_cod" value="Place order (Cash on Delivery)" />
+                                </div>
+                                <div class="order_button-payment">
+                                    <button  id="rzp-button1" type="submit" name="submit_razorpay">Pay with Razorpay</button>
                                 </div>
                                 {% else %} 
                                     <span class="text-danger">Please Add an Address</span> 
@@ -169,12 +160,101 @@
     </div>
 </div>
 <!-- checkout-area end -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 {% if cart_changed %}
 <script>
     alert("Cart items have changed. Please review your order.");
     window.location.href = "{% url 'checkout_page' user_uid=request.user.profile.uid %}";
 </script>
 {% endif %}
+<script>
+    document.getElementById('rzp-button1').onclick = function(e){
+        e.preventDefault();
+        
+        var selectedAddressId = $("input[name='addressId']:checked").val();
+        console.log(selectedAddressId)
+        // Check if an address is selected
+        if (!selectedAddressId) {
+            alert("Please select an address.");
+            return;
+        }
+        
+        $.ajax({
+            type: "POST",
+            url: "/checkout/place_order/",  // Replace with the actual endpoint for creating orders
+            data: {
+                csrfmiddlewaretoken: '{{ csrf_token }}', // Include the CSRF token
+                addressId: selectedAddressId, // Include the selected address ID
+            },
+            success: function(response) {
+                // Check if the order creation was successful
+                
+                if (response.payment) {
+                    // Open the Razorpay payment modal
+                    console.log(response.payment)
+                    razorpaycalling(response);
+                    
+                } else {
+                    // Handle error in order creation
+                    alert("Failed to create the order.");
+                }
+            },
+            error: function() {
+                // Handle AJAX error
+                alert("An error occurred while creating the order.");
+            }
+        });
+   
 
+    
+
+    function  razorpaycalling(response){
+
+        var options = {
+            "key": "rzp_test_UAqDQGJ5B2qwiK", // Enter the Key ID generated from the Dashboard
+            "amount": response.payment.amount, // Amount is in currency subunits. Default currency is INR. Hence, 50000 refers to 50000 paise
+            "currency": "INR",
+            "name": "Fashion corporate",
+            "description": "Transaction",
+            "image": "https://example.com/your_logo",
+            "order_id": response.payment.id, //This is a sample Order ID. Pass the `id` obtained in the response of Step 1
+            "handler": function (response){
+            
+            
+            
+            
+            
+            alert(response.razorpay_payment_id);
+            alert(response.razorpay_order_id);
+            alert(response.razorpay_signature);
+            window.location.href = '/checkout/sucess_page/'
+        },
+        "prefill": {
+            "name": "Gaurav Kumar",
+            "email": "gaurav.kumar@example.com",
+            "contact": "9000090000"
+        },
+        "notes": {
+            "address": "Razorpay Corporate Office"
+        },
+        "theme": {
+            "color": "#000000"
+        }
+    };
+    var rzp1 = new Razorpay(options);
+    rzp1.on('payment.failed', function (response){
+        alert(response.error.code);
+        alert(response.error.description);
+        alert(response.error.source);
+        alert(response.error.step);
+        alert(response.error.reason);
+        alert(response.error.metadata.order_id);
+        alert(response.error.metadata.payment_id);
+    });
+    rzp1.open();
+    }
+}
+</script>
     
 {% endblock %}

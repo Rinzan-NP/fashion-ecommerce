@@ -150,5 +150,5 @@ EMAIL_PORT = 587
 EMAIL_HOST_USER = 'audioecommmerce@gmail.com'
 EMAIL_HOST_PASSWORD = 'bwdevetrvzdswqhg'
 
-razor_pay_key_id = "rzp_test_Ifix3V7vZkKXnm"
-razor_secret = "fapS8eqgmYvGhbv8RaFo5Pc8"
+KEY = "rzp_test_UAqDQGJ5B2qwiK"
+SECRET = "Cizk7Cf5nKp9uja9vRSVANYP"
