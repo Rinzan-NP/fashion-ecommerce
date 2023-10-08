@@ -118,8 +118,6 @@ def create_order(request):
         payment_method = PaymentMethod.objects.get(method="Razor_pay")
         cart_items = CartItems.objects.filter(cart__user=request.user.profile)
 
-
-
         # Create the order first
         order = Order.objects.create(
             user=request.user,
@@ -155,7 +153,6 @@ def create_order(request):
         # Calculate the bill amount
         order.calculate_bill_amount()
         
-
         # Initialize the Razorpay client
         client = razorpay.Client(auth=(settings.KEY, settings.SECRET))
 

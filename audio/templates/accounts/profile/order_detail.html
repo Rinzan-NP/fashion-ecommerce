@@ -52,6 +52,10 @@
                             <span id="quantity">{{order.quantity}}</span>
                         </div>
                         <div class="form-group">
+                            <label for="quantity">Quantity:</label>
+                            <span id="quantity">{{order.amount_to_pay}}</span>
+                        </div>
+                        <div class="form-group">
                             <label for="quantity">Size:</label>
                             <span id="quantity">{{order.size.size}}</span>
                         </div>
@@ -75,7 +79,11 @@
                             {% endif %}
                         </div>
                         {% if order.status != "Canceled" %}
-                            <a class="btn btn-danger h-auto" href="#" data-toggle="modal" data-target="#cancelOrderModal">Cancel Order</a>
+                            {% if order.status == "Delivered" %}
+                                <a class="btn btn-danger h-auto" href="#" data-toggle="modal" data-target="#returnOrderModal">Return</a>
+                            {% else %}
+                                <a class="btn btn-danger h-auto" href="#" data-toggle="modal" data-target="#cancelOrderModal">Cancel Order</a>
+                            {% endif %}
                         {% endif %}
                     </div>
                 </div>
@@ -104,6 +112,25 @@
         </div>
     </div>
 </div>
+<div class="modal fade" id="returnOrderModal" tabindex="-1" role="dialog" aria-labelledby="cancelOrderModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="cancelOrderModalLabel">Confirm Return</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to return the product?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary h-auto" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger auto">Return</button>
+            </div>
+        </div>
+    </div>
+</div>
 <style>
     
     .order-card {
@@ -121,4 +148,12 @@
         margin-bottom: 10px;
     }
 </style>
+<script>
+    // JavaScript to trigger the modal when the "Return" button is clicked
+    $(document).ready(function () {
+        $('.btn-danger').click(function () {
+            $('#cancelOrderModal').modal('show');
+        });
+    });
+</script>
 {% endblock content %}
