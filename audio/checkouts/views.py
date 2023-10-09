@@ -7,7 +7,7 @@ from . models import Address,Coupon
 import json
 from django.contrib.sessions.models import Session
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
-from .models import Profile, Cart, Address, PaymentMethod, Order,OrderItems
+from .models import Profile, Cart, Address, PaymentMethod, Order,OrderItems,Wallet
 import razorpay
 from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
@@ -122,8 +122,10 @@ def create_order(request):
         address_id = request.POST.get('addressId')
         payment_method = PaymentMethod.objects.get(method="Razor_pay")
         cart_items = CartItems.objects.filter(cart__user=request.user.profile)
-
-        # Create the order first
+        
+        wallet_applied = request.POST.get('useWallet')
+        
+           
         order = Order.objects.create(
             user=request.user,
             address=Address.objects.get(uid=address_id),
@@ -161,10 +163,20 @@ def create_order(request):
         
         # Initialize the Razorpay client
         client = razorpay.Client(auth=(settings.KEY, settings.SECRET))
-
-        # Convert grand_total to paise
-        grand_total_in_paise = int(grand_total * 100)
-
+        print(wallet_applied)
+        if wallet_applied == "true":
+            wall_amount = request.user.profile.wallet.amount
+            print(wall_amount)
+            if wall_amount < grand_total + 50:
+                grand_total -= wall_amount
+                order.amount_to_pay = grand_total + 50
+            else:
+                grand_total = 0
+                order.amount_to_pay = 50
+                
+        
+        grand_total_in_paise = int(grand_total * 100)+5000
+        
         # Create the Razorpay payment
         payment = client.order.create({'amount': grand_total_in_paise, "currency": "INR", "payment_capture": 1})
         
@@ -176,10 +188,15 @@ def create_order(request):
     return JsonResponse({'error': 'Invalid request'}, status=400)
 
 def success(request):
+    wallet = request.user.profile.wallet
     cart_items = CartItems.objects.filter(cart__user=request.user.profile)
+    grand_total = 0
+    for cart in cart_items:
+        grand_total += (cart.quantity * cart.product.selling_price)
+    wallet.amount -= grand_total
+    wallet.save()
     cart_items.delete()
     return  render(request, 'checkouts/order_placed.html')
-
 
 @csrf_exempt
 def verify_payment(request):
@@ -261,3 +278,20 @@ def delete_order(request):
 
     return JsonResponse({'success': False, 'error_message': 'Invalid request method'})  
   
+def wallet(request):
+    wallet_amount = request.user.profile.wallet.amount
+    grand_total = 0
+    order = CartItems.objects.filter(cart__user = request.user.profile)
+    for item in order:
+        grand_total += (item.quantity * item.product.selling_price)
+  
+    if float(wallet_amount) < (float((grand_total)-50)):
+       amount = float(grand_total + 50) - float(wallet_amount)
+       
+    else:
+        amount = 50
+    wallet = wallet_amount if wallet_amount < grand_total else grand_total
+
+    response_data = {'new_order_total': amount,'wallet' : wallet }
+    return JsonResponse(response_data)
+

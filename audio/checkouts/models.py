@@ -60,8 +60,7 @@ class Order(BaseModel):
     def calculate_bill_amount(self):
         # Calculate the bill_amount as the sum of sub_total for all OrderItems
         total = sum(item.sub_total for item in self.orderitems.all())
-        self.bill_amount = total
-        self.amount_to_pay = total + 50
+        self.bill_amount = total + 50
         self.save()
 
 class OrderItems(BaseModel):
@@ -85,5 +84,7 @@ def generate_unique_six_digit_field(sender, instance, **kwargs):
                 break
 
 class Wallet(BaseModel):
-    user = models.OneToOneField(Profile, on_delete=models.CASCADE)
+    user = models.OneToOneField(Profile, on_delete=models.CASCADE, related_name="wallet")
     amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+
+

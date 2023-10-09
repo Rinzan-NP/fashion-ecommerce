@@ -35,6 +35,45 @@
     .form-check-input:checked + .form-check-label {
         font-weight: bold; /* Change the font-weight to bold (optional) */
     }
+    /* Style the label for the checkbox */
+label[for="use_wallet"] {
+    display: inline-block;
+    margin-right: 10px; /* Add spacing between the checkbox and label text */
+    font-weight: bold;
+    color: #333; /* Change the label text color */
+}
+
+/* Style the checkbox itself */
+#use_wallet {
+    display: none; /* Hide the default checkbox */
+}
+
+/* Style the custom checkbox icon */
+#use_wallet + label::before {
+    content: '\2713'; /* Unicode checkmark character */
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 1px solid #333; /* Border around the checkbox */
+    text-align: center;
+    line-height: 18px; /* Vertically center the checkmark */
+    background-color: #fff; /* Background color of the checkbox */
+    color: #333; /* Color of the checkmark */
+    font-size: 16px;
+    margin-right: 5px; /* Add spacing between the checkbox and label text */
+}
+
+/* Style the custom checkbox icon when checked */
+#use_wallet:checked + label::before {
+    background-color: #333; /* Background color when checked */
+    color: #fff; /* Color of the checkmark when checked */
+}
+
+/* Adjust the width of "Pay with Razorpay" button when the checkbox is checked */
+#use_wallet:checked + label + .container .row .col-md-6.pl-md-2 button#rzp-button1 {
+    width: 100%;
+}
+
 
 </style>
 
@@ -130,10 +169,18 @@
                                         <th>Shipping Fee</th>
                                         <td><span class="amount">₹ 50</span></td>
                                     </tr>
+                                    <tr class="cart-wallet-amount">
+                                        <th>Wallet</th>
+                                        
+                                        
+                                        
+                                        <td><span class="amount text-danger">-₹ {{request.user.profile.wallet.amount}}</span></td>
+                                       
+                                    </tr>
                                     <tr class="order-total">
                                         <th>Order Total</th>
                                         <td>
-                                            <strong><span class="amount">₹ {{grand_total | add:50 }}</span></strong>
+                                            <strong><span id="grand_total_amount" class="amount">₹ {{grand_total | add:50 }}</span></strong>
                                         </td>
                                     </tr>
                                 </tfoot>
@@ -141,15 +188,27 @@
                         </div>
                         <div class="payment-method">
                             <div class="payment-accordion">
+                                <div class="container">
+                                    <div class="row">
+                                        {% if addresses %}
+                                        <div class="col-md-6 mb-3 pr-md-2">
+                                            <input type="checkbox" name="use_wallet" id="use_wallet" value="1">
+                                            <label for="use_wallet">Pay with Wallet</label>
+                                        </div>
+                                        
+                                        {% endif %}
+                                    </div>
+                                </div>
                                 {% if addresses %}
                                 <div class="container">
                                     <div class="row">
-                                        <div class="col-md-6 mb-3 pr-md-2">
-                                            <input type="submit" name="submit_cod" class="btn btn-dark btn-block h-auto" value="Place order (Cash on Delivery)" />
-                                        </div>
                                         <div class="col-md-6 pl-md-2">
                                             <button id="rzp-button1" type="submit" name="submit_razorpay" class="btn btn-dark btn-block h-auto">Pay with Razorpay</button>
+                                        </div> 
+                                        <div class="col-md-6 mb-3 pr-md-2">
+                                            <input type="submit" name="submit_cod" class="btn btn-dark btn-block h-auto" value="Place order (Cash on Delivery) " id="place_order_button" />
                                         </div>
+                                         
                                     </div>
                                 </div>
                                 
@@ -172,21 +231,101 @@
 <script>
     alert("Cart items have changed. Please review your order.");
     window.location.href = "{% url 'checkout_page' user_uid=request.user.profile.uid %}";
+
+
 </script>
 {% endif %}
 {% if out_of_stock %}
 <script>
     alert("Some items in your cart are out of stock. You will be redirected to the cart page.");
     window.location.href = "{% url 'cart_listing' %}"; 
+
+    
 </script>
 {% endif %}
+<script>
+    var useWalletCheckbox = document.getElementById('use_wallet');
+    var placeOrderButton = document.getElementById('place_order_button');
+
+    useWalletCheckbox.addEventListener('change', function () {
+        if (this.checked) {
+            placeOrderButton.style.display = 'none';
+        } else {
+            placeOrderButton.style.display = 'block';
+        }
+    });
+
+    // Initialize the display based on the initial state of the checkbox
+    if (useWalletCheckbox.checked) {
+        placeOrderButton.style.display = 'none';
+    } else {
+        placeOrderButton.style.display = 'block';
+    }
+    $(document).ready(function() {
+        var useWalletCheckbox = $('#use_wallet');
+        var walletAmountRow = $('.cart-wallet-amount');
+        var walletAmountSpan = walletAmountRow.find('.amount');
+        var grandTotalSpan = $('#grand_total_amount');
+        
+        // Store the original grand total when the page loads
+        var originalGrandTotal = parseFloat(grandTotalSpan.text().replace(/[^\d.-]/g, ''));
+        
+        // Store the original wallet amount when the page loads
+        var originalWalletAmount = parseFloat('{{ request.user.profile.wallet.amount }}');
+        
+        // Initial state based on checkbox status
+        var initialAmount = useWalletCheckbox.prop('checked') ? originalWalletAmount : 0;
+        walletAmountSpan.text('₹ ' + initialAmount.toFixed(2));
+        
+        // Add an event listener to the checkbox
+        useWalletCheckbox.on('change', function() {
+            // Update the wallet amount based on checkbox status
+            var walletAmount = this.checked ? originalWalletAmount : 0;
+            walletAmountSpan.text('₹ ' + walletAmount.toFixed(2));
+        
+            if (this.checked) {
+                $.ajax({
+                    type: 'POST',
+                    url: '/checkout/wallet/',
+                    data: {
+                        grand_total: grandTotalSpan.text(),
+                        wallet: walletAmount, // Include the wallet amount in the data
+                        csrfmiddlewaretoken: '{{ csrf_token }}'
+                    },
+                    success: function(data) {
+                        // Handle the success response from the server here
+                        console.log(data.wallet)
+                        grandTotalSpan.text('₹ ' + data.new_order_total.toFixed(2));
+                        walletAmountSpan.text('-₹ ' + data.wallet); // Update the wallet amount
+                    },
+                    error: function(xhr, status, error) {
+                        // Handle any errors that occur during the AJAX request
+                        console.error('AJAX request to /checkout/wallet failed');
+                    }
+                });
+            } else {
+                // Reset the grand total and wallet amount to their original values
+                grandTotalSpan.text('₹ ' + originalGrandTotal.toFixed(2));
+                walletAmountSpan.text('₹ ' + originalWalletAmount.toFixed(2));
+            }
+        });
+    });
+    
+    
+
+
+</script>
+
 <script>
     document.getElementById('rzp-button1').onclick = function (e) {
         e.preventDefault();
 
         var selectedAddressId = $("input[name='addressId']:checked").val();
-        console.log(selectedAddressId)
-        // Check if an address is selected
+      
+
+        var useWalletCheckbox = $('#use_wallet').is(':checked');
+        console.log(useWalletCheckbox)
+
         if (!selectedAddressId) {
             alert("Please select an address.");
             return;
@@ -198,13 +337,14 @@
             data: {
                 csrfmiddlewaretoken: '{{ csrf_token }}', // Include the CSRF token
                 addressId: selectedAddressId, // Include the selected address ID
+                useWallet: useWalletCheckbox
             },
             success: function (response) {
                 // Check if the order creation was successful
 
                 if (response.payment) {
                     // Open the Razorpay payment modal
-                    console.log(response.payment);
+         
                     razorpaycalling(response);
 
                 } else {
@@ -328,6 +468,7 @@
             rzp1.open();
         }
     }
+   
 </script>
 
     

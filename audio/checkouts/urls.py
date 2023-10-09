@@ -15,6 +15,7 @@ urlpatterns = [
 
     path('payment_failed/', views.payment_failed, name = "payment_failed"),
 
-    path('delete_order/', views.delete_order, name = "delete_order")
+    path('delete_order/', views.delete_order, name = "delete_order"),
+    path('wallet/', views.wallet, name="wallet"),
 
 ]

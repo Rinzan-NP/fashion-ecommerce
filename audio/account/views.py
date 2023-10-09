@@ -237,7 +237,7 @@ def cart_listing(request, uid):
 def profile(request, uid):
     context = {}
     profile = Profile.objects.get(uid=uid)
-    wallet = Wallet.objects.get(user = profile)
+    wallet, created = Wallet.objects.get_or_create(user=request.user.profile)
     
 
     context['profiles'] = profile
@@ -340,7 +340,9 @@ def return_order(request, order_uid):
     varient.sold -= order.quantity
     wallet = Wallet.objects.get(user = request.user.profile)
     wallet.amount += order.sub_total
+    order.save()
     wallet.save()
     varient.save()
-    return redirect(reverse('order_listing'))
+    return redirect(reverse('order_listing', args=[str(request.user.profile.uid)]))
+
 
