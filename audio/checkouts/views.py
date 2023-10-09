@@ -143,7 +143,7 @@ def create_order(request):
                 'quantity': cart_item.quantity,
                 'product_price': cart_item.product.selling_price,
                 'size': cart_item.size,
-                'sub_total': sub_total_in_paise,
+                'sub_total': sub_total,
             })
 
             product_stock = ProductVarient.objects.get(product = cart_item.product,size = cart_item.size)

@@ -237,32 +237,11 @@ def cart_listing(request, uid):
 def profile(request, uid):
     context = {}
     profile = Profile.objects.get(uid=uid)
-
-    if request.method == "POST":
-        first_name = request.POST.get('fname')
-        last_name = request.POST.get('lname')
-        user_obj = request.user
-
-        # Update the user's first_name and last_name
-        user_obj.first_name = first_name
-        user_obj.last_name = last_name
-
-        # Handle profile image update
-        if 'profile' in request.FILES:
-            profile_image = request.FILES['profile']
-
-            # Get the path of the old image and delete it
-            old_image_path = os.path.join(settings.MEDIA_ROOT, str(profile.profile_image))
-            if os.path.exists(old_image_path):
-                os.remove(old_image_path)
-
-            # Save the new profile image
-            profile.profile_image = profile_image
-
-        user_obj.save()  # Save the updated user object
-        profile.save()  # Save the updated profile object
+    wallet = Wallet.objects.get(user = profile)
+    
 
     context['profiles'] = profile
+    context['wallet'] = wallet
     return render(request, 'accounts/profile/profile.html', context)
 
 def order_listing(request, user_uid):
@@ -352,3 +331,16 @@ def address_deleting(request, address_uid):
         return redirect(reverse('address_listing'))
     except Exception as e:
         return HttpResponse(e)
+    
+def return_order(request, order_uid):
+    order = OrderItems.objects.get(uid = order_uid)
+    order.status = "Returned"
+    varient  = ProductVarient.objects.get(product = order.product, size = order.size)
+    varient.stock += order.quantity
+    varient.sold -= order.quantity
+    wallet = Wallet.objects.get(user = request.user.profile)
+    wallet.amount += order.sub_total
+    wallet.save()
+    varient.save()
+    return redirect(reverse('order_listing'))
+
