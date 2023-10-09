@@ -52,8 +52,8 @@
                             <span id="quantity">{{order.quantity}}</span>
                         </div>
                         <div class="form-group">
-                            <label for="quantity">Quantity:</label>
-                            <span id="quantity">{{order.amount_to_pay}}</span>
+                            <label for="quantity">Subtotal:</label>
+                            <span id="quantity">{{ order.sub_total|floatformat:"-2" }}</span>
                         </div>
                         <div class="form-group">
                             <label for="quantity">Size:</label>
@@ -147,6 +147,7 @@
         margin-top :10px;
         margin-bottom: 10px;
     }
+    
 </style>
 <script>
     // JavaScript to trigger the modal when the "Return" button is clicked

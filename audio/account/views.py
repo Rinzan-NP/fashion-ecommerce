@@ -12,7 +12,7 @@ from django.utils import timezone
 from datetime import timedelta 
 import os
 from django.conf import settings
-from checkouts.models import Address,OrderItems,Order
+from checkouts.models import Address,OrderItems,Order,Wallet
 from django.shortcuts import get_object_or_404
 
 # Create your views here.
@@ -281,13 +281,16 @@ def order_detail(request, order_uid):
 
 def order_canceling(request, order_uid):
     try:
-        order_obj = OrderItems.objects.filter(uid = order_uid)
-        for order in order_obj:
-            order.status = "Canceled"
-            order.save()
-            product_stock = ProductVarient.objects.get(size = order.size, product = order.product)
-            product_stock.stock += order.quantity
-            product_stock.save()
+        order_obj = OrderItems.objects.get(uid = order_uid)
+        order_obj.status = "Canceled"
+        wallet, created = Wallet.objects.get_or_create(user=request.user.profile)
+        wallet.amount += order_obj.product_price
+        wallet.save()
+        order_obj.save()
+        product_stock = ProductVarient.objects.get(size = order_obj.size, product = order_obj.product)
+        product_stock.stock += order_obj.quantity
+        product_stock.sold -= order_obj.quantity
+        product_stock.save()
         messages.success(request, "Order canceled successfully!")
         return redirect(f'/account/order/{request.user.profile.uid}')
     except Exception as e:

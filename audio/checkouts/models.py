@@ -84,8 +84,6 @@ def generate_unique_six_digit_field(sender, instance, **kwargs):
                 instance.order_id = six_digit_number
                 break
 
-class Razor_pay(BaseModel):
-    order = models.OneToOneField(Order, on_delete=models.CASCADE)
-    razor_pay_order_id  = models.CharField(max_length=100, null =  True, blank= True)
-    razor_pay_payment_id = models.CharField(max_length= 100, null= True, blank=True)
-    razor_pay_payment_signature = models.CharField(max_length= 100, null=True, blank=True)
+class Wallet(BaseModel):
+    user = models.OneToOneField(Profile, on_delete=models.CASCADE)
+    amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)

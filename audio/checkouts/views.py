@@ -7,7 +7,7 @@ from . models import Address,Coupon
 import json
 from django.contrib.sessions.models import Session
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
-from .models import Profile, Cart, Address, PaymentMethod, Order,OrderItems,Razor_pay
+from .models import Profile, Cart, Address, PaymentMethod, Order,OrderItems
 import razorpay
 from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
@@ -34,10 +34,14 @@ def checkout(request, user_uid):
     cart_items = CartItems.objects.filter(cart__user=profile)
     addresses = Address.objects.filter(unlisted=False, user=request.user)
     
+    out_of_stock = False
     grand_total = 0
     for cart_item in cart_items:
         sub_total = cart_item.calculate_sub_total()
         grand_total += sub_total
+        variant = ProductVarient.objects.get(product = cart_item.product, size = cart_item.size)
+        if cart_item.quantity > variant.stock:
+            out_of_stock = True
 
     if request.method == "POST":
         if "submit_cod" in request.POST:
@@ -91,6 +95,7 @@ def checkout(request, user_uid):
                 order_item.save()
                 product_stock = ProductVarient.objects.get(product = cart_product.product,size = cart_product.size)
                 product_stock.stock -= cart_product.quantity
+                product_stock.sold += cart_product.quantity
                 product_stock.save()
 
 
@@ -103,7 +108,7 @@ def checkout(request, user_uid):
             return render(request, 'checkouts/order_placed.html')
         
     
-    # If it's not a POST request, retrieve data for the checkout page
+    context['out_of_stock'] = out_of_stock
     context['products'] = cart_items
     context['grand_total'] = grand_total
     context['user'] = profile
@@ -143,6 +148,7 @@ def create_order(request):
 
             product_stock = ProductVarient.objects.get(product = cart_item.product,size = cart_item.size)
             product_stock.stock -= cart_item.quantity
+            product_stock.sold += cart_item.quantity
             product_stock.save()
 
         # Create all order items
@@ -220,6 +226,10 @@ def update_status(request):
             orders = OrderItems.objects.filter(order = order)
             for item in orders:
                 item.status = "Canceled"
+                product = ProductVarient.objects.get(product = item.product, size = item.size)
+                product.stock += item.quantity
+                product.sold -= item.quantity
+                product.save()
                 item.save()
             # Respond with a success JSON response
             return JsonResponse({'success': True})
@@ -236,7 +246,12 @@ def delete_order(request):
         razorpay_order_id = request.POST.get('razorpay_order_id')
         try:            
             order = Order.objects.get(razor_pay_id=razorpay_order_id)
-       
+            order_items = OrderItems.objects.filter(order = order)
+            for item in  order_items:
+                varient = ProductVarient.objects.get(product = item.product, size = item.size)
+                varient.stock += item.quantity
+                varient.sold -= item.quantity
+                varient.save()
             order.delete()
 
             return JsonResponse({'success': True})
@@ -244,4 +259,5 @@ def delete_order(request):
         except Order.DoesNotExist:
             return JsonResponse({'success': False, 'error_message': 'Order not found'})
 
-    return JsonResponse({'success': False, 'error_message': 'Invalid request method'})    
+    return JsonResponse({'success': False, 'error_message': 'Invalid request method'})  
+  
