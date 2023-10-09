@@ -59,6 +59,7 @@ class ProductVarient(BaseModel):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     stock = models.IntegerField()
     size = models.ForeignKey(Size, on_delete=models.CASCADE)
+    sold = models.IntegerField(default=0)
 
     def __str__(self):
         return f"{self.product.name} : {self.Size}"

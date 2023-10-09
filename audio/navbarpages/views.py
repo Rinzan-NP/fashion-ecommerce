@@ -106,8 +106,6 @@ def product_detail(request, uid):
 
     if request.user.is_authenticated and request.user.is_staff is False:
         context['wishlist'] = [item.product for item in Wishlist.objects.filter(user=request.user.profile)]
-        user_cart_items = CartItems.objects.filter(cart__user=request.user.profile)
-        context['cart'] = [item.product for item in user_cart_items]
         context['user'] = Profile.objects.get(user = request.user)
     context['products'] = product_obj
     context['sizes'] = sizes

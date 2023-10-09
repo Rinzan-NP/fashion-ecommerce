@@ -4,6 +4,18 @@ from . import views
 
 urlpatterns = [
     path('user/<user_uid>', views.checkout, name = "checkout_page"),
-    path('order_placed/', views.order_placed, name = "order_placed"),
-    path('check_cart/', views.check_cart , name = "checking_cart")
+
+    path('place_order/', views.create_order, name = "create_order" ),
+
+    path('sucess_page/', views.success, name = "success"),
+
+    path('verify_payment/', views.verify_payment, name = "verify_payment"),
+
+    path('update_order_status/', views.update_status, name = "order_status"),
+
+    path('payment_failed/', views.payment_failed, name = "payment_failed"),
+
+    path('delete_order/', views.delete_order, name = "delete_order"),
+    path('wallet/', views.wallet, name="wallet"),
+
 ]

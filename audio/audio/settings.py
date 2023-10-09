@@ -149,3 +149,6 @@ EMAIL_USE_TLS = True
 EMAIL_PORT = 587
 EMAIL_HOST_USER = 'audioecommmerce@gmail.com'
 EMAIL_HOST_PASSWORD = 'bwdevetrvzdswqhg'
+
+KEY = "rzp_test_UAqDQGJ5B2qwiK"
+SECRET = "Cizk7Cf5nKp9uja9vRSVANYP"

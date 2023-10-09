@@ -43,6 +43,8 @@ class Order(BaseModel):
     products = models.ManyToManyField(Product, through="OrderItems")    
     bill_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     amount_to_pay = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    is_paid = models.BooleanField(default=False)
+    razor_pay_id = models.CharField(blank=True, null=True, max_length=100)
     
     def save(self, *args, **kwargs):
         if not self.pk:  # Check if this is a new instance
@@ -58,8 +60,7 @@ class Order(BaseModel):
     def calculate_bill_amount(self):
         # Calculate the bill_amount as the sum of sub_total for all OrderItems
         total = sum(item.sub_total for item in self.orderitems.all())
-        self.bill_amount = total
-        self.amount_to_pay = total + 50
+        self.bill_amount = total + 50
         self.save()
 
 class OrderItems(BaseModel):
@@ -71,6 +72,7 @@ class OrderItems(BaseModel):
     sub_total = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     status = models.CharField(max_length=40, default="Pending")
 
+
 @receiver(pre_save, sender=Order)
 def generate_unique_six_digit_field(sender, instance, **kwargs):
     if not instance.order_id:
@@ -80,3 +82,9 @@ def generate_unique_six_digit_field(sender, instance, **kwargs):
             if not Order.objects.filter(order_id=six_digit_number).exists():
                 instance.order_id = six_digit_number
                 break
+
+class Wallet(BaseModel):
+    user = models.OneToOneField(Profile, on_delete=models.CASCADE, related_name="wallet")
+    amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+
+
