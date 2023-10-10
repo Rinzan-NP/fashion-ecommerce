@@ -273,15 +273,21 @@ def order_detail(request, order_uid):
 def order_canceling(request, order_uid):
     try:
         order_obj = OrderItems.objects.get(uid = order_uid)
-        order_obj.status = "Canceled"
-        wallet, created = Wallet.objects.get_or_create(user=request.user.profile)
-        wallet.amount += order_obj.product_price
-        wallet.save()
-        order_obj.save()
         product_stock = ProductVarient.objects.get(size = order_obj.size, product = order_obj.product)
         product_stock.stock += order_obj.quantity
         product_stock.sold -= order_obj.quantity
+        print(order_obj.status)
+        if order_obj.order.payment_method != "COD" and str(order_obj.status) == "Pending" :
+            wallet, created = Wallet.objects.get_or_create(user=request.user.profile)   
+            wallet.amount += (order_obj.product_price * order_obj.quantity)+ 50
+            wallet.save()
+        elif order_obj.order.payment_method != "COD":
+            wallet, created = Wallet.objects.get_or_create(user=request.user.profile)   
+            wallet.amount += order_obj.product_price * order_obj.quantity
+            wallet.save()
         product_stock.save()
+        order_obj.status = "Canceled"
+        order_obj.save()
         messages.success(request, "Order canceled successfully!")
         return redirect(f'/account/order/{request.user.profile.uid}')
     except Exception as e:

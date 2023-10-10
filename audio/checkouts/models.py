@@ -45,7 +45,9 @@ class Order(BaseModel):
     amount_to_pay = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     is_paid = models.BooleanField(default=False)
     razor_pay_id = models.CharField(blank=True, null=True, max_length=100)
-    
+    wallet_applied = models.BooleanField(default=False)
+
+
     def save(self, *args, **kwargs):
         if not self.pk:  # Check if this is a new instance
             # Generate a unique 6-digit number

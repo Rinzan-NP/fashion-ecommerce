@@ -163,11 +163,11 @@ def create_order(request):
         
         # Initialize the Razorpay client
         client = razorpay.Client(auth=(settings.KEY, settings.SECRET))
-        print(wallet_applied)
+        
         if wallet_applied == "true":
             wall_amount = request.user.profile.wallet.amount
-            print(wall_amount)
-            if wall_amount < grand_total + 50:
+            order.wallet_applied = True
+            if wall_amount < grand_total:
                 grand_total -= wall_amount
                 order.amount_to_pay = grand_total + 50
             else:
@@ -187,14 +187,18 @@ def create_order(request):
 
     return JsonResponse({'error': 'Invalid request'}, status=400)
 
-def success(request):
+def success(request, uid):
     wallet = request.user.profile.wallet
     cart_items = CartItems.objects.filter(cart__user=request.user.profile)
-    grand_total = 0
-    for cart in cart_items:
-        grand_total += (cart.quantity * cart.product.selling_price)
-    wallet.amount -= grand_total
-    wallet.save()
+    order = Order.objects.get(uid = uid)
+    print(order.wallet_applied)
+    if order.wallet_applied == True :
+        if wallet.amount > order.bill_amount + 50 :
+            wallet.amount -= order.bill_amount
+            wallet.save()
+        else:
+            wallet.amount = 0
+            wallet.save()
     cart_items.delete()
     return  render(request, 'checkouts/order_placed.html')
 
@@ -220,12 +224,11 @@ def verify_payment(request):
                                                     'razorpay_signature': razorpay_signature
                                                     })
 
-            print(razorpay_order_id)
             order = Order.objects.get(razor_pay_id = razorpay_order_id)
             order.is_paid = True
             order.save()
             
-            return JsonResponse({'success': True})
+            return JsonResponse({'id' : order.uid})
        
 
         except razorpay.errors.SignatureVerificationError as e:
@@ -255,6 +258,7 @@ def update_status(request):
     return JsonResponse({'success': False, 'error_message': 'Invalid request method'})
 
 def payment_failed(request):
+    
     return render(request, 'checkouts/payment_failed.html')
 
 @csrf_exempt
@@ -285,7 +289,7 @@ def wallet(request):
     for item in order:
         grand_total += (item.quantity * item.product.selling_price)
   
-    if float(wallet_amount) < (float((grand_total)-50)):
+    if float(wallet_amount) < (float(grand_total)):
        amount = float(grand_total + 50) - float(wallet_amount)
        
     else:

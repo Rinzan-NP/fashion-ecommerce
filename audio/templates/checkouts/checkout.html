@@ -386,9 +386,8 @@ label[for="use_wallet"] {
                         }),
                         
                         success: function (verificationResponse) {
-                            if (verificationResponse.success) {
-                                // Payment is verified, you can redirect to the order_placed page
-                                window.location.href = '/checkout/sucess_page';
+                            if (verificationResponse.id) {
+                                window.location.href = `/checkout/sucess_page/${verificationResponse.id}`;
                             } else {
                                 alert('Payment verification failed. Please contact support.');
                             }
