@@ -5,9 +5,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Oswald:wght@600&family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> 
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+
+
 
 {% endblock head %} {% block content %}
 <style>
@@ -182,20 +182,36 @@
 <div class="product-description-review-area pb-90">
     <div class="container">
         <div class="product-description-review text-center">
-            <div class="description-review-title nav" role=tablist>
-                <a class="active" href="#pro-dec" data-bs-toggle="tab" role="tab" aria-selected="true">
-                    Description
-                </a>
+            <div class="description-review-title nav" role="tablist">
+                <a class="active" href="#pro-dec" data-bs-toggle="tab" role="tab" aria-selected="true"> Description </a>
                 <a href="#pro-review" data-bs-toggle="tab" role="tab" aria-selected="false">
-                    Reviews (0)
+                    Reviews
                 </a>
             </div>
-            <div class="description-review-text tab-content">
+            <div class="description-review-text tab-content mt-5">
                 <div class="tab-pane active show fade" id="pro-dec" role="tabpanel">
-                    <p>{{products.description}}</p>
+                    <div class="product-specification">
+                        {{products.description}}
+                    </div>
                 </div>
+
                 <div class="tab-pane fade" id="pro-review" role="tabpanel">
-                    <a href="#">Be the first to write your review!</a>
+                    <div class="testimonials-area bg-img">
+                        <div class="container">
+                            <div class="testimonials-active owl-carousel">
+                                {% if reviews %}
+                                    {% for review in reviews %}
+                                    <div class="single-testimonial-2 text-center">
+                                        <p>{{ review.review }}</p>
+                                        <h4>Posted By {{ review.user.user.first_name }}</h4>
+                                    </div>
+                                    {% endfor %}
+                                {% else %}
+                                    <p class="text-dark">No reviews</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>  
                 </div>
             </div>
         </div>
@@ -225,16 +241,12 @@
                               <i class="pe-7s-like"></i>
                               {% endif %}
                             </a>
-                            <a class="animate-top" title="Add To Cart" href="#">
-                              <i class="pe-7s-cart"></i>
-                            </a>
+                            
                             {% else %}
                             <a class="animate-left" title="Wishlist" href="/account/login/">
                               <i class="pe-7s-like"></i>
                             </a>
-                            <a class="animate-top" title="Add To Cart" href="/account/login/">
-                              <i class="pe-7s-cart"></i>
-                            </a>
+                            
                             {% endif %}
                         </div>
                     </div>
@@ -327,25 +339,5 @@
         </div>
     </div>
 </footer>
-<script>
 
-
-
-</script>
-
-<script>
-    $(document).ready(function () {
-        // Activate the first tab by default
-        $('.product-details-small a:first').tab('show');
-    
-        // Handle tab changes to update the active class
-        $('.product-details-small a').on('click', function () {
-            $('.product-details-small a').removeClass('active');
-            $(this).addClass('active');
-        });
-    });
-</script>
-<script>
-
-</script>
 {% endblock content%}

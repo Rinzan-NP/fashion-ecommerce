@@ -132,3 +132,12 @@ class CartItems(BaseModel):
     def calculate_sub_total(self):
         return self.product.selling_price * self.quantity
 
+class Review(BaseModel):
+    user = models.ForeignKey(Profile,related_name="review", on_delete=models.CASCADE)
+    product = models.ForeignKey(Product,related_name = "product_review", on_delete=models.CASCADE)
+    review = models.TextField()
+
+    class Meta:
+        unique_together = ('user', 'product')
+
+           
