@@ -5,7 +5,7 @@ from django.http import HttpResponseRedirect,HttpResponse
 from django.contrib.auth.models import User
 from django.contrib import messages
 from . models import Profile
-from products.models import ProductVarient, Wishlist,Cart,CartItems
+from products.models import ProductVarient, Review, Wishlist,Cart,CartItems
 from django.urls import reverse
 from .utils import send_account_activation_email, send_forgot_pass_token
 from django.utils import timezone
@@ -255,7 +255,19 @@ def order_listing(request, user_uid):
 def order_detail(request, order_uid):
     context = {}
     order = OrderItems.objects.get(uid = order_uid)
+    if request.method == "POST":
+        review = request.POST.get('review')
+        user_review = Review.objects.get(user = request.user.profile, product = order.product)
+        user_review.review = review
+        user_review.save()
+        return redirect(request.META.get('HTTP_REFERER'))
+
     context['order'] = order
+    try:
+        context['review'] = Review.objects.get(user = request.user.profile, product = order.product)
+    except:
+        Review.objects.create(user = request.user.profile, product = order.product, review = "")
+        context['review'] = Review.objects.get(user = request.user.profile, product = order.product)
     return render(request, 'accounts/profile/order_detail.html', context)
 
 def order_canceling(request, order_uid):

@@ -1,5 +1,5 @@
 from django.shortcuts import redirect, render,render
-from products.models import Product,Product_image,Category,Size,Color,Brand,Wishlist,Cart,Profile,CartItems
+from products.models import Product,Product_image,Category, Review,Size,Color,Brand,Wishlist,Cart,Profile,CartItems
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db.models import Q
 from django.http import QueryDict
@@ -64,7 +64,7 @@ def shop_listing(request):
         product_obj = product_obj.order_by('-price')
         filter_params['sort'] = 'high_to_low'
 
-    paginator = Paginator(product_obj, 1)
+    paginator = Paginator(product_obj, 6)
     page = request.GET.get('page')
 
     try:
@@ -97,8 +97,7 @@ def product_detail(request, uid):
     product_img_obj = Product_image.objects.get(product = product_obj)
     category_obj = product_obj.category
     sizes = Size.objects.all()
-    products_with_category = Product.objects.filter(category = category_obj)
-
+    products_with_category = Product.objects.filter(category = category_obj).order_by('?')
     if request.method == "POST":
         size = request.POST.get('size')
         size_obj  = Size.objects.get(id = size)
@@ -107,6 +106,7 @@ def product_detail(request, uid):
     if request.user.is_authenticated and request.user.is_staff is False:
         context['wishlist'] = [item.product for item in Wishlist.objects.filter(user=request.user.profile)]
         context['user'] = Profile.objects.get(user = request.user)
+    context['reviews'] = Review.objects.filter(product = product_obj)
     context['products'] = product_obj
     context['sizes'] = sizes
     context['images'] = product_img_obj

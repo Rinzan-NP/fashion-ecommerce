@@ -4,10 +4,11 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate,login,logout
 from django.contrib import messages
 from django.urls import reverse
-from products.models import Product,Category,Size,Brand,Color,Product_image,ProductVarient
+from products.models import Product,Category, Review,Size,Brand,Color,Product_image,ProductVarient
 from account.models import Profile
 from checkouts.models import Order,OrderItems
 from .decarator import admin_required
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 # Create your views here.
 def dashboard(request):
     if  request.user.is_authenticated and request.user.is_staff is True:
@@ -521,3 +522,31 @@ def order_detail(request, order_uid):
 
     return render(request, 'admins/order/order_detail.html', context)
 
+@admin_required
+def review_listing(request):
+    context = {}
+    reviews = Review.objects.all()
+
+    paginator = Paginator(reviews, 10)
+
+    # Get the current page number from the request's GET parameters
+    page = request.GET.get('page')
+
+    try:
+        reviews = paginator.page(page)
+    except PageNotAnInteger:
+        # If page is not an integer, deliver first page.
+        reviews = paginator.page(1)
+    except EmptyPage:
+        # If page is out of range (e.g., 9999), deliver the last page of results.
+        reviews = paginator.page(paginator.num_pages)
+
+    context['reviews'] = reviews
+    return render(request, 'admins/review/review.html', context)
+
+@admin_required
+def review_detail(request, uid):
+    context = {}
+    review = Review.objects.get(uid = uid)
+    context['review'] = review
+    return render(request, 'admins/review/review_detail.html',context)

@@ -85,6 +85,31 @@
                                 <a class="btn btn-danger h-auto" href="#" data-toggle="modal" data-target="#cancelOrderModal">Cancel Order</a>
                             {% endif %}
                         {% endif %}
+
+                        {% if order.status  == "Delivered" %}
+                        <hr class="border-2 border-secondary" />
+                        <!-- Review Section -->
+                            <div class="container mt-5">
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <h3>Write a Review</h3>
+                                        <form method="POST">
+                                            
+                                            {% csrf_token %}
+                                            <!-- Review Text -->
+                                            <div class="form-group">
+                                                <label for="reviewText">Review:</label>
+                                                <textarea class="form-control" id="reviewText" name="review" rows="4">{{review.review}}</textarea>
+                                            </div>
+                                            <!-- Submit Button -->
+                                            <button type="submit" class="btn btn-dark h-auto">Submit Review</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Review End -->
+                            {% endif %}
+                      
                     </div>
                 </div>
             </div>
