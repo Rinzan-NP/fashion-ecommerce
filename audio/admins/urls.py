@@ -39,7 +39,9 @@ urlpatterns = [
     path('order/', views.order, name = "admin_order_listing"),
     path('order_detail/<order_uid>', views.order_detail, name = "admin_order_detail"),
 
-
+    path('review/', views.review_listing, name = "admin_review_listing"),
+    path('review/detail/<uid>', views.review_detail, name="review_detail")
+    
 
 
 
