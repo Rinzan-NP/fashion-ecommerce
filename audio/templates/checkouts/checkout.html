@@ -128,8 +128,14 @@ label[for="use_wallet"] {
                                 </div>
                                   
                                 {% endif %}
-                                
-                               
+                            </div>
+                            <div class="coupon">
+                                <div class="coupon">
+                                    <form action="POST">    
+                                        <input id="coupon_code" class="input-text" name="coupon_code" value="" placeholder="Coupon code" type="text">
+                                        <button class="btn btn-dark h-auto " type="submit">Apply coupon</button>
+                                    </form>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -171,9 +177,6 @@ label[for="use_wallet"] {
                                     </tr>
                                     <tr class="cart-wallet-amount">
                                         <th>Wallet</th>
-                                        
-                                        
-                                        
                                         <td><span class="amount text-danger">-₹ {{request.user.profile.wallet.amount}}</span></td>
                                        
                                     </tr>
@@ -221,6 +224,7 @@ label[for="use_wallet"] {
                     </div>
                 </div>
             </div>
+
         </form>
     </div>
 </div>

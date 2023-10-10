@@ -32,7 +32,7 @@ class Coupon(BaseModel):
     code = models.CharField(max_length=10)
     expiry_date = models.DateTimeField()
     minimum_amount = models.IntegerField()
-    discount_amount = models.IntegerField()
+    discount_percentage = models.IntegerField()
 
 
 class Order(BaseModel):
@@ -46,6 +46,8 @@ class Order(BaseModel):
     is_paid = models.BooleanField(default=False)
     razor_pay_id = models.CharField(blank=True, null=True, max_length=100)
     wallet_applied = models.BooleanField(default=False)
+    coupon = models.ForeignKey(Coupon,on_delete= models.CASCADE, null=True, blank=True)
+
 
 
     def save(self, *args, **kwargs):

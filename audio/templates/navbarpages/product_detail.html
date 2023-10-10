@@ -201,10 +201,12 @@
                             <div class="testimonials-active owl-carousel">
                                 {% if reviews %}
                                     {% for review in reviews %}
+                                    {% if review.review != "" %}
                                     <div class="single-testimonial-2 text-center">
                                         <p>{{ review.review }}</p>
                                         <h4>Posted By {{ review.user.user.first_name }}</h4>
                                     </div>
+                                    {% endif %}
                                     {% endfor %}
                                 {% else %}
                                     <p class="text-dark">No reviews</p>
