@@ -117,7 +117,20 @@ def checkout(request, user_uid):
     request.session['initial_cart_items'] = serialize_cart_items(cart_items)
 
     return render(request, 'checkouts/checkout.html', context)
-   
+
+def coupon_validation(code):
+    try:
+        coupon = Coupon.objects.get(code = code)
+        current_datetime = timezone.now()
+        if coupon.expiry_date >= current_datetime:
+            
+            return True
+        else:
+            
+            return False
+    except:
+        return False
+
 def create_order(request):
     if request.method == 'POST':
         address_id = request.POST.get('addressId')
@@ -125,8 +138,10 @@ def create_order(request):
         cart_items = CartItems.objects.filter(cart__user=request.user.profile)
         
         wallet_applied = request.POST.get('useWallet')
-        
-           
+        coupon_code = request.POST.get('coupon_code', None)
+        print(coupon_code)
+        valid = coupon_validation(str(coupon_code))
+        print(valid)
         order = Order.objects.create(
             user=request.user,
             address=Address.objects.get(uid=address_id),
@@ -134,20 +149,39 @@ def create_order(request):
             
         )
 
+        if valid:
+            coupon = Coupon.objects.get(code = coupon_code)
+            order.coupon = coupon
+            order.save()
+
         grand_total = 0
         order_items = []
         for cart_item in cart_items:
             sub_total = cart_item.calculate_sub_total()
             grand_total += sub_total
 
-            sub_total_in_paise = int(sub_total * 100)  # Convert to paise
-            order_items.append({
-                'product': cart_item.product,
-                'quantity': cart_item.quantity,
-                'product_price': cart_item.product.selling_price,
-                'size': cart_item.size,
-                'sub_total': sub_total,
-            })
+
+            if valid:
+                discounted_subtotal = float(sub_total) * float((100 - float(order.coupon.discount_percentage))/100)
+                print(discounted_subtotal)
+                order_items.append({
+                    'product': cart_item.product,
+                    'quantity': cart_item.quantity,
+                    'product_price': cart_item.product.selling_price,
+                    'size': cart_item.size,
+                    'sub_total': sub_total,
+                    'discounted_subtotal':discounted_subtotal,
+
+                })
+            else:
+                order_items.append({
+                    'product': cart_item.product,
+                    'quantity': cart_item.quantity,
+                    'product_price': cart_item.product.selling_price,
+                    'size': cart_item.size,
+                    'sub_total': sub_total,
+                    'discounted_subtotal':sub_total,
+                })
 
 
 
@@ -156,8 +190,12 @@ def create_order(request):
             OrderItems(order=order, **item) for item in order_items
         ])
 
-        # Calculate the bill amount
+        
         order.calculate_bill_amount()
+        order_items = OrderItems.objects.filter(order = order)
+        grand_total = 0
+        for item in order_items:
+            grand_total += item.discounted_subtotal
         
         # Initialize the Razorpay client
         client = razorpay.Client(auth=(settings.KEY, settings.SECRET))
@@ -311,10 +349,9 @@ def wallet(request):
             grand_total = float(grand_total) * ((100 - float(coupon.discount_percentage))/100)
             if float(wallet_amount) > grand_total:
                 wallet_amount = grand_total 
-                print("--------------------")
                 amount = 50
             elif float(wallet_amount) < grand_total:
-                amount = grand_total - wallet_amount + 50
+                amount = float(grand_total) - float(wallet_amount) + 50
             response_data['new_order_total'] = amount
             response_data['wallet'] = wallet_amount
 
@@ -326,7 +363,7 @@ def validate_coupon(request):
         coupon_code = request.POST.get('coupon_code', None)
         wallet_applied = request.POST.get('useWallet')
         response_data = {}
-        current_datetime = datetime.now()
+        
         cart = Cart.objects.get(user = request.user.profile)
         cart_items = CartItems.objects.filter(cart = cart)
 
@@ -352,7 +389,7 @@ def validate_coupon(request):
                             response_data['total'] = order_total
                         elif request.user.profile.wallet.amount < grand_total:
                             wallet_amount = request.user.profile.wallet.amount
-                            order_total = grand_total - wallet_amount 
+                            order_total = float(grand_total) - float(wallet_amount) 
                             response_data['wallet'] = wallet_amount
                             response_data['total'] = order_total
 
@@ -367,3 +404,4 @@ def validate_coupon(request):
             response_data['message'] = 'Invalid coupon code.'
 
         return JsonResponse(response_data)
+    

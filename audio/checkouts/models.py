@@ -73,6 +73,7 @@ class OrderItems(BaseModel):
     product_price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     amount_to_pay = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     sub_total = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    discounted_subtotal = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     status = models.CharField(max_length=40, default="Pending")
     is_paid = models.BooleanField(default=False)
 

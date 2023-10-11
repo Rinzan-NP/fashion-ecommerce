@@ -353,7 +353,9 @@ label[for="use_wallet"] {
                         grandTotalSpan.text('₹ ' + data.new_order_total.toFixed(2));
                         walletAmountSpan.text('-₹ ' + data.wallet); // Update the wallet amount
                         if(data.discount_percent){
-                            var discountPercent = response.discount_percent;
+                            var discountPercent = data.discount_percent;
+                            var discountSpan = $('.cart-coupon .discount');
+                            var couponHead = $('.coupon-head');
                             couponHead.text('COUPON')
                             discountSpan.text(discountPercent + "% OFF");
                             $('.cart-coupon').show();
@@ -381,7 +383,7 @@ label[for="use_wallet"] {
       
 
         var useWalletCheckbox = $('#use_wallet').is(':checked');
-        
+        var couponCode = $('#coupon_code').val();
 
         if (!selectedAddressId) {
             alert("Please select an address.");
@@ -394,7 +396,8 @@ label[for="use_wallet"] {
             data: {
                 csrfmiddlewaretoken: '{{ csrf_token }}', // Include the CSRF token
                 addressId: selectedAddressId, // Include the selected address ID
-                useWallet: useWalletCheckbox
+                useWallet: useWalletCheckbox,
+                'coupon_code': couponCode,
             },
             success: function (response) {
                 // Check if the order creation was successful
