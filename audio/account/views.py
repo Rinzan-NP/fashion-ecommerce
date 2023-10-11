@@ -277,11 +277,11 @@ def order_canceling(request, order_uid):
         product_stock.stock += order_obj.quantity
         product_stock.sold -= order_obj.quantity
         print(order_obj.status)
-        if order_obj.order.payment_method != "COD" and str(order_obj.status) == "Pending" :
+        if order_obj.order.payment_method != "COD" and str(order_obj.status) == "Pending" and order_obj.is_paid is True:
             wallet, created = Wallet.objects.get_or_create(user=request.user.profile)   
             wallet.amount += (order_obj.product_price * order_obj.quantity)+ 50
             wallet.save()
-        elif order_obj.order.payment_method != "COD":
+        elif order_obj.order.payment_method != "COD" and order_obj.is_paid is True:
             wallet, created = Wallet.objects.get_or_create(user=request.user.profile)   
             wallet.amount += order_obj.product_price * order_obj.quantity
             wallet.save()

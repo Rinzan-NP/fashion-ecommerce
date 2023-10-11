@@ -7,11 +7,12 @@ from . models import Address,Coupon
 import json
 from django.contrib.sessions.models import Session
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
-from .models import Profile, Cart, Address, PaymentMethod, Order,OrderItems,Wallet
+from .models import Profile, Cart, Address, PaymentMethod, Order,OrderItems,Wallet,CartItems
 import razorpay
 from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
-
+from datetime import datetime
+from django.utils import timezone
 
 def serialize_cart_items(cart_items):
     serialized_items = []
@@ -148,10 +149,7 @@ def create_order(request):
                 'sub_total': sub_total,
             })
 
-            product_stock = ProductVarient.objects.get(product = cart_item.product,size = cart_item.size)
-            product_stock.stock -= cart_item.quantity
-            product_stock.sold += cart_item.quantity
-            product_stock.save()
+
 
         # Create all order items
         OrderItems.objects.bulk_create([
@@ -191,7 +189,12 @@ def success(request, uid):
     wallet = request.user.profile.wallet
     cart_items = CartItems.objects.filter(cart__user=request.user.profile)
     order = Order.objects.get(uid = uid)
-    print(order.wallet_applied)
+    order_items =OrderItems.objects.filter(order = order)
+    for item in order_items:
+        varient = ProductVarient.objects.get(product = item.product, size = item.size)
+        varient.stock -= item.quantity
+        varient.sold += item.quantity
+        varient.save()
     if order.wallet_applied == True :
         if wallet.amount > order.bill_amount + 50 :
             wallet.amount -= order.bill_amount
@@ -284,6 +287,9 @@ def delete_order(request):
   
 def wallet(request):
     wallet_amount = request.user.profile.wallet.amount
+    coupon_code = request.POST.get('coupon_code', None)  
+    
+    current_datetime = datetime.now() 
     grand_total = 0
     order = CartItems.objects.filter(cart__user = request.user.profile)
     for item in order:
@@ -295,7 +301,69 @@ def wallet(request):
     else:
         amount = 50
     wallet = wallet_amount if wallet_amount < grand_total else grand_total
-
     response_data = {'new_order_total': amount,'wallet' : wallet }
+    
+    if coupon_code:
+        coupon = Coupon.objects.get(code = coupon_code)
+        current_datetime = timezone.now()
+        if coupon.expiry_date >= current_datetime:
+            response_data['discount_percent'] = coupon.discount_percentage
+            grand_total = float(grand_total) * ((100 - float(coupon.discount_percentage))/100)
+            if float(wallet_amount) > grand_total:
+                wallet_amount = grand_total 
+                print("--------------------")
+                amount = 50
+            elif float(wallet_amount) < grand_total:
+                amount = grand_total - wallet_amount + 50
+            response_data['new_order_total'] = amount
+            response_data['wallet'] = wallet_amount
+
     return JsonResponse(response_data)
 
+
+def validate_coupon(request):
+    if request.method == 'POST':
+        coupon_code = request.POST.get('coupon_code', None)
+        wallet_applied = request.POST.get('useWallet')
+        response_data = {}
+        current_datetime = datetime.now()
+        cart = Cart.objects.get(user = request.user.profile)
+        cart_items = CartItems.objects.filter(cart = cart)
+
+        grand_total = 0
+        for item in cart_items:
+            grand_total += (item.quantity * item.product.selling_price)
+
+        
+        if coupon_code:
+            try:
+                coupon = Coupon.objects.get(code=coupon_code)
+                current_datetime = timezone.now()
+                if coupon.expiry_date >= current_datetime:
+                    response_data['success'] = True
+                    response_data['discount_percent'] = coupon.discount_percentage
+                    grand_total = float(grand_total) * ((100 - float(coupon.discount_percentage))/100)
+                    response_data['total'] = grand_total + 50
+                    if wallet_applied == "true":
+                        if request.user.profile.wallet.amount > grand_total:
+                            wallet_amount = grand_total
+                            order_total = 50
+                            response_data['wallet'] = wallet_amount
+                            response_data['total'] = order_total
+                        elif request.user.profile.wallet.amount < grand_total:
+                            wallet_amount = request.user.profile.wallet.amount
+                            order_total = grand_total - wallet_amount 
+                            response_data['wallet'] = wallet_amount
+                            response_data['total'] = order_total
+
+                else:
+                    response_data['success'] = False
+                    response_data['message'] = 'Coupon has expired.'
+            except Coupon.DoesNotExist:
+                response_data['success'] = False
+                response_data['message'] = 'Coupon does not exist or is not active.'
+        else:
+            response_data['success'] = False
+            response_data['message'] = 'Invalid coupon code.'
+
+        return JsonResponse(response_data)
