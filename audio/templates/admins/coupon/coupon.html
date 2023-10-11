@@ -1,0 +1,195 @@
+{% extends "base/base.html" %}
+{% load static %}
+{% block head %}
+{% endblock head %}
+{% block content %}
+
+<div class="screen-overlay"></div>
+<aside class="navbar-aside" id="offcanvas_aside">
+  <div class="aside-top">
+    <a href = "/admin" class="brand-wrap">
+      <img
+        src="{% static 'admins/assets/imgs/theme/logo.png' %}"
+        class="logo"
+        alt="Evara Dashboard"
+      />
+    </a>
+    <div>
+      <button class="btn btn-icon btn-aside-minimize">
+        <i class="text-muted material-icons md-menu_open"></i>
+      </button>
+    </div>
+  </div>
+  <nav>
+    <ul class="menu-aside">
+      <li class="menu-item">
+        <a class="menu-link" href="/admin/">
+          <i class="icon material-icons md-home"></i>
+          <span class="text">Dashboard</span>
+        </a>
+      </li>
+      <li class="menu-item">
+        <a class="menu-link" href="/admin/products">
+          <i class="icon material-icons md-shopping_bag"></i>
+          <span class="text">Products</span>
+        </a>
+      </li>
+      <li class="menu-item ">
+        <a class="menu-link" href="/admin/products/add_product">
+          <i class="icon material-icons md-add_box"></i>
+          <span class="text">Add product</span>
+        </a>
+      </li>
+      <li class="menu-item has-submenu">
+        <a class="menu-link" href="#">
+          <i class="icon material-icons md-person"></i>
+          <span class="text">Account</span>
+        </a>
+        <div class="submenu">
+          <a href="/admin/users">User</a>
+          <a href="/admin/staffs">Staff</a>
+        </div>
+      </li>
+      <li class="menu-item has-submenu ">
+        <a class="menu-link" href="#"> <i class="icon material-icons md-store"></i>
+            <span class="text">Category</span>
+        </a>
+        <div class="submenu">
+            <a href="/admin/category/add">Add</a>
+            <a href="/admin/category" >Listing</a>
+        </div>
+    </li>
+    <li class="menu-item has-submenu">
+      <a class="menu-link" href="#"><i class="icon material-icons md-stars"></i>
+          <span class="text">Color</span>
+      </a>
+      <div class="submenu">
+          <a href="/admin/color">Listing</a>
+          <a href="/admin/color/add">Add</a>
+      </div>
+    </li>
+      <li class="menu-item">
+        <a class="menu-link" href="/admin/order">
+          <i class="icon material-icons md-shopping_cart"></i>
+          <span class="text">Orders</span>
+        </a>
+        
+      </li>
+      
+
+      
+
+      <li class="menu-item">
+        <a class="menu-link" href="/admin/review">
+          <i class="icon material-icons md-comment"></i>
+          <span class="text">Reviews</span>
+        </a>
+      </li>
+      <li class="menu-item">
+        <a class="menu-link" href="/admin/brand">
+          <i class="icon material-icons md-stars"></i>
+          <span class="text">Brands</span>
+        </a>
+      </li>
+      
+    </ul>
+    <hr />
+    <ul class="menu-aside">
+      <li class="menu-item has-submenu">
+        <a class="menu-link" href="#">
+          <i class="icon material-icons md-settings"></i>
+          <span class="text">Settings</span>
+        </a>
+        <div class="submenu">
+          <a href="page-settings-1.html">Setting sample 1</a>
+          <a href="page-settings-2.html">Setting sample 2</a>
+        </div>
+      </li>
+      <li class="menu-item active">
+        <a class="menu-link " href="/admin/coupon">
+          <i class="icon material-icons md-redeem"></i>
+          <span class="text"> Coupon </span>
+        </a>
+      </li>
+    </ul>
+    <br />
+    <br />
+  </nav>
+</aside>
+<main class="main-wrap">
+<header class="main-header navbar" style="display: flex; justify-content: flex-end;">
+    <div class="col-nav">
+        <ul class="nav">
+            <li class="nav-item">
+                <a class="nav-link btn-icon" href="/admin/logouting">Logout</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link btn-icon darkmode" href="#"><i class="material-icons md-nights_stay"></i></a>
+            </li>
+        </ul>
+    </div>
+</header>
+
+<section class="content-main">
+    <div class="content-header">
+        <div>
+            <h2 class="content-title card-title">Coupon</h2>
+            
+        </div>
+        <div>
+            <a href="/admin/coupon/add" class="btn btn-primary h-auto">Add Coupon</a>
+        </div>
+    </div>
+    <div class="card mb-4">
+        
+        <!-- card-header end// -->
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            
+                            <th>Coupon</th>
+                            <th>Discount</th>
+                            <th>Expiry Date</th>
+                            <th class="text">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for coupon in coupons %}
+                        <tr>
+                            <td>{{coupon.code}}</td>
+                            <td><b>{{coupon.discount_percentage}}%</b></td>
+                            
+                            
+                            <td>{{coupon.expiry_date}}</td>
+                            <td class="text">
+                                <a href="/admin/coupon/detail/{{coupon.uid}}" class="btn btn-primary rounded font-sm h-auto px-2">Detail</a> 
+                            </td>
+                        </tr>
+                        {% endfor %}
+
+                    </tbody>
+                </table>
+            </div> <!-- table-responsive//end -->
+        </div>
+        <!-- card-body end// -->
+    </div>
+    
+</section> <!-- content-main end// -->
+<footer class="main-footer font-xs">
+    <div class="row pb-30 pt-15">
+        <div class="col-sm-6">
+            <script>
+            document.write(new Date().getFullYear())
+            </script> ©, Evara - HTML Ecommerce Template .
+        </div>
+        <div class="col-sm-6">
+            <div class="text-sm-end">
+                All rights reserved
+            </div>
+        </div>
+    </div>
+</footer>
+</main>
+{% endblock content %}

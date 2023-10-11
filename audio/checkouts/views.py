@@ -199,7 +199,7 @@ def create_order(request):
         
         # Initialize the Razorpay client
         client = razorpay.Client(auth=(settings.KEY, settings.SECRET))
-        
+        order.amount = grand_total
         if wallet_applied == "true":
             wall_amount = request.user.profile.wallet.amount
             order.wallet_applied = True

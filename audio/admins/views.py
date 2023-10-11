@@ -6,9 +6,10 @@ from django.contrib import messages
 from django.urls import reverse
 from products.models import Product,Category, Review,Size,Brand,Color,Product_image,ProductVarient
 from account.models import Profile
-from checkouts.models import Order,OrderItems
+from checkouts.models import Coupon, Order,OrderItems
 from .decarator import admin_required
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from datetime import datetime
 # Create your views here.
 def dashboard(request):
     if  request.user.is_authenticated and request.user.is_staff is True:
@@ -529,7 +530,7 @@ def review_listing(request):
 
     paginator = Paginator(reviews, 10)
 
-    # Get the current page number from the request's GET parameters
+    
     page = request.GET.get('page')
 
     try:
@@ -550,3 +551,46 @@ def review_detail(request, uid):
     review = Review.objects.get(uid = uid)
     context['review'] = review
     return render(request, 'admins/review/review_detail.html',context)
+
+@admin_required
+def coupon_listing(request):
+    context = {}
+    coupon = Coupon.objects.all()
+    context['coupons'] = coupon
+    return render(request, 'admins/coupon/coupon.html',context)
+
+@admin_required
+def coupon_adding(request):
+    if request.method == "POST":
+        code = request.POST['code']
+        discount_percentage = request.POST['discount_percentage']
+        expiry_date = request.POST['expiry_date']
+        expiry_date = datetime.strptime(expiry_date, '%Y-%m-%dT%H:%M')
+        if Coupon.objects.filter(code = code).exists():
+            messages.warning(request, "Coupon Already exists!")
+            return redirect(reverse('coupon_adding'))
+        coupon = Coupon(code=code, discount_percentage=discount_percentage, expiry_date=expiry_date)
+        coupon.save()
+        messages.success(request, "Coupon added successfully")
+        return redirect(reverse('coupon_adding'))
+    return render(request, "admins/coupon/add_coupon.html")
+
+@admin_required
+def coupon_editing(request, coupon_uid):
+    coupon = Coupon.objects.get(uid = coupon_uid)
+    context = {}
+    if request.method =="POST":
+        
+        discount_percentage = request.POST['discount_percentage']
+        expiry_date = request.POST['expiry_date']
+        expiry_date = datetime.strptime(expiry_date, '%Y-%m-%dT%H:%M')
+        
+   
+        coupon.expiry_date = expiry_date
+        coupon.discount_percentage = discount_percentage
+        coupon.save()
+        messages.success(request,"Edited successfully!")
+        return redirect(reverse("coupon_listing"))
+    context['coupon'] = coupon
+    return render(request, 'admins/coupon/coupon_editing.html', context)
+    
