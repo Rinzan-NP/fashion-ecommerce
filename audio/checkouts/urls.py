@@ -7,7 +7,7 @@ urlpatterns = [
 
     path('place_order/', views.create_order, name = "create_order" ),
 
-    path('sucess_page/', views.success, name = "success"),
+    path('sucess_page/<uid>', views.success, name = "success"),
 
     path('verify_payment/', views.verify_payment, name = "verify_payment"),
 
@@ -17,5 +17,6 @@ urlpatterns = [
 
     path('delete_order/', views.delete_order, name = "delete_order"),
     path('wallet/', views.wallet, name="wallet"),
+    path('validate_coupon/', views.validate_coupon, name='validate_coupon'),
 
 ]

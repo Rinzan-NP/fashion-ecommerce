@@ -128,8 +128,6 @@ label[for="use_wallet"] {
                                 </div>
                                   
                                 {% endif %}
-                                
-                               
                             </div>
                         </div>
                     </div>
@@ -169,14 +167,16 @@ label[for="use_wallet"] {
                                         <th>Shipping Fee</th>
                                         <td><span class="amount">₹ 50</span></td>
                                     </tr>
+                                    <tr class="cart-coupon"  style="display: none;">
+                                        <th class="coupon-head"></th>
+                                        <td><span class="discount text-danger"></span></td>
+                                    </tr>
                                     <tr class="cart-wallet-amount">
                                         <th>Wallet</th>
-                                        
-                                        
-                                        
                                         <td><span class="amount text-danger">-₹ {{request.user.profile.wallet.amount}}</span></td>
-                                       
                                     </tr>
+                                         
+                                        
                                     <tr class="order-total">
                                         <th>Order Total</th>
                                         <td>
@@ -222,6 +222,14 @@ label[for="use_wallet"] {
                 </div>
             </div>
         </form>
+        <div class="coupon">
+            <div class="coupon">
+                <form method="POST" id="coupon-form"> <!-- Added id attribute -->
+                    <input id="coupon_code" class="input-text" name="coupon_code" value="" placeholder="Coupon code" type="text">
+                    <button class="btn btn-dark h-auto" type="submit" for="coupon-form">Apply coupon</button>
+                </form>
+            </div>
+        </div>
     </div>
 </div>
 <!-- checkout-area end -->
@@ -244,6 +252,50 @@ label[for="use_wallet"] {
 </script>
 {% endif %}
 <script>
+    $(document).ready(function() {
+        $('#coupon-form').submit(function(e) {
+            e.preventDefault(); // Prevent the default form submission
+            var couponCode = $('#coupon_code').val();
+            var walletAmountRow = $('.cart-wallet-amount');
+            var useWalletCheckbox = $('#use_wallet').is(':checked');
+            var walletAmountSpan = walletAmountRow.find('.amount');
+            var grandTotalSpan = $('#grand_total_amount');
+            $.ajax({
+                type: 'POST',
+                url: '/checkout/validate_coupon/',
+                data: {
+                    'coupon_code': couponCode,
+                    'csrfmiddlewaretoken': '{{ csrf_token }}',
+                    'useWallet': useWalletCheckbox
+                },
+                success: function(response) {
+                    if (response.success) {
+                        
+                        var discountPercent = response.discount_percent;
+                        var discountSpan = $('.cart-coupon .discount');
+                        var couponHead = $('.coupon-head');
+                        
+                        couponHead.text('COUPON')
+                        discountSpan.text(discountPercent + "% OFF");
+                        $('.cart-coupon').show();
+                        grandTotalSpan.text('₹ ' + response.total.toFixed(2));
+                        if(response.wallet){
+                            
+                            walletAmountSpan.text('-₹ ' + response.wallet);
+                        }
+
+                    } else {
+                        alert(response.message);
+                    }
+                },
+                error: function() {
+                    // Handle AJAX request errors
+                }
+            });
+            return false; // Ensure the form is not submitted
+        });
+    });
+    
     var useWalletCheckbox = document.getElementById('use_wallet');
     var placeOrderButton = document.getElementById('place_order_button');
 
@@ -262,6 +314,7 @@ label[for="use_wallet"] {
         placeOrderButton.style.display = 'block';
     }
     $(document).ready(function() {
+        
         var useWalletCheckbox = $('#use_wallet');
         var walletAmountRow = $('.cart-wallet-amount');
         var walletAmountSpan = walletAmountRow.find('.amount');
@@ -282,7 +335,8 @@ label[for="use_wallet"] {
             // Update the wallet amount based on checkbox status
             var walletAmount = this.checked ? originalWalletAmount : 0;
             walletAmountSpan.text('₹ ' + walletAmount.toFixed(2));
-        
+            var couponCode = $('#coupon_code').val();
+            console.log(couponCode)
             if (this.checked) {
                 $.ajax({
                     type: 'POST',
@@ -290,13 +344,24 @@ label[for="use_wallet"] {
                     data: {
                         grand_total: grandTotalSpan.text(),
                         wallet: walletAmount, // Include the wallet amount in the data
-                        csrfmiddlewaretoken: '{{ csrf_token }}'
+                        csrfmiddlewaretoken: '{{ csrf_token }}',
+                        'coupon_code': couponCode,
                     },
                     success: function(data) {
                         // Handle the success response from the server here
-                        console.log(data.wallet)
+                        
                         grandTotalSpan.text('₹ ' + data.new_order_total.toFixed(2));
                         walletAmountSpan.text('-₹ ' + data.wallet); // Update the wallet amount
+                        if(data.discount_percent){
+                            var discountPercent = data.discount_percent;
+                            var discountSpan = $('.cart-coupon .discount');
+                            var couponHead = $('.coupon-head');
+                            couponHead.text('COUPON')
+                            discountSpan.text(discountPercent + "% OFF");
+                            $('.cart-coupon').show();
+
+                        }
+
                     },
                     error: function(xhr, status, error) {
                         // Handle any errors that occur during the AJAX request
@@ -305,18 +370,12 @@ label[for="use_wallet"] {
                 });
             } else {
                 // Reset the grand total and wallet amount to their original values
-                grandTotalSpan.text('₹ ' + originalGrandTotal.toFixed(2));
-                walletAmountSpan.text('₹ ' + originalWalletAmount.toFixed(2));
+                
+                location.reload()
             }
         });
     });
     
-    
-
-
-</script>
-
-<script>
     document.getElementById('rzp-button1').onclick = function (e) {
         e.preventDefault();
 
@@ -324,7 +383,7 @@ label[for="use_wallet"] {
       
 
         var useWalletCheckbox = $('#use_wallet').is(':checked');
-        console.log(useWalletCheckbox)
+        var couponCode = $('#coupon_code').val();
 
         if (!selectedAddressId) {
             alert("Please select an address.");
@@ -337,7 +396,8 @@ label[for="use_wallet"] {
             data: {
                 csrfmiddlewaretoken: '{{ csrf_token }}', // Include the CSRF token
                 addressId: selectedAddressId, // Include the selected address ID
-                useWallet: useWalletCheckbox
+                useWallet: useWalletCheckbox,
+                'coupon_code': couponCode,
             },
             success: function (response) {
                 // Check if the order creation was successful
@@ -386,9 +446,8 @@ label[for="use_wallet"] {
                         }),
                         
                         success: function (verificationResponse) {
-                            if (verificationResponse.success) {
-                                // Payment is verified, you can redirect to the order_placed page
-                                window.location.href = '/checkout/sucess_page';
+                            if (verificationResponse.id) {
+                                window.location.href = `/checkout/sucess_page/${verificationResponse.id}`;
                             } else {
                                 alert('Payment verification failed. Please contact support.');
                             }
