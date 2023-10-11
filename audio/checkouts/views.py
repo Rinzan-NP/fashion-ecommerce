@@ -389,7 +389,7 @@ def validate_coupon(request):
                             response_data['total'] = order_total
                         elif request.user.profile.wallet.amount < grand_total:
                             wallet_amount = request.user.profile.wallet.amount
-                            order_total = float(grand_total) - float(wallet_amount) 
+                            order_total = float(grand_total) - float(wallet_amount) + 50
                             response_data['wallet'] = wallet_amount
                             response_data['total'] = order_total
 
