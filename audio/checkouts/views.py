@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from django.urls import reverse
 from products.models import Cart,Product,Profile,CartItems,ProductVarient
 from django.http import HttpResponse
-from . models import Address,Coupon
+from . models import Address,Coupon, WalletHistory
 import json
 from django.contrib.sessions.models import Session
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
@@ -125,7 +125,7 @@ def checkout(request, user_uid):
 
     return render(request, 'checkouts/checkout.html', context)
 
-@login_required
+
 def coupon_validation(code):
     try:
         coupon = Coupon.objects.get(code = code)
@@ -139,7 +139,7 @@ def coupon_validation(code):
     except:
         return False
 
-@login_required
+
 def create_order(request):
     if request.method == 'POST':
         address_id = request.POST.get('addressId')
@@ -149,7 +149,7 @@ def create_order(request):
         wallet_applied = request.POST.get('useWallet')
         coupon_code = request.POST.get('coupon_code', None)
         print(coupon_code)
-        valid = coupon_validation(str(coupon_code))
+        valid = coupon_validation(coupon_code)
         print(valid)
         order = Order.objects.create(
             user=request.user,
@@ -250,6 +250,7 @@ def success(request, uid):
     if order.wallet_applied == True :
         if wallet.amount > order.bill_amount + 50 :
             wallet.amount -= total
+            WalletHistory.objects.create(wallet = wallet, amount = total,action = "Debit")
             wallet.save()
         else:
             wallet.amount = 0
