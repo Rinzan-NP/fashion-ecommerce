@@ -6,8 +6,10 @@ from .models import Wishlist,Product,Cart,CartItems,Size,ProductVarient
 from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib import messages
 from django.shortcuts import get_object_or_404
+from account.decarator import login_required
 
 # Create your views here.
+@login_required
 def wishlist_management(request,user_uid, product_uid):
     try:
         user_obj = Profile.objects.get(uid = user_uid)
@@ -21,7 +23,7 @@ def wishlist_management(request,user_uid, product_uid):
         return HttpResponse(e)
     
         
-
+@login_required
 def add_to_cart(request, product_uid, size_id):
     try:
         product_obj = Product.objects.get(uid=product_uid)
@@ -51,6 +53,7 @@ def add_to_cart(request, product_uid, size_id):
     except Exception as e:
         return HttpResponse(e)
 
+@login_required
 def cart_deleting(request, uid):
     try:
         cart = CartItems.objects.get(uid=uid)
@@ -61,6 +64,7 @@ def cart_deleting(request, uid):
     except Exception as e:
         return HttpResponse(str(e))
 
+@login_required
 def quantity_decreasing(request, uid, product_uid):
     try:
         cart_obj = CartItems.objects.get(uid=uid)
@@ -87,7 +91,7 @@ def quantity_decreasing(request, uid, product_uid):
     except Exception as e:
         return JsonResponse({'error': str(e)})
 
-
+@login_required
 def quantity_increasing(request, uid, product_uid):
     try:
         cart_obj = CartItems.objects.get(uid=uid)

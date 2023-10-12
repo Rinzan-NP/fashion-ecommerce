@@ -14,7 +14,7 @@ import os
 from django.conf import settings
 from checkouts.models import Address,OrderItems,Order,Wallet
 from django.shortcuts import get_object_or_404
-
+from .decarator import login_required
 # Create your views here.
 
 def register(request):
@@ -190,6 +190,7 @@ def email_verification(request):
 
     return render(request, 'accounts/verify_email.html')
 
+@login_required
 def wishlist_listing(request, uid):
     context = {}
     try:
@@ -201,6 +202,7 @@ def wishlist_listing(request, uid):
         return HttpResponse(e)
     return render(request, 'accounts/wishlist.html',context)
 
+@login_required
 def cart_listing(request, uid):
     context = {}
     try:
@@ -234,6 +236,7 @@ def cart_listing(request, uid):
         return HttpResponse(e)
     return render(request, 'accounts/cart.html', context)
 
+@login_required
 def profile(request, uid):
     context = {}
     profile = Profile.objects.get(uid=uid)
@@ -244,6 +247,7 @@ def profile(request, uid):
     context['wallet'] = wallet
     return render(request, 'accounts/profile/profile.html', context)
 
+@login_required
 def order_listing(request, user_uid):
     context = {}
     profile = Profile.objects.get(uid = user_uid)
@@ -252,6 +256,7 @@ def order_listing(request, user_uid):
     context['orders'] = orders
     return render(request, 'accounts/profile/orders.html',context)
 
+@login_required
 def order_detail(request, order_uid):
     context = {}
     order = OrderItems.objects.get(uid = order_uid)
@@ -270,6 +275,7 @@ def order_detail(request, order_uid):
         context['review'] = Review.objects.get(user = request.user.profile, product = order.product)
     return render(request, 'accounts/profile/order_detail.html', context)
 
+@login_required
 def order_canceling(request, order_uid):
     try:
         order_obj = OrderItems.objects.get(uid = order_uid)
@@ -292,13 +298,15 @@ def order_canceling(request, order_uid):
         return redirect(f'/account/order/{request.user.profile.uid}')
     except Exception as e:
         return HttpResponse(e)
-    
+
+@login_required    
 def address_listing(request):
     users = request.user
     context = {}
     context['addresses'] = Address.objects.filter(user = users,unlisted = False)
     return render(request, 'accounts/profile/address.html',context)
 
+@login_required
 def address_adding(request):
     if request.method == 'POST':
         # Retrieve form data from POST request
@@ -320,6 +328,7 @@ def address_adding(request):
 
     return render(request, 'accounts/profile/add_address.html')
 
+@login_required
 def address_editing(request, address_uid):
     context = {}
     address = Address.objects.get(uid=address_uid)
@@ -341,6 +350,7 @@ def address_editing(request, address_uid):
     context['address'] = address
     return render(request, 'accounts/profile/edit_address.html', context)
 
+@login_required
 def address_deleting(request, address_uid):
     try:
         address = Address.objects.get(uid=address_uid)
@@ -349,7 +359,8 @@ def address_deleting(request, address_uid):
         return redirect(reverse('address_listing'))
     except Exception as e:
         return HttpResponse(e)
-    
+
+@login_required
 def return_order(request, order_uid):
     order = OrderItems.objects.get(uid = order_uid)
     order.status = "Returned"
