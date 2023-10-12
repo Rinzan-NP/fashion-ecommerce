@@ -65,7 +65,8 @@ def checkout(request, user_uid):
             address_id = request.POST.get('addressId')
             selected_address = Address.objects.get(uid=address_id)
             payment_method = PaymentMethod.objects.get(method=payment_method_id)
-
+            coupon = request.POST.get('coupon_code')
+            print(coupon,"--------------------------------")
             
             order = Order.objects.create(
                 user=request.user,
@@ -80,7 +81,9 @@ def checkout(request, user_uid):
                 
                 sub_total = cart_product.quantity * cart_product.product.selling_price
 
-                # Create an order item
+                
+
+
                 order_item = OrderItems.objects.create(
                     order=order,  
                     product=cart_product.product,
@@ -88,6 +91,7 @@ def checkout(request, user_uid):
                     product_price=cart_product.product.selling_price,
                     size = cart_product.size,
                     sub_total=sub_total,
+                    discounted_subtotal = sub_total,
                 )
 
                 
@@ -102,11 +106,12 @@ def checkout(request, user_uid):
 
 
             order.calculate_bill_amount()
-
+            
+            order.amount_to_pay = order.bill_amount
             # Clear the user's cart
             cart_items.delete()
-
-            return render(request, 'checkouts/order_placed.html')
+            return redirect(reverse('success_page'))
+          
         
     
     context['out_of_stock'] = out_of_stock
@@ -199,7 +204,7 @@ def create_order(request):
         
         # Initialize the Razorpay client
         client = razorpay.Client(auth=(settings.KEY, settings.SECRET))
-        
+        order.amount = grand_total
         if wallet_applied == "true":
             wall_amount = request.user.profile.wallet.amount
             order.wallet_applied = True
@@ -228,14 +233,18 @@ def success(request, uid):
     cart_items = CartItems.objects.filter(cart__user=request.user.profile)
     order = Order.objects.get(uid = uid)
     order_items =OrderItems.objects.filter(order = order)
+    total = 0
     for item in order_items:
+        item.is_paid = True
+        total += item.discounted_subtotal
+        item.save()
         varient = ProductVarient.objects.get(product = item.product, size = item.size)
         varient.stock -= item.quantity
         varient.sold += item.quantity
         varient.save()
     if order.wallet_applied == True :
         if wallet.amount > order.bill_amount + 50 :
-            wallet.amount -= order.bill_amount
+            wallet.amount -= total
             wallet.save()
         else:
             wallet.amount = 0
@@ -405,3 +414,5 @@ def validate_coupon(request):
 
         return JsonResponse(response_data)
     
+def success_page(request):
+    return render(request, 'checkouts/order_placed.html')
