@@ -270,7 +270,7 @@ label[for="use_wallet"] {
                 },
                 success: function(response) {
                     if (response.success) {
-                        
+                        var placeOrderButton = document.getElementById('place_order_button');
                         var discountPercent = response.discount_percent;
                         var discountSpan = $('.cart-coupon .discount');
                         var couponHead = $('.coupon-head');
@@ -279,6 +279,7 @@ label[for="use_wallet"] {
                         discountSpan.text(discountPercent + "% OFF");
                         $('.cart-coupon').show();
                         grandTotalSpan.text('₹ ' + response.total.toFixed(2));
+                        placeOrderButton.style.display = 'none';
                         if(response.wallet){
                             
                             walletAmountSpan.text('-₹ ' + response.wallet);

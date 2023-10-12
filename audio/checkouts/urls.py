@@ -18,5 +18,6 @@ urlpatterns = [
     path('delete_order/', views.delete_order, name = "delete_order"),
     path('wallet/', views.wallet, name="wallet"),
     path('validate_coupon/', views.validate_coupon, name='validate_coupon'),
+    path('success_page/', views.success_page, name="success_page")
 
 ]

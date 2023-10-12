@@ -62,7 +62,7 @@ class Order(BaseModel):
     def calculate_bill_amount(self):
         # Calculate the bill_amount as the sum of sub_total for all OrderItems
         total = sum(item.sub_total for item in self.orderitems.all())
-        self.bill_amount = total + 50
+        self.bill_amount = total 
         self.save()
 
 class OrderItems(BaseModel):
@@ -71,7 +71,6 @@ class OrderItems(BaseModel):
     size = models.ForeignKey(Size, on_delete=models.CASCADE)
     quantity = models.IntegerField()
     product_price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
-    amount_to_pay = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     sub_total = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     discounted_subtotal = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     status = models.CharField(max_length=40, default="Pending")
