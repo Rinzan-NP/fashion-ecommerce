@@ -13,6 +13,7 @@ from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
 from datetime import datetime
 from django.utils import timezone
+from account.decarator import login_required
 
 def serialize_cart_items(cart_items):
     serialized_items = []
@@ -28,6 +29,7 @@ def serialize_cart_items(cart_items):
 def compare_cart_items(initial_cart_items, current_cart_items):
     return initial_cart_items == serialize_cart_items(current_cart_items)
 
+@login_required
 def checkout(request, user_uid):
     context = {}
     profile = Profile.objects.get(uid=user_uid)
@@ -66,7 +68,7 @@ def checkout(request, user_uid):
             selected_address = Address.objects.get(uid=address_id)
             payment_method = PaymentMethod.objects.get(method=payment_method_id)
             coupon = request.POST.get('coupon_code')
-            print(coupon,"--------------------------------")
+            
             
             order = Order.objects.create(
                 user=request.user,
@@ -123,6 +125,7 @@ def checkout(request, user_uid):
 
     return render(request, 'checkouts/checkout.html', context)
 
+@login_required
 def coupon_validation(code):
     try:
         coupon = Coupon.objects.get(code = code)
@@ -136,6 +139,7 @@ def coupon_validation(code):
     except:
         return False
 
+@login_required
 def create_order(request):
     if request.method == 'POST':
         address_id = request.POST.get('addressId')
@@ -228,6 +232,7 @@ def create_order(request):
 
     return JsonResponse({'error': 'Invalid request'}, status=400)
 
+@login_required
 def success(request, uid):
     wallet = request.user.profile.wallet
     cart_items = CartItems.objects.filter(cart__user=request.user.profile)
@@ -252,6 +257,7 @@ def success(request, uid):
     cart_items.delete()
     return  render(request, 'checkouts/order_placed.html')
 
+@login_required
 @csrf_exempt
 def verify_payment(request):
     if request.method == 'POST':
@@ -287,6 +293,7 @@ def verify_payment(request):
 
     return JsonResponse({'success': False, 'error_message': 'Invalid request'})
 
+@login_required
 @csrf_exempt
 def update_status(request):
     if request.method == 'POST':
@@ -307,10 +314,12 @@ def update_status(request):
             return JsonResponse({'success': False, 'error_message': 'Order not found'})
     return JsonResponse({'success': False, 'error_message': 'Invalid request method'})
 
+@login_required
 def payment_failed(request):
     
     return render(request, 'checkouts/payment_failed.html')
 
+@login_required
 @csrf_exempt
 def delete_order(request):
     if request.method == 'POST':
@@ -332,6 +341,7 @@ def delete_order(request):
 
     return JsonResponse({'success': False, 'error_message': 'Invalid request method'})  
   
+@login_required  
 def wallet(request):
     wallet_amount = request.user.profile.wallet.amount
     coupon_code = request.POST.get('coupon_code', None)  
@@ -366,7 +376,7 @@ def wallet(request):
 
     return JsonResponse(response_data)
 
-
+@login_required
 def validate_coupon(request):
     if request.method == 'POST':
         coupon_code = request.POST.get('coupon_code', None)
@@ -414,5 +424,6 @@ def validate_coupon(request):
 
         return JsonResponse(response_data)
     
+@login_required    
 def success_page(request):
     return render(request, 'checkouts/order_placed.html')
