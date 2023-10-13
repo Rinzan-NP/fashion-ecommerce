@@ -284,12 +284,14 @@ def order_canceling(request, order_uid):
         product_stock.stock += order_obj.quantity
         product_stock.sold -= order_obj.quantity
         print(order_obj.status)
-        if order_obj.order.payment_method != "COD" and order_obj.is_paid is True:
+        if (order_obj.order.payment_method != "COD" and order_obj.is_paid is True) or order_obj.status == "Delivered":
             wallet, created = Wallet.objects.get_or_create(user=request.user.profile) 
             wallet.amount += order_obj.discounted_subtotal
             WalletHistory.objects.create(wallet = wallet, amount = order_obj.discounted_subtotal,action ="Credit") 
             wallet.save()
         
+
+
         product_stock.save()
         order_obj.status = "Canceled"
         order_obj.save()
