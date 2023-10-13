@@ -378,16 +378,21 @@ def category_editng(request, id):
     category = Category.objects.get(id = id)
     if request.method == "POST":
         name = request.POST.get('name')
-        if Category.objects.filter(category_name = name).exists():
-            messages.warning(request, 'Category already exist!')
-            return redirect(reverse("category_editing"))
-        else:
-            try:
-                category.category_name = name
-                category.save()
-                return redirect(reverse('category_listing'))
-            except Exception as e:
-                return HttpResponse(e)
+        offer = request.POST.get('offer')
+        try:
+            category.category_name = name
+            category.offer = offer
+            products = Product.objects.filter(category = category)
+            for product in products:
+                if offer == "0":
+                    break
+                product.selling_price = float(product.price) * (100 - float(offer))/100
+
+                product.save()
+            category.save()
+            return redirect(reverse('category_listing'))
+        except Exception as e:
+            return HttpResponse(e)
     context['category'] = category
     return render(request, 'admins/category/category_editing.html', context)
 
