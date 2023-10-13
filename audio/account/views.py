@@ -12,9 +12,10 @@ from django.utils import timezone
 from datetime import timedelta 
 import os
 from django.conf import settings
-from checkouts.models import Address,OrderItems,Order,Wallet
+from checkouts.models import Address,OrderItems,Order,Wallet, WalletHistory
 from django.shortcuts import get_object_or_404
 from .decarator import login_required
+from checkouts.views import validate_coupon
 # Create your views here.
 
 def register(request):
@@ -283,14 +284,14 @@ def order_canceling(request, order_uid):
         product_stock.stock += order_obj.quantity
         product_stock.sold -= order_obj.quantity
         print(order_obj.status)
-        if order_obj.order.payment_method != "COD" and str(order_obj.status) == "Pending" and order_obj.is_paid is True:
-            wallet, created = Wallet.objects.get_or_create(user=request.user.profile)   
-            wallet.amount += (order_obj.product_price * order_obj.quantity)+ 50
+        if (order_obj.order.payment_method != "COD" and order_obj.is_paid is True) or order_obj.status == "Delivered":
+            wallet, created = Wallet.objects.get_or_create(user=request.user.profile) 
+            wallet.amount += order_obj.discounted_subtotal
+            WalletHistory.objects.create(wallet = wallet, amount = order_obj.discounted_subtotal,action ="Credit") 
             wallet.save()
-        elif order_obj.order.payment_method != "COD" and order_obj.is_paid is True:
-            wallet, created = Wallet.objects.get_or_create(user=request.user.profile)   
-            wallet.amount += order_obj.product_price * order_obj.quantity
-            wallet.save()
+        
+
+
         product_stock.save()
         order_obj.status = "Canceled"
         order_obj.save()
@@ -369,9 +370,15 @@ def return_order(request, order_uid):
     varient.sold -= order.quantity
     wallet = Wallet.objects.get(user = request.user.profile)
     wallet.amount += order.sub_total
+    transaction = WalletHistory.objects.create(wallet = wallet,amount = order.sub_total,action = "Credit")
     order.save()
     wallet.save()
     varient.save()
     return redirect(reverse('order_listing', args=[str(request.user.profile.uid)]))
 
-
+@login_required
+def wallet_history(request):
+    context= {}
+    transactions = WalletHistory.objects.filter(wallet = request.user.profile.wallet)
+    context['transactions'] = transactions
+    return render(request, 'accounts/profile/wallet.html',context)

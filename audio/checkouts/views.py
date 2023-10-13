@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from django.urls import reverse
 from products.models import Cart,Product,Profile,CartItems,ProductVarient
 from django.http import HttpResponse
-from . models import Address,Coupon
+from . models import Address,Coupon, WalletHistory
 import json
 from django.contrib.sessions.models import Session
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
@@ -125,7 +125,7 @@ def checkout(request, user_uid):
 
     return render(request, 'checkouts/checkout.html', context)
 
-@login_required
+
 def coupon_validation(code):
     try:
         coupon = Coupon.objects.get(code = code)
@@ -139,7 +139,7 @@ def coupon_validation(code):
     except:
         return False
 
-@login_required
+
 def create_order(request):
     if request.method == 'POST':
         address_id = request.POST.get('addressId')
@@ -148,9 +148,9 @@ def create_order(request):
         
         wallet_applied = request.POST.get('useWallet')
         coupon_code = request.POST.get('coupon_code', None)
-        print(coupon_code)
-        valid = coupon_validation(str(coupon_code))
-        print(valid)
+    
+        valid = coupon_validation(coupon_code)
+
         order = Order.objects.create(
             user=request.user,
             address=Address.objects.get(uid=address_id),
@@ -172,7 +172,7 @@ def create_order(request):
 
             if valid:
                 discounted_subtotal = float(sub_total) * float((100 - float(order.coupon.discount_percentage))/100)
-                print(discounted_subtotal)
+               
                 order_items.append({
                     'product': cart_item.product,
                     'quantity': cart_item.quantity,
@@ -217,8 +217,8 @@ def create_order(request):
                 order.amount_to_pay = grand_total + 50
             else:
                 grand_total = 0
-                order.amount_to_pay = 50
-                
+                order.amount_to_pay = 0
+                return JsonResponse({'order_id' : order.uid})
         
         grand_total_in_paise = int(grand_total * 100)+5000
         
@@ -235,7 +235,7 @@ def create_order(request):
 @login_required
 def success(request, uid):
     wallet = request.user.profile.wallet
-    cart_items = CartItems.objects.filter(cart__user=request.user.profile)
+    cart_items = Cart.objects.filter(user=request.user.profile)
     order = Order.objects.get(uid = uid)
     order_items =OrderItems.objects.filter(order = order)
     total = 0
@@ -247,15 +247,17 @@ def success(request, uid):
         varient.stock -= item.quantity
         varient.sold += item.quantity
         varient.save()
-    if order.wallet_applied == True :
+    if order.wallet_applied is True :
         if wallet.amount > order.bill_amount + 50 :
             wallet.amount -= total
+            WalletHistory.objects.create(wallet = wallet, amount = total,action = "Debit")
             wallet.save()
         else:
+            WalletHistory.objects.create(wallet = wallet, amount = wallet.amount,action = "Debit")
             wallet.amount = 0
             wallet.save()
     cart_items.delete()
-    return  render(request, 'checkouts/order_placed.html')
+    return  redirect('/checkout/success_page')
 
 @login_required
 @csrf_exempt
@@ -357,8 +359,8 @@ def wallet(request):
        
     else:
         amount = 50
-    wallet = wallet_amount if wallet_amount < grand_total else grand_total
-    response_data = {'new_order_total': amount,'wallet' : wallet }
+    wallet = wallet_amount if wallet_amount < grand_total else grand_total + 50
+    response_data = {'new_order_total': 0,'wallet' : wallet }
     
     if coupon_code:
         coupon = Coupon.objects.get(code = coupon_code)
@@ -366,9 +368,9 @@ def wallet(request):
         if coupon.expiry_date >= current_datetime:
             response_data['discount_percent'] = coupon.discount_percentage
             grand_total = float(grand_total) * ((100 - float(coupon.discount_percentage))/100)
-            if float(wallet_amount) > grand_total:
-                wallet_amount = grand_total 
-                amount = 50
+            if float(wallet_amount) >= grand_total + 50:
+                wallet_amount = grand_total + 50
+                amount = 0
             elif float(wallet_amount) < grand_total:
                 amount = float(grand_total) - float(wallet_amount) + 50
             response_data['new_order_total'] = amount
@@ -401,10 +403,10 @@ def validate_coupon(request):
                     grand_total = float(grand_total) * ((100 - float(coupon.discount_percentage))/100)
                     response_data['total'] = grand_total + 50
                     if wallet_applied == "true":
-                        if request.user.profile.wallet.amount > grand_total:
-                            wallet_amount = grand_total
-                            order_total = 50
-                            response_data['wallet'] = wallet_amount
+                        if request.user.profile.wallet.amount > grand_total + 50:
+                            wallet_amount = grand_total + 50
+                            order_total = 0
+                            response_data['wallet'] = wallet_amount 
                             response_data['total'] = order_total
                         elif request.user.profile.wallet.amount < grand_total:
                             wallet_amount = request.user.profile.wallet.amount
@@ -427,3 +429,25 @@ def validate_coupon(request):
 @login_required    
 def success_page(request):
     return render(request, 'checkouts/order_placed.html')
+
+@login_required
+def success_pages(request, uid):
+    wallet = request.user.profile.wallet
+    cart_items = CartItems.objects.filter(cart__user=request.user.profile)
+    order = Order.objects.get(uid = uid)
+    order_items =OrderItems.objects.filter(order = order)
+    total = 0
+    for item in order_items:
+        item.is_paid = True
+        total += item.discounted_subtotal
+        item.save()
+        varient = ProductVarient.objects.get(product = item.product, size = item.size)
+        varient.stock -= item.quantity
+        varient.sold += item.quantity
+        varient.save()
+    wallet.amount -= total + 50
+    wallet.save()
+    WalletHistory.objects.create(wallet = wallet, amount = total + 50,action = "Debit")
+    cart_items.delete()
+    return  redirect('/checkout/success_page')
+

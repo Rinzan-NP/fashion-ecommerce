@@ -24,6 +24,6 @@ urlpatterns = [
    path('addresses/', views.address_listing, name = "address_listing"),
    path('add_address/', views.address_adding, name = "aderess_adding"),
    path('edit_address/<address_uid>', views.address_editing, name = "address_editing"),
-   path('delete_address/<address_uid>', views.address_deleting, name = "address_deleting")
 
+   path("wallet/", views.wallet_history, name="wallet_history"),
 ]

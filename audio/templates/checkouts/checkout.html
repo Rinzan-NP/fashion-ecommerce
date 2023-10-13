@@ -80,6 +80,22 @@ label[for="use_wallet"] {
 <!-- checkout-area start -->
 <div class="checkout-area ptb-100">
     <div class="container">
+        <div class="row">
+            <div class="coupon-accordion">
+
+                <h3>Have a coupon? <span id="showcoupon">Click here to enter your code</span></h3>
+                <div id="checkout_coupon" class="coupon-checkout-content">
+                    <div class="coupon-info d-flex">
+                        <div class="coupon">
+                            <form method="POST" id="coupon-form"> <!-- Added id attribute -->
+                                <input id="coupon_code" class="input-text" name="coupon_code" value="" placeholder="Coupon code" type="text">
+                                <button class="btn btn-dark h-auto" type="submit" for="coupon-form">Apply coupon</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
         <form method="post">
             {% csrf_token %}
             <div class="row">
@@ -173,12 +189,12 @@ label[for="use_wallet"] {
                                     </tr>
                                     <tr class="cart-wallet-amount">
                                         <th>Wallet</th>
-                                        <td><span class="amount text-danger">-₹ {{request.user.profile.wallet.amount}}</span></td>
+                                        <td><span class="amount text-danger">₹ 0.00</span></td>
                                     </tr>
                                          
                                         
                                     <tr class="order-total">
-                                        <th>Order Total</th>
+                                        <th>Amount to pay</th>
                                         <td>
                                             <strong><span id="grand_total_amount" class="amount">₹ {{grand_total | add:50 }}</span></strong>
                                         </td>
@@ -222,14 +238,7 @@ label[for="use_wallet"] {
                 </div>
             </div>
         </form>
-        <div class="coupon">
-            <div class="coupon">
-                <form method="POST" id="coupon-form"> <!-- Added id attribute -->
-                    <input id="coupon_code" class="input-text" name="coupon_code" value="" placeholder="Coupon code" type="text">
-                    <button class="btn btn-dark h-auto" type="submit" for="coupon-form">Apply coupon</button>
-                </form>
-            </div>
-        </div>
+        
     </div>
 </div>
 <!-- checkout-area end -->
@@ -246,7 +255,7 @@ label[for="use_wallet"] {
 {% if out_of_stock %}
 <script>
     alert("Some items in your cart are out of stock. You will be redirected to the cart page.");
-    window.location.href = "{% url 'cart_listing' %}"; 
+    window.location.href = "/account/cart/{{request.user.profile.uid}}"; 
 
     
 </script>
@@ -402,14 +411,17 @@ label[for="use_wallet"] {
             },
             success: function (response) {
                 // Check if the order creation was successful
-
-                if (response.payment) {
+                if (response.order_id){
+                    
+                    window.location.href = `/checkout/success_pages/${response.order_id}`
+                }
+                else if (response.payment) {
                     // Open the Razorpay payment modal
          
                     razorpaycalling(response);
 
                 } else {
-                    // Handle error in order creation
+                    
                     alert("Failed to create the order.");
                 }
             },

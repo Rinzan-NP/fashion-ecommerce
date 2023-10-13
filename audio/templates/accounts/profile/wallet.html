@@ -1,0 +1,38 @@
+{% extends "base/base.html" %}
+{% load static %}
+{% block head %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">{% endblock head %}
+{% block content %}
+{% include "base/nav.html" %}
+<div class="container mt-4">
+    <h1 class="mb-4">Wallet Transactions</h1>
+
+    <!-- Table to display transactions -->
+    <table class="table table-bordered">
+        {% if transactions %}
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Amount</th>
+                <th>Type</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for transaction in transactions  %}
+            <tr>
+                <td>{{transaction.created_at}}</td>
+                <td>{{transaction.amount}}</td>
+                {% if transaction.action == "Credit"%}
+                    <td class="text-success">Credit</td>
+                {% else %}
+                    <td class="text-danger">Debit</td>
+                {% endif %}
+            </tr>
+            {% endfor %}
+        </tbody>
+        {% else %}
+        <h4 class="text-danger">No Transaction!</h4>
+        {% endif %}
+    </table>
+</div>
+{% endblock %}
