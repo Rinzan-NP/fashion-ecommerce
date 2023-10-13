@@ -10,10 +10,30 @@ from checkouts.models import Coupon, Order,OrderItems
 from .decarator import admin_required
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from datetime import datetime
+from django.utils import timezone
+from django.db.models import Sum, Q
 # Create your views here.
 def dashboard(request):
     if  request.user.is_authenticated and request.user.is_staff is True:
-        return render(request, 'admins/index.html')
+        context = {}
+        try:
+            new_user = Profile.objects.filter(email_verified = True).order_by('created_at')[3]
+        except:
+            new_user = Profile.objects.filter(email_verified = True).order_by('created_at')
+        now = timezone.now()
+        start_month = timezone.datetime(now.year, now.month, 1) 
+        delivered_products = OrderItems.objects.filter(status='Delivered', created_at__gte=start_month)
+        monthly_revenue = delivered_products.aggregate(revenue=Sum('discounted_subtotal'))['revenue']
+        orders = Order.objects.all()
+        context['orders'] = orders
+        delivered_items = OrderItems.objects.filter(status="Delivered")
+        total = delivered_items.aggregate(total_discounted_subtotal=Sum('discounted_subtotal'))['total_discounted_subtotal']
+        context['no_of_product'] = Product.objects.filter(is_selling = True).count()
+        context['delivered'] = OrderItems.objects.filter(status = "Delivered").count()
+        context['monthly_revenue'] = monthly_revenue
+        context['new_user'] = new_user
+        context['revenue'] = total
+        return render(request, 'admins/index.html',context)
     else:
         return redirect(logining)
 
