@@ -346,7 +346,7 @@ label[for="use_wallet"] {
             var walletAmount = this.checked ? originalWalletAmount : 0;
             walletAmountSpan.text('₹ ' + walletAmount.toFixed(2));
             var couponCode = $('#coupon_code').val();
-            console.log(couponCode)
+         
             if (this.checked) {
                 $.ajax({
                     type: 'POST',

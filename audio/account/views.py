@@ -27,7 +27,9 @@ def register(request):
         email = request.POST.get('email')
         password = request.POST.get('password')
         re_password = request.POST.get('re_password')
-        
+        referance_code = request.POST.get('refercance_code')
+        if referance_code is None:
+            referance_code = "None"
         if password == re_password and len(password) < 8:
             messages.warning(request, "Passwords must be minimum of 8 length.")  
         elif password == re_password and len(password)  > 8:
@@ -36,6 +38,8 @@ def register(request):
                 return HttpResponseRedirect(request.path_info)
             else:
                 user = User.objects.create_user(username=email, password=password, email=email, first_name=firstname, last_name=lastname)
+                user.profile.refered = referance_code
+                user.profile.save()
                 messages.success(request, "An email is sent to your email to verify your email.")
                 return HttpResponseRedirect(request.path_info)
 
@@ -87,6 +91,16 @@ def verify_email(request, email_token):
             return redirect(reverse('logining'))
         
         user.email_verified = True
+        refered_user = Profile.objects.filter(referance_code = user.refered)
+        if refered_user.exists():
+            r_user = Profile.objects.get(referance_code = user.refered)
+            user_wallet = Wallet.objects.get_or_create(amount = 50,user = user)
+            refered_wallet= Wallet.objects.get_or_create(user = r_user)
+            
+            refered_wallet[0].amount += 30
+            refered_wallet[0].save()
+            WalletHistory.objects.create(wallet = refered_wallet[0], amount = 30, action = "Credit")
+            WalletHistory.objects.create(wallet = user_wallet[0], amount = 50, action = 50)
         user.save()
         messages.success(request, 'Your account is  verified.')
         return redirect('/account/login')  # Use the URL pattern name 'login'

@@ -9,7 +9,7 @@ import uuid
 from .utils import send_account_activation_email
 from django.utils import timezone
 from datetime import timedelta 
-
+import random
 # Create your models here.
 
 class Profile(BaseModel):
@@ -25,11 +25,30 @@ class Profile(BaseModel):
     forgot_password_token = models.CharField(max_length=100, null = True, blank = True)
     forgot_password_token_created_at = models.DateTimeField(default=timezone.now)
     email_token_created_at = models.DateTimeField(default=timezone.now)
-
+    referance_code = models.CharField(max_length= 12)
+    refered = models.CharField(max_length=12,default="",blank=True,null=True)
 
     def __str__(self) -> str:
         return self.user.username
     
+    def generate_reference_code(self):
+        while True:
+            unique_code = random.randint(1000000, 9999999)  # Generates a 7-digit random number
+            if not Profile.objects.filter(referance_code=unique_code).exists():
+                self.referance_code = f"REF{unique_code}"
+                break
+    
+    def save(self, *args, **kwargs):
+        if not self.referance_code:
+            self.generate_reference_code()
+        super(Profile, self).save(*args, **kwargs)
+
+
+
+
+
+
+
 @receiver(post_save, sender = User)
 def send_email_tokent(sender,  instance, created, **kwargs):
     try:
