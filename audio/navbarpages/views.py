@@ -90,7 +90,6 @@ def shop_listing(request):
     return render(request, 'navbarpages/shop.html', context)
 
 
-
 def product_detail(request, uid):
     context = {}
     product_obj = Product.objects.get(uid = uid)
@@ -113,3 +112,8 @@ def product_detail(request, uid):
     context['category_products'] = products_with_category
     return render(request, 'navbarpages/product_detail.html', context)
 
+def contact(request):
+    return render(request, 'navbarpages/contact.html')
+
+def aboutus(request):
+    return render(request, "navbarpages/about_us.html")

@@ -377,18 +377,10 @@ def category_editng(request, id):
     context = {}
     category = Category.objects.get(id = id)
     if request.method == "POST":
-        name = request.POST.get('name')
-        offer = request.POST.get('offer')
+        name = request.POST.get('name')   
         try:
             category.category_name = name
-            category.offer = offer
             products = Product.objects.filter(category = category)
-            for product in products:
-                if offer == "0":
-                    break
-                product.selling_price = float(product.price) * (100 - float(offer))/100
-
-                product.save()
             category.save()
             return redirect(reverse('category_listing'))
         except Exception as e:
