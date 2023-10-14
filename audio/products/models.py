@@ -141,4 +141,9 @@ class Review(BaseModel):
     class Meta:
         unique_together = ('user', 'product')
 
-           
+class Banner(BaseModel):
+    banncer_image = models.ImageField()
+    banner_text = models.CharField(max_length=20)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    expiry_date = models.DateField(auto_now=False, auto_now_add=False)
+    

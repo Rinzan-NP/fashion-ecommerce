@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate,login,logout
 from django.contrib import messages
 from django.urls import reverse
-from products.models import Product,Category, Review,Size,Brand,Color,Product_image,ProductVarient
+from products.models import Banner, Product,Category, Review,Size,Brand,Color,Product_image,ProductVarient
 from account.models import Profile
 from checkouts.models import Coupon, Order,OrderItems
 from .decarator import admin_required
@@ -26,6 +26,16 @@ def dashboard(request):
         monthly_revenue = delivered_products.aggregate(revenue=Sum('discounted_subtotal'))['revenue']
         orders = Order.objects.all()
         context['orders'] = orders
+        no_of_cod = Order.objects.filter(payment_method__method = "COD").count()
+        print(no_of_cod,"ddddddddddd")
+        no_of_upi = Order.objects.filter(payment_method__method = "Razor_pay").count()
+        print(no_of_upi,"------------------------")
+        try:
+            upi_percent = round((no_of_upi/(no_of_upi + no_of_cod)) * 100, 2)
+            cod_percent = round((no_of_cod/(no_of_cod + no_of_upi)) * 100, 2)
+        except: 
+            cod_percent = 100
+            upi_percent = 100
         delivered_items = OrderItems.objects.filter(status="Delivered")
         total = delivered_items.aggregate(total_discounted_subtotal=Sum('discounted_subtotal'))['total_discounted_subtotal']
         context['no_of_product'] = Product.objects.filter(is_selling = True).count()
@@ -33,6 +43,8 @@ def dashboard(request):
         context['monthly_revenue'] = monthly_revenue
         context['new_user'] = new_user
         context['revenue'] = total
+        context['cod'] = cod_percent
+        context['upi'] = upi_percent
         return render(request, 'admins/index.html',context)
     else:
         return redirect(logining)
@@ -611,3 +623,12 @@ def coupon_editing(request, coupon_uid):
     context['coupon'] = coupon
     return render(request, 'admins/coupon/coupon_editing.html', context)
     
+@admin_required
+def banner(request):
+    context = {}
+    banners = Banner.objects.all()
+    return render(request, 'admins/banner/banner.html', context)
+
+@admin_required
+def banner_adding(request):
+    return render(request, 'admins/banner/banner_adding.html')
