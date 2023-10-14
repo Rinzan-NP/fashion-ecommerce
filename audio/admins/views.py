@@ -11,6 +11,8 @@ from .decarator import admin_required
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from datetime import datetime
 from django.utils import timezone
+from django.db.models import Count
+from django.db.models.functions import TruncMonth
 from django.db.models import Sum, Q
 # Create your views here.
 def dashboard(request):
@@ -27,24 +29,60 @@ def dashboard(request):
         orders = Order.objects.all()
         context['orders'] = orders
         no_of_cod = Order.objects.filter(payment_method__method = "COD").count()
-        print(no_of_cod,"ddddddddddd")
         no_of_upi = Order.objects.filter(payment_method__method = "Razor_pay").count()
-        print(no_of_upi,"------------------------")
         try:
             upi_percent = round((no_of_upi/(no_of_upi + no_of_cod)) * 100, 2)
             cod_percent = round((no_of_cod/(no_of_cod + no_of_upi)) * 100, 2)
         except: 
             cod_percent = 100
             upi_percent = 100
+
+        now = datetime.now()
+        year = now.year
+        month = now.month
+        monthly_order_counts = []
+        monthly_product_count = []
+        monthly_user_count = []
+        for m in range(1, month + 1):
+            start_date = datetime(year, m, 1)
+            if m == 12:
+                end_date = datetime(year + 1, 1, 1)
+            else:
+                end_date = datetime(year, m + 1, 1)
+
+           
+            orders_count = Order.objects.filter(
+                created_at__range=(start_date, end_date)
+            ).aggregate(order_count=Count('uid'))['order_count']
+            monthly_order_counts.append(orders_count or 0)
+            
+            products_count = Product.objects.filter(
+                created_at__range=(start_date, end_date)
+            ).aggregate(product_count=Count('uid'))['product_count']
+            monthly_product_count.append(products_count or 0)
+
+            users_count = Profile.objects.filter(
+                created_at__range=(start_date, end_date)
+            ).aggregate(user_count=Count('uid'))['user_count']
+            monthly_user_count.append(users_count or 0)
+
+
+
+
         delivered_items = OrderItems.objects.filter(status="Delivered")
         total = delivered_items.aggregate(total_discounted_subtotal=Sum('discounted_subtotal'))['total_discounted_subtotal']
         context['no_of_product'] = Product.objects.filter(is_selling = True).count()
         context['delivered'] = OrderItems.objects.filter(status = "Delivered").count()
+        context['orders'] = Order.objects.all().order_by('-created_at')[:6]
         context['monthly_revenue'] = monthly_revenue
         context['new_user'] = new_user
         context['revenue'] = total
         context['cod'] = cod_percent
         context['upi'] = upi_percent
+        context['sales'] = monthly_order_counts
+        context['products'] = monthly_product_count
+        context['users'] = monthly_user_count
+
         return render(request, 'admins/index.html',context)
     else:
         return redirect(logining)

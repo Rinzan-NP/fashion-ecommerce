@@ -74,7 +74,7 @@ def checkout(request, user_uid):
                 user=request.user,
                 address=selected_address,
                 payment_method=payment_method,
-                # You can adjust this as needed
+                
             )
 
             
@@ -108,8 +108,9 @@ def checkout(request, user_uid):
 
 
             order.calculate_bill_amount()
-            
+        
             order.amount_to_pay = order.bill_amount
+            order.save()
             # Clear the user's cart
             cart_items.delete()
             return redirect(reverse('success_page'))
@@ -225,6 +226,7 @@ def create_order(request):
         # Create the Razorpay payment
         payment = client.order.create({'amount': grand_total_in_paise, "currency": "INR", "payment_capture": 1})
         
+        order.amount_to_pay = grand_total
         order.razor_pay_id = payment['id']
         order.save()
         
