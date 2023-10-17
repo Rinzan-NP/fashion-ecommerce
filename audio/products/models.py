@@ -5,6 +5,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from PIL import Image
 from account.models import Profile
+from django.utils import timezone
 # Create your models here.
 
 class Category(models.Model):
@@ -125,10 +126,6 @@ class CartItems(BaseModel):
     
     def __str__(self):
         return f'{self.quantity} x {self.product.name} in Cart'
-    
-    @property
-    def is_out_of_stock(self):
-        return self.quantity > ProductVarient.objects.get(product=self.product, size=self.size).stock
 
     def calculate_sub_total(self):
         return self.product.selling_price * self.quantity
@@ -147,3 +144,15 @@ class Banner(BaseModel):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     expiry_date = models.DateField(auto_now=False, auto_now_add=False)
     status = models.BooleanField(default=True)
+
+class CategoryOffer(BaseModel):
+    category = models.OneToOneField(Category, on_delete=models.CASCADE, related_name="category_offer")
+    percentage = models.IntegerField(default=0)
+    expiry_date = models.DateField(auto_now=True)
+
+    def is_valid(self):
+        return self.expiration_date >= timezone.now().date()
+
+    def __str__(self):
+        return f"{self.category.category_name} Offer"
+    

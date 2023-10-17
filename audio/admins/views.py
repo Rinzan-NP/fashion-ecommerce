@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate,login,logout
 from django.contrib import messages
 from django.urls import reverse
-from products.models import Banner, Product,Category, Review,Size,Brand,Color,Product_image,ProductVarient
+from products.models import Banner, CategoryOffer, Product,Category, Review,Size,Brand,Color,Product_image,ProductVarient
 from account.models import Profile
 from checkouts.models import Coupon, Order,OrderItems
 from .decarator import admin_required
@@ -427,10 +427,20 @@ def category_editng(request, id):
     category = Category.objects.get(id = id)
     if request.method == "POST":
         name = request.POST.get('name')   
+        offer = request.POST.get('offer')
+        expiry_date = request.POST.get('expiry_date')
+        expiry_date = datetime.strptime(expiry_date, '%Y-%m-%d').date()
         try:
             category.category_name = name
-            products = Product.objects.filter(category = category)
             category.save()
+            category_offer, created = CategoryOffer.objects.get_or_create(category = category)
+            category_offer.percentage = offer
+            category_offer.expiry_date = expiry_date
+            category_offer.save()
+            products = Product.objects.filter(category = category)
+            for product in  products:
+                product.selling_price = (float(product.price) - (float(product.price) * float(category_offer.percentage)/100))
+                product.save()            
             return redirect(reverse('category_listing'))
         except Exception as e:
             return HttpResponse(e)

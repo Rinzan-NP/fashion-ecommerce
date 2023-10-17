@@ -217,7 +217,7 @@ def create_order(request):
         if wallet_applied == "true":
             wall_amount = request.user.profile.wallet.amount
             order.wallet_applied = True
-            if wall_amount < grand_total:
+            if wall_amount <= grand_total + 50:
                 grand_total -= wall_amount
                 order.amount_to_pay = grand_total + 50
             else:
@@ -360,12 +360,11 @@ def wallet(request):
     for item in order:
         grand_total += (item.quantity * item.product.selling_price)
   
-    if float(wallet_amount) < (float(grand_total)):
+    if float(wallet_amount) <= (float(grand_total)) + 50:
        amount = float(grand_total + 50) - float(wallet_amount)
-       
     else:
         amount = 0
-    wallet = wallet_amount if wallet_amount < grand_total else grand_total + 50
+    wallet = wallet_amount if wallet_amount <= grand_total + 50 else grand_total + 50
     response_data = {'new_order_total': amount,'wallet' : wallet }
     
     if coupon_code:
@@ -379,7 +378,7 @@ def wallet(request):
             if float(wallet_amount) >= grand_total + 50:
                 wallet_amount = grand_total + 50
                 amount = 0
-            elif float(wallet_amount) < grand_total:
+            elif float(wallet_amount) <= grand_total + 50:
                 amount = float(grand_total) - float(wallet_amount) + 50
             response_data['new_order_total'] = amount
             response_data['wallet'] = wallet_amount
@@ -475,3 +474,4 @@ def invoice(request, order_uid):
     context['amount_to_pay'] = f"{order.bill_amount + 50 :,}"
     context['is_paid'] = OrderItems.objects.filter(order = order)[0].is_paid
     return render(request, 'checkouts/bill.html',context)
+
