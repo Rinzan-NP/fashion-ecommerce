@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from django.urls import reverse
 from products.models import Cart,Product,Profile,CartItems,ProductVarient
 from django.http import HttpResponse
-from . models import Address,Coupon, WalletHistory
+from . models import Address,Coupon, WalletHistory,CouponHistory
 import json
 from django.contrib.sessions.models import Session
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
@@ -113,7 +113,7 @@ def checkout(request, user_uid):
             order.save()
             # Clear the user's cart
             cart_items.delete()
-            return redirect(reverse('success_page'))
+            return redirect(f'/checkout/success_page/{order.uid}')
           
         
     
@@ -127,15 +127,19 @@ def checkout(request, user_uid):
     return render(request, 'checkouts/checkout.html', context)
 
 
-def coupon_validation(code):
+def coupon_validation(code, uid):
     try:
+        user = Profile.objects.get(uid = uid)
         coupon = Coupon.objects.get(code = code)
+        cart_items = CartItems.objects.filter(cart__user = user)
+        grand_total = 0
+        for item in cart_items:
+            grand_total += (item.quantity * item.product.selling_price)
+        no = CouponHistory.objects.filter(user = user, coupon = coupon).count()
         current_datetime = timezone.now()
-        if coupon.expiry_date >= current_datetime:
-            
+        if coupon.expiry_date >= current_datetime and coupon.minimum_amount <= grand_total and (no + 1) <= coupon.maximum_use :
             return True
         else:
-            
             return False
     except:
         return False
@@ -150,7 +154,7 @@ def create_order(request):
         wallet_applied = request.POST.get('useWallet')
         coupon_code = request.POST.get('coupon_code', None)
     
-        valid = coupon_validation(coupon_code)
+        valid = coupon_validation(coupon_code,request.user.profile.uid)
 
         order = Order.objects.create(
             user=request.user,
@@ -173,7 +177,7 @@ def create_order(request):
 
             if valid:
                 discounted_subtotal = float(sub_total) * float((100 - float(order.coupon.discount_percentage))/100)
-               
+                coupon_history = CouponHistory.objects.create(user = request.user.profile, coupon = coupon)
                 order_items.append({
                     'product': cart_item.product,
                     'quantity': cart_item.quantity,
@@ -259,7 +263,7 @@ def success(request, uid):
             wallet.amount = 0
             wallet.save()
     cart_items.delete()
-    return  redirect('/checkout/success_page')
+    return  redirect(f'/checkout/success_page/{order.uid}')
 
 @login_required
 @csrf_exempt
@@ -360,14 +364,16 @@ def wallet(request):
        amount = float(grand_total + 50) - float(wallet_amount)
        
     else:
-        amount = 50
+        amount = 0
     wallet = wallet_amount if wallet_amount < grand_total else grand_total + 50
-    response_data = {'new_order_total': 0,'wallet' : wallet }
+    response_data = {'new_order_total': amount,'wallet' : wallet }
     
     if coupon_code:
         coupon = Coupon.objects.get(code = coupon_code)
+        no = CouponHistory.objects.filter(user = request.user.profile, coupon = coupon).count()
+        
         current_datetime = timezone.now()
-        if coupon.expiry_date >= current_datetime:
+        if coupon.expiry_date >= current_datetime and coupon.minimum_amount <= grand_total and (no + 1) <= coupon.maximum_use :
             response_data['discount_percent'] = coupon.discount_percentage
             grand_total = float(grand_total) * ((100 - float(coupon.discount_percentage))/100)
             if float(wallet_amount) >= grand_total + 50:
@@ -377,7 +383,9 @@ def wallet(request):
                 amount = float(grand_total) - float(wallet_amount) + 50
             response_data['new_order_total'] = amount
             response_data['wallet'] = wallet_amount
-
+            
+        else:
+            return JsonResponse(response_data)
     return JsonResponse(response_data)
 
 @login_required
@@ -399,7 +407,9 @@ def validate_coupon(request):
             try:
                 coupon = Coupon.objects.get(code=coupon_code)
                 current_datetime = timezone.now()
-                if coupon.expiry_date >= current_datetime:
+                no = CouponHistory.objects.filter(user = request.user.profile, coupon = coupon).count()
+                
+                if coupon.expiry_date >= current_datetime and coupon.minimum_amount <= grand_total and (no+1) <= coupon.maximum_use:
                     response_data['success'] = True
                     response_data['discount_percent'] = coupon.discount_percentage
                     grand_total = float(grand_total) * ((100 - float(coupon.discount_percentage))/100)
@@ -418,7 +428,7 @@ def validate_coupon(request):
 
                 else:
                     response_data['success'] = False
-                    response_data['message'] = 'Coupon has expired.'
+                    response_data['message'] = 'Coupon is not valid.'
             except Coupon.DoesNotExist:
                 response_data['success'] = False
                 response_data['message'] = 'Coupon does not exist or is not active.'
@@ -429,8 +439,11 @@ def validate_coupon(request):
         return JsonResponse(response_data)
     
 @login_required    
-def success_page(request):
-    return render(request, 'checkouts/order_placed.html')
+def success_page(request,uid):
+    order = Order.objects.get(uid = uid)
+    context = {}
+    context['order'] = order
+    return render(request, 'checkouts/order_placed.html', context)
 
 @login_required
 def success_pages(request, uid):
@@ -451,5 +464,14 @@ def success_pages(request, uid):
     wallet.save()
     WalletHistory.objects.create(wallet = wallet, amount = total + 50,action = "Debit")
     cart_items.delete()
-    return  redirect('/checkout/success_page')
+    return  redirect(f'/checkout/success_page/{order.uid}')
 
+@login_required
+def invoice(request, order_uid):
+    order = Order.objects.get(uid = order_uid)
+    context = {}
+    context['order'] = order
+    context['orders'] = OrderItems.objects.filter(order = order)
+    context['amount_to_pay'] = f"{order.bill_amount + 50 :,}"
+    context['is_paid'] = OrderItems.objects.filter(order = order)[0].is_paid
+    return render(request, 'checkouts/bill.html',context)

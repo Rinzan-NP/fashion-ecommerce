@@ -63,8 +63,10 @@ def shop_listing(request):
     elif sort_option == 'high_to_low':
         product_obj = product_obj.order_by('-selling_price')
         filter_params['sort'] = 'high_to_low'
+    else:
+        product_obj = product_obj.order_by('?')
 
-    paginator = Paginator(product_obj, 2)
+    paginator = Paginator(product_obj, 4)
     page = request.GET.get('page')
 
     try:

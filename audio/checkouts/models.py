@@ -32,7 +32,8 @@ class Coupon(BaseModel):
     code = models.CharField(max_length=10)
     expiry_date = models.DateTimeField()
     discount_percentage = models.IntegerField()
-
+    maximum_use = models.IntegerField(default=1)
+    minimum_amount = models.IntegerField(default = 1000)
 
 class Order(BaseModel):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -97,3 +98,7 @@ class WalletHistory(BaseModel):
     action = models.CharField(max_length=10)
 
     
+class CouponHistory(BaseModel):
+    user = models.ForeignKey(Profile, on_delete=models.CASCADE)
+    coupon = models.ForeignKey(Coupon, on_delete=models.CASCADE, related_name="history")
+
