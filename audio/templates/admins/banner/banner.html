@@ -142,9 +142,9 @@
         <!-- card-header end// -->
        <div class="card-body bg-light">
            <article class="itemlist">
-               <div class="row align-items-center">
+               <div class="row align-items-center justify-content-between">
                    
-                   <div class="col-lg-4 col-sm-4 col-8 flex-grow-1 col-name">
+                   <div class="col-lg-4 col-sm-4 col-8  col-name">
                        <a class="itemside" href="#">
                            <div class="info">
                                <h6 class="mb-0">Product</h6>
@@ -152,14 +152,14 @@
                        </a>
                    </div>
                
-                   <div class="col-lg-2 col-sm-2 col-4 col-status">
-                       <span class="alert">Unlisted</span>
+                   <div class="col-lg-2 col-sm-2 col-4 ">
+                       <span class="alert">Expiry date</span>
                    </div>
                    
-                   <div class="col-lg-2 col-sm-2 col-4 col-action text-end ">
+                   <div class="col-lg-2 col-sm-2 col-4 col-action text-end">
                        
                        <a href="#" class="btn btn-sm font-sm btn-econdary rounded">
-                           </i>Change
+                           </i>Status
                        </a>
                    </div>
                </div> <!-- row .// -->
@@ -167,37 +167,33 @@
            
            
        </div> <!-- card-body end// -->
-       {% for category in categories %}
+       {% for banner in banners %}
        <div class="card-body">
            <article class="itemlist">
-               <div class="row align-items-center">
+               <div class="row align-items-center justify-content-between">
                    
-                   <div class="col-lg-4 col-sm-4 col-8 flex-grow-1 col-name">
+                   <div class="col-lg-4 col-sm-4 col-8 col-name">
                        <a class="itemside" href="#">
                            <div class="info">
-                               <h6 class="mb-0">{{category.category_name}}</h6>
+                               <h6 class="mb-0">{{banner.product}}</h6>
                            </div>
                        </a>
                    </div>
                    
-                   <div class="col-lg-2 col-sm-2 col-4 col-status">
-                       {% if category.unlisted is False %}
-                       <span class="badge rounded-pill alert-success">Available </span>
-                       {% else %}
-                       <span class="badge rounded-pill alert-danger">Not available</span>
-                       {% endif %}
+                   <div class="col-lg-2 col-sm-2 col-4">
+                       
+                       <h6 class="mb-0">{{banner.expiry_date}}</h6>
+                     
                    </div>
                    
-                   <div class="col-lg-2 col-sm-2 col-4 col-action text-end d-flex gap-2">
-                       <a href="/admin/category/edit/{{category.id}}" class="btn btn-sm font-sm rounded btn-info text-white d-flex justify-content-center align-items-center fs-4">
-                          <i class="material-icons md-edit"></i> 
-                       </a>
-                       {% if category.unlisted is True %}
-                       <a href="/admin/category/delete/{{category.id}}" class="btn btn-sm font-sm btn-success h-auto d-flex justify-content-center align-items-center rounded">
+                   <div class="col-lg-2 col-sm-2 col-4 col-action text-end">
+                       
+                       {% if banner.status is False %}
+                       <a href="/admin/banner/delete/{{banner.uid}}" class="btn btn-sm font-sm btn-success h-auto d-flex justify-content-center align-items-center rounded">
                            List
                        </a>
                        {% else %}
-                       <a href="/admin/category/delete/{{category.id}}" class="btn btn-sm font-sm btn-danger rounded">
+                       <a href="/admin/banner/delete/{{banner.uid}}" class="btn btn-sm font-sm btn-danger h-auto d-flex justify-content-center align-items-center rounded">
                            Unlist
                        </a>
                        {% endif %}

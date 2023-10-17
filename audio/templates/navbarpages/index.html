@@ -75,26 +75,28 @@
         </div>
       </div>
     </div>
+    {% for banner in banners %}
     <div
-      class="single-slider single-slider-hm1 bg-img height-100vh"
-      style="background-image: url('{% static 'assets/img/slider/bg.jpeg' %}');"
-
+    class="single-slider single-slider-hm1 bg-img height-100vh"
+    style="background-image: url('{{banner.banner_image.url}}')"
+    
     >
-      <div class="container">
-        <div
+    <div class="container">
+      <div
           class="slider-content slider-animation slider-content-style-fashion slider-animated-1"
-        >
+          >
           <div class="text-bg animated">
             <img
-              class="tilter-2 animated"
-              src="{% static 'assets/img/icon-img/45.png' %}"
-              alt=""
+            class="tilter-2 animated"
+            src="{% static 'assets/img/icon-img/45.png' %}"
+            alt=""
             />
           </div>
           <p class="animated">Step into your style.</p>
         </div>
       </div>
     </div>
+    {% endfor %}
   </div>
 
 
@@ -165,6 +167,21 @@
 
 <!-- all products area end -->
 <!-- fashion banner area start -->
+{% if banners %}
+<div class="fashion-banner-area pb-60">
+  <div class="container">
+    <div class="fashion-banner-wrapper">
+      <img src="{{item.banner_image.url}}" alt="" />
+      <div class="fashion-banner-content">
+        <h2>{{item.banner_text}}</h2>
+        <a class="btn-hover fashion-2-btn" href="/product/detail/{{item.product.uid}}"
+        >Shop Now</a
+        >
+      </div>
+    </div>
+  </div>
+</div>
+{% else %}
 <div class="fashion-banner-area pb-60">
   <div class="container">
     <div class="fashion-banner-wrapper">
@@ -172,12 +189,13 @@
       <div class="fashion-banner-content">
         <h2>20% off For <br />Women <br />Collection</h2>
         <a class="btn-hover fashion-2-btn" href="product-details.html"
-          >Shop Now</a
+        >Shop Now</a
         >
       </div>
     </div>
   </div>
 </div>
+{% endif %}
 
 
 <!-- testimonials area start -->
@@ -186,28 +204,29 @@
     <div class="section-title-2 text-center mb-35">
       <h2>Testimonial</h2>
     </div>
+    {% if reviews %}
+    {% for review in reviews %}
     <div class="testimonials-active owl-carousel mb-30">
       <div class="single-testimonial-4 text-center">
         <img src="{% static 'assets/img/icon-img/42.png' %}" alt="" />
         <p>
-          This product is the best product I ever got. Lorem ipsum dolor sit
-          amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt
-          labore et dolore magna.
+          {{review.review}}
         </p>
-        <h4>Newaz Sharif / UI Ux Designer</h4>
+        <h4>{{review.user.user.first_name}}</h4>
       </div>
+      {% endfor %}
+      {% else %}
       <div class="single-testimonial-4 text-center">
-        <img src="{% static 'assets/img/icon-img/42.png' %}" alt="" />
+       
         <p>
-          This product is the best product I ever got. Lorem ipsum dolor sit
-          amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt
-          labore et dolore magna.
+          No Reviews
         </p>
-        <h4>Newaz Sharif / UI Ux Designer</h4>
+        
       </div>
-  </div>
+    </div>
+    {% endif %}
 </div>
-
+</div>
 <!-- testimonials area end -->
 
 <footer class="footer-area">

@@ -47,7 +47,7 @@ urlpatterns = [
     
     path('banner/', views.banner, name = "banner_listing"),
     path('banner/add/', views.banner_adding, name = "banner_adding"),
-
+    path('banner/delete/<uid>', views.banner_deleting, name = "block banner"),
 ]
 
 if settings.DEBUG:

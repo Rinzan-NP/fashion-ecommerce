@@ -1,9 +1,9 @@
 from django.shortcuts import redirect, render,render
-from products.models import Product,Product_image,Category, Review,Size,Color,Brand,Wishlist,Cart,Profile,CartItems
+from products.models import Banner, Product,Product_image,Category, Review,Size,Color,Brand,Wishlist,Cart,Profile,CartItems
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db.models import Q
 from django.http import QueryDict
-
+from django.utils import timezone
 # Create your views here.
 def home(request):
     context = {}
@@ -17,6 +17,15 @@ def home(request):
         context['wishlist'] = [item.product for item in Wishlist.objects.filter(user=request.user.profile)]
         user_cart_items = CartItems.objects.filter(cart__user=request.user.profile)
         context['cart'] = [item.product for item in user_cart_items]
+    banners = Banner.objects.filter(expiry_date__gt=timezone.now(), status=True)
+    try:
+        reviews = Review.objects.exclude(review = "").order_by('?')[:4]
+        context['reviews'] = reviews
+    except:
+        pass
+    context['item'] = banners[0]
+    context['banners'] = banners
+    
     return render(request, 'navbarpages/index.html', context)
 
 
@@ -107,7 +116,7 @@ def product_detail(request, uid):
     if request.user.is_authenticated and request.user.is_staff is False:
         context['wishlist'] = [item.product for item in Wishlist.objects.filter(user=request.user.profile)]
         context['user'] = Profile.objects.get(user = request.user)
-    context['reviews'] = Review.objects.filter(product = product_obj)
+    context['reviews'] = Review.objects.filter(product = product_obj).exclude(review = "")
     context['products'] = product_obj
     context['sizes'] = sizes
     context['images'] = product_img_obj

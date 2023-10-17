@@ -173,8 +173,7 @@ def product_adding(request):
             ProductVarient.objects.create(product = product_obj,size = size_obj_10, stock = stock_10)
             messages.success(request, 'Product added successfully!')
             return redirect(reverse('product_adding'))
-            # except Exception as e:
-            #     return HttpResponse(e)
+           
 
     if  request.user.is_authenticated and request.user.is_staff is True:
         categories = Category.objects.all()
@@ -553,7 +552,7 @@ def order(request):
     if request.method == "POST":
         order_uid = request.POST.get('uid')
         if order_uid:
-            orders = Order.objects.filter(order_id__contains =order_uid)
+            orders = Order.objects.filter(order_id__contains =order_uid).order_by('-created_at')
     
     context['orders'] = orders
     return render(request, 'admins/order/order.html', context)
@@ -665,8 +664,36 @@ def coupon_editing(request, coupon_uid):
 def banner(request):
     context = {}
     banners = Banner.objects.all()
+    context['banners'] = banners
     return render(request, 'admins/banner/banner.html', context)
 
 @admin_required
 def banner_adding(request):
-    return render(request, 'admins/banner/banner_adding.html')
+    context = {}
+    if request.method == "POST":
+        text = request.POST.get('banner_text')
+        image = request.FILES.get('image')
+        expiry_date = request.POST['expiry_date']
+        product_uid = request.POST['product']
+
+        expiry_date = datetime.strptime(expiry_date, '%Y-%m-%dT%H:%M')
+        product = Product.objects.get(uid = product_uid)
+
+        banner = Banner.objects.create(banner_image = image, banner_text = text, expiry_date = expiry_date, product = product)
+        messages.success(request, "Banner created successfully")
+
+
+
+    context['products'] = Product.objects.filter(is_selling = True)
+    return render(request, 'admins/banner/banner_adding.html', context)
+
+@admin_required
+def banner_deleting(request, uid):
+    banner = Banner.objects.get(uid = uid)
+    if banner.status is True:
+        banner.status = False
+    else:
+        banner.status = True
+    banner.save()
+    return redirect(reverse('banner_listing'))
+
