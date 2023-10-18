@@ -6,7 +6,7 @@ from django.contrib import messages
 from django.urls import reverse
 from products.models import Banner, CategoryOffer, Product,Category, Review,Size,Brand,Color,Product_image,ProductVarient
 from account.models import Profile
-from checkouts.models import Coupon, Order,OrderItems
+from checkouts.models import Coupon, Order,OrderItems, Wallet, WalletHistory
 from .decarator import admin_required
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from datetime import datetime
@@ -514,16 +514,12 @@ def brand_editing(request, id):
     brand = Brand.objects.get(id = id)
     if request.method == "POST":
         name = request.POST.get('name')
-        if Brand.objects.filter(brand_name = name).exists():
-            messages.warning(request, 'Brand already exist!')
-            return redirect(reverse("brand_editing"))
-        else:
-            try:
-                brand.brand_name = name
-                brand.save()
-                return redirect(reverse("brand"))
-            except Exception as e:
-                return HttpResponse(e)
+        try:
+            brand.brand_name = name
+            brand.save()
+            return redirect('/admin/brand')
+        except Exception as e:
+            return HttpResponse(e)
     context['brand'] = brand
     return render(request, 'admins/brand/brand_editing.html', context)
 
@@ -557,7 +553,7 @@ def brand_adding(request):
 @admin_required
 def order(request):
     context = {}
-    orders = Order.objects.all()
+    orders = Order.objects.all().order_by('-created_at')
     
     if request.method == "POST":
         order_uid = request.POST.get('uid')
@@ -580,20 +576,12 @@ def order_detail(request, order_uid):
             status = request.POST.get(f'status-{item.uid}')
             item.status = status
             item.save()
-
-        # Update the overall order status based on the order items
-        new_order_status = "Delivered"  # Set a default status, change it as needed
-        for item in orders:
-            if item.status == "Pending":
-                new_order_status = "Pending"
-                break
-            elif item.status == "Shipped":
-                new_order_status = "Shipped"
-                
-            # You can add more logic here for other status combinations if needed
-        
-        order.status = new_order_status
-        order.save()
+            if item.status == "Canceled" or item.status == "Returned":
+                amount = item.discounted_subtotal if item.status == "Canceled" else float(item.discounted_subtotal) + 50
+                wallet = Wallet.objects.get_or_create(user = order.user.profile)
+                wallet[0].amount += amount
+                wallet[0].save()
+                WalletHistory.objects.create(wallet = wallet[0], amount = amount,action="Credit")
 
         return redirect(reverse('admin_order_listing'))
 

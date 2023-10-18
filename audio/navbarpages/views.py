@@ -1,16 +1,27 @@
 from django.shortcuts import redirect, render,render
-from products.models import Banner, Product,Product_image,Category, Review,Size,Color,Brand,Wishlist,Cart,Profile,CartItems
+from products.models import Banner, Product,Product_image,Category, Review,Size,Color,Brand,Wishlist,Cart,Profile,CartItems,CategoryOffer
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db.models import Q
 from django.http import QueryDict
 from django.utils import timezone
 # Create your views here.
+
+def category_offer(products):
+    for product in products:
+        if product.category.category_offer.is_valid():
+            product.selling_price = float(product.price) - (float(product.price) * float(product.category.category_offer.percentage) / 100)
+        else:
+            product.selling_price = product.price
+        product.save()
+
+
 def home(request):
     context = {}
+
     latest_products = Product.objects.filter(is_selling = True,
         category__unlisted=False,
-        
         brand__unlisted=False).order_by('-created_at')[:8]
+    category_offer(latest_products)
     context['products'] = latest_products
 
     if request.user.is_authenticated and request.user.is_staff is False:
@@ -45,6 +56,7 @@ def shop_listing(request):
         brand__unlisted=False
     )
 
+    category_offer(product_obj)
     categories = Category.objects.filter(unlisted=False)
     brands = Brand.objects.filter(unlisted=False)
     sizes = Size.objects.all()
@@ -52,7 +64,7 @@ def shop_listing(request):
 
     # Apply filters to the QuerySet and add them to the filter_params
     if category_filter:
-        product_obj = product_obj.filter(category=category_filter)
+        product_obj = product_obj.filter(category__slug__icontains = category_filter)
         filter_params['category'] = category_filter
 
     if query:
@@ -63,7 +75,7 @@ def shop_listing(request):
         filter_params['q'] = query
 
     if brand_filter:
-        product_obj = product_obj.filter(brand=brand_filter)
+        product_obj = product_obj.filter(brand__slug__icontains = brand_filter)
         filter_params['brand'] = brand_filter
 
     if sort_option == 'low_to_high':
@@ -73,7 +85,7 @@ def shop_listing(request):
         product_obj = product_obj.order_by('-selling_price')
         filter_params['sort'] = 'high_to_low'
     else:
-        product_obj = product_obj.order_by('?')
+        product_obj = product_obj.order_by('created_at')
 
     paginator = Paginator(product_obj, 4)
     page = request.GET.get('page')
@@ -84,6 +96,8 @@ def shop_listing(request):
         products = paginator.page(1)
     except EmptyPage:
         products = paginator.page(paginator.num_pages)
+
+
 
     context['products'] = products
     context['categories'] = categories
@@ -108,6 +122,7 @@ def product_detail(request, uid):
     category_obj = product_obj.category
     sizes = Size.objects.all()
     products_with_category = Product.objects.filter(category = category_obj).order_by('?')
+    category_offer(Product.objects.filter(uid = uid))
     if request.method == "POST":
         size = request.POST.get('size')
         size_obj  = Size.objects.get(id = size)

@@ -6,16 +6,22 @@ from django.dispatch import receiver
 from PIL import Image
 from account.models import Profile
 from django.utils import timezone
+from django.utils.text import slugify
 # Create your models here.
 
 class Category(models.Model):
-    category_name = models.CharField(max_length=100)
+    category_name = models.CharField(max_length=100,unique=True)
     offer = models.IntegerField(default = 0)
     unlisted = models.BooleanField(default=False)
+    slug = models.SlugField(null=True, blank=True)
 
     def __str__(self) -> str:
         return self.category_name
 
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.category_name)
+        super(Category, self).save(*args, **kwargs)
 
 class Size(models.Model):
     size = models.IntegerField()
@@ -27,12 +33,16 @@ class Size(models.Model):
 
 
 class Brand(models.Model):
-    brand_name = models.CharField(max_length=50)
+    brand_name = models.CharField(max_length=50, unique=True)
     unlisted = models.BooleanField(default=False)
+    slug = models.SlugField(null=True, blank=True)
 
     def __str__(self):
         return self.brand_name
-    
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.brand_name)
+        super(Brand, self).save(*args, **kwargs)
 
 class Color(models.Model):
     color_name = models.CharField(max_length=100)
@@ -148,10 +158,10 @@ class Banner(BaseModel):
 class CategoryOffer(BaseModel):
     category = models.OneToOneField(Category, on_delete=models.CASCADE, related_name="category_offer")
     percentage = models.IntegerField(default=0)
-    expiry_date = models.DateField(auto_now=True)
+    expiry_date = models.DateField(default=timezone.now)
 
     def is_valid(self):
-        return self.expiration_date >= timezone.now().date()
+        return self.expiry_date >= timezone.now().date()
 
     def __str__(self):
         return f"{self.category.category_name} Offer"
