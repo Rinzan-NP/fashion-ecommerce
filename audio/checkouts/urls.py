@@ -18,6 +18,7 @@ urlpatterns = [
     path('delete_order/', views.delete_order, name = "delete_order"),
     path('wallet/', views.wallet, name="wallet"),
     path('validate_coupon/', views.validate_coupon, name='validate_coupon'),
-    path('success_page/', views.success_page, name="success_page"),
-    path('success_pages/<uid>', views.success_pages, name="success_pages")
+    path('success_page/<uid>', views.success_page, name="success_page"),
+    path('success_pages/<uid>', views.success_pages, name="success_pages"),
+    path('invoice/<order_uid>', views.invoice, name= "invoice")
 ]

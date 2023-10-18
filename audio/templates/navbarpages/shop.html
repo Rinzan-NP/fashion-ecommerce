@@ -32,7 +32,7 @@
                             <ul>
                                 {% for category in categories %}
                                 <li>
-                                    <a href="?category={{ category.id }}{% if request.GET.brand %}&brand={{ request.GET.brand }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}">
+                                    <a href="?category={{ category.slug }}{% if request.GET.brand %}&brand={{ request.GET.brand }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}">
                                         {{ category.category_name }}
                                     </a>
                                 </li>
@@ -46,7 +46,7 @@
                             <ul>
                                 {% for brand in brands %}
                                 <li>
-                                    <a href="?brand={{ brand.id }}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}">
+                                    <a href="?brand={{ brand.slug }}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.sort %}&sort={{ request.GET.sort }}{% endif %}">
                                         {{ brand.brand_name }}
                                     </a>
                                 </li>

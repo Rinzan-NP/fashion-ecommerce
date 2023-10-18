@@ -4,13 +4,15 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate,login,logout
 from django.contrib import messages
 from django.urls import reverse
-from products.models import Product,Category, Review,Size,Brand,Color,Product_image,ProductVarient
+from products.models import Banner, CategoryOffer, Product,Category, Review,Size,Brand,Color,Product_image,ProductVarient
 from account.models import Profile
-from checkouts.models import Coupon, Order,OrderItems
+from checkouts.models import Coupon, Order,OrderItems, Wallet, WalletHistory
 from .decarator import admin_required
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from datetime import datetime
 from django.utils import timezone
+from django.db.models import Count
+from django.db.models.functions import TruncMonth
 from django.db.models import Sum, Q
 # Create your views here.
 def dashboard(request):
@@ -26,13 +28,61 @@ def dashboard(request):
         monthly_revenue = delivered_products.aggregate(revenue=Sum('discounted_subtotal'))['revenue']
         orders = Order.objects.all()
         context['orders'] = orders
+        no_of_cod = Order.objects.filter(payment_method__method = "COD").count()
+        no_of_upi = Order.objects.filter(payment_method__method = "Razor_pay").count()
+        try:
+            upi_percent = round((no_of_upi/(no_of_upi + no_of_cod)) * 100, 2)
+            cod_percent = round((no_of_cod/(no_of_cod + no_of_upi)) * 100, 2)
+        except: 
+            cod_percent = 100
+            upi_percent = 100
+
+        now = datetime.now()
+        year = now.year
+        month = now.month
+        monthly_order_counts = []
+        monthly_product_count = []
+        monthly_user_count = []
+        for m in range(1, month + 1):
+            start_date = datetime(year, m, 1)
+            if m == 12:
+                end_date = datetime(year + 1, 1, 1)
+            else:
+                end_date = datetime(year, m + 1, 1)
+
+           
+            orders_count = Order.objects.filter(
+                created_at__range=(start_date, end_date)
+            ).aggregate(order_count=Count('uid'))['order_count']
+            monthly_order_counts.append(orders_count or 0)
+            
+            products_count = Product.objects.filter(
+                created_at__range=(start_date, end_date)
+            ).aggregate(product_count=Count('uid'))['product_count']
+            monthly_product_count.append(products_count or 0)
+
+            users_count = Profile.objects.filter(
+                created_at__range=(start_date, end_date)
+            ).aggregate(user_count=Count('uid'))['user_count']
+            monthly_user_count.append(users_count or 0)
+
+
+
+
         delivered_items = OrderItems.objects.filter(status="Delivered")
         total = delivered_items.aggregate(total_discounted_subtotal=Sum('discounted_subtotal'))['total_discounted_subtotal']
         context['no_of_product'] = Product.objects.filter(is_selling = True).count()
         context['delivered'] = OrderItems.objects.filter(status = "Delivered").count()
+        context['orders'] = Order.objects.all().order_by('-created_at')[:6]
         context['monthly_revenue'] = monthly_revenue
         context['new_user'] = new_user
         context['revenue'] = total
+        context['cod'] = cod_percent
+        context['upi'] = upi_percent
+        context['sales'] = monthly_order_counts
+        context['products'] = monthly_product_count
+        context['users'] = monthly_user_count
+
         return render(request, 'admins/index.html',context)
     else:
         return redirect(logining)
@@ -123,8 +173,7 @@ def product_adding(request):
             ProductVarient.objects.create(product = product_obj,size = size_obj_10, stock = stock_10)
             messages.success(request, 'Product added successfully!')
             return redirect(reverse('product_adding'))
-            # except Exception as e:
-            #     return HttpResponse(e)
+           
 
     if  request.user.is_authenticated and request.user.is_staff is True:
         categories = Category.objects.all()
@@ -377,17 +426,24 @@ def category_editng(request, id):
     context = {}
     category = Category.objects.get(id = id)
     if request.method == "POST":
-        name = request.POST.get('name')
-        if Category.objects.filter(category_name = name).exists():
-            messages.warning(request, 'Category already exist!')
-            return redirect(reverse("category_editing"))
-        else:
-            try:
-                category.category_name = name
-                category.save()
-                return redirect(reverse('category_listing'))
-            except Exception as e:
-                return HttpResponse(e)
+        name = request.POST.get('name')   
+        offer = request.POST.get('offer')
+        expiry_date = request.POST.get('expiry_date')
+        expiry_date = datetime.strptime(expiry_date, '%Y-%m-%d').date()
+        try:
+            category.category_name = name
+            category.save()
+            category_offer, created = CategoryOffer.objects.get_or_create(category = category)
+            category_offer.percentage = offer
+            category_offer.expiry_date = expiry_date
+            category_offer.save()
+            products = Product.objects.filter(category = category)
+            for product in  products:
+                product.selling_price = (float(product.price) - (float(product.price) * float(category_offer.percentage)/100))
+                product.save()            
+            return redirect(reverse('category_listing'))
+        except Exception as e:
+            return HttpResponse(e)
     context['category'] = category
     return render(request, 'admins/category/category_editing.html', context)
 
@@ -458,16 +514,12 @@ def brand_editing(request, id):
     brand = Brand.objects.get(id = id)
     if request.method == "POST":
         name = request.POST.get('name')
-        if Brand.objects.filter(brand_name = name).exists():
-            messages.warning(request, 'Brand already exist!')
-            return redirect(reverse("brand_editing"))
-        else:
-            try:
-                brand.brand_name = name
-                brand.save()
-                return redirect(reverse("brand"))
-            except Exception as e:
-                return HttpResponse(e)
+        try:
+            brand.brand_name = name
+            brand.save()
+            return redirect('/admin/brand')
+        except Exception as e:
+            return HttpResponse(e)
     context['brand'] = brand
     return render(request, 'admins/brand/brand_editing.html', context)
 
@@ -501,12 +553,12 @@ def brand_adding(request):
 @admin_required
 def order(request):
     context = {}
-    orders = Order.objects.all()
+    orders = Order.objects.all().order_by('-created_at')
     
     if request.method == "POST":
         order_uid = request.POST.get('uid')
         if order_uid:
-            orders = Order.objects.filter(order_id__contains =order_uid)
+            orders = Order.objects.filter(order_id__contains =order_uid).order_by('-created_at')
     
     context['orders'] = orders
     return render(request, 'admins/order/order.html', context)
@@ -524,20 +576,12 @@ def order_detail(request, order_uid):
             status = request.POST.get(f'status-{item.uid}')
             item.status = status
             item.save()
-
-        # Update the overall order status based on the order items
-        new_order_status = "Delivered"  # Set a default status, change it as needed
-        for item in orders:
-            if item.status == "Pending":
-                new_order_status = "Pending"
-                break
-            elif item.status == "Shipped":
-                new_order_status = "Shipped"
-                
-            # You can add more logic here for other status combinations if needed
-        
-        order.status = new_order_status
-        order.save()
+            if item.status == "Canceled" or item.status == "Returned":
+                amount = item.discounted_subtotal if item.status == "Canceled" else float(item.discounted_subtotal) + 50
+                wallet = Wallet.objects.get_or_create(user = order.user.profile)
+                wallet[0].amount += amount
+                wallet[0].save()
+                WalletHistory.objects.create(wallet = wallet[0], amount = amount,action="Credit")
 
         return redirect(reverse('admin_order_listing'))
 
@@ -614,3 +658,40 @@ def coupon_editing(request, coupon_uid):
     context['coupon'] = coupon
     return render(request, 'admins/coupon/coupon_editing.html', context)
     
+@admin_required
+def banner(request):
+    context = {}
+    banners = Banner.objects.all()
+    context['banners'] = banners
+    return render(request, 'admins/banner/banner.html', context)
+
+@admin_required
+def banner_adding(request):
+    context = {}
+    if request.method == "POST":
+        text = request.POST.get('banner_text')
+        image = request.FILES.get('image')
+        expiry_date = request.POST['expiry_date']
+        product_uid = request.POST['product']
+
+        expiry_date = datetime.strptime(expiry_date, '%Y-%m-%dT%H:%M')
+        product = Product.objects.get(uid = product_uid)
+
+        banner = Banner.objects.create(banner_image = image, banner_text = text, expiry_date = expiry_date, product = product)
+        messages.success(request, "Banner created successfully")
+
+
+
+    context['products'] = Product.objects.filter(is_selling = True)
+    return render(request, 'admins/banner/banner_adding.html', context)
+
+@admin_required
+def banner_deleting(request, uid):
+    banner = Banner.objects.get(uid = uid)
+    if banner.status is True:
+        banner.status = False
+    else:
+        banner.status = True
+    banner.save()
+    return redirect(reverse('banner_listing'))
+

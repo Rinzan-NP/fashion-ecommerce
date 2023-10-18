@@ -1,0 +1,109 @@
+{% extends "base/base.html" %}
+{% block head %}
+<style>
+    body {
+        font-family: Arial, sans-serif;
+    }
+    .bill {
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 20px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+    }
+    .header {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+    .bill-details {
+        margin-bottom: 20px;
+    }
+    .product-list {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    .product-list th, .product-list td {
+        border: 1px solid #ccc;
+        padding: 10px;
+        text-align: left;
+    }
+    .product-list th {
+        background-color: #f2f2f2;
+    }
+    .total {
+        text-align: right;
+    }
+    .print-button {
+        text-align: center;
+        margin-top: 20px;
+    }
+    @media print {
+        /* Adjust styles for printing */
+        body {
+            margin: 0;
+            padding: 0;
+        }
+        .bill {
+            width: 800px;
+            margin: 0;
+            padding: 0;
+            border: none;
+            border-radius: 0;
+        }
+    }
+</style>
+
+{% endblock head %}
+
+{% block content %}
+
+<div class="bill mt-5">
+    <div class="header">
+        <h1>Order Invoice</h1>
+    </div>
+    <div class="bill-details">
+        <p><strong>Order ID:</strong> ORD{{order.order_id}}</p>
+        <p><strong>Order Date:</strong> {{order.created_at}}</p>
+        <p><strong>Customer Name:</strong> {{order.user.first_name}}</p>
+        <p><strong>Payment method :</strong> {{order.payment_method.method}}</p>
+        {% if order.payment_method.method != "COD" %}
+            <p><strong>Payment Status :</strong> {% if is_paid %}Paid{% else %}Pending{% endif %}</p>
+        {% endif %}
+    </div>
+    <table class="product-list">
+        <thead>
+            <tr>
+                <th>Product Name</th>
+                <th>Quantity</th>
+                <th>Unit Price</th>
+                <th>Total Price</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in orders  %}
+            <tr>
+                <td>{{item.product.name}}</td>
+                <td>{{item.quantity}}</td>
+                <td>{{item.product_price}}</td>
+                <td>{{item.discounted_subtotal}}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <br>
+    <div class="total">
+        <p><strong>Order Total: {{amount_to_pay }}</strong></p>
+    </div>
+    
+</div>
+<div class="print-button">
+    <button onclick="printBill()" class=" btn btn-dark h-auto border rounded">Print</button>
+</div>
+<script>    
+    function printBill() {
+        document.querySelector('.print-button').style.display = 'none';
+        window.print();
+        document.querySelector('.print-button').style.display = 'block';
+    }
+</script>
+{% endblock content %}

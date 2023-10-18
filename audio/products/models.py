@@ -5,15 +5,23 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from PIL import Image
 from account.models import Profile
+from django.utils import timezone
+from django.utils.text import slugify
 # Create your models here.
 
 class Category(models.Model):
-    category_name = models.CharField(max_length=100)
+    category_name = models.CharField(max_length=100,unique=True)
+    offer = models.IntegerField(default = 0)
     unlisted = models.BooleanField(default=False)
+    slug = models.SlugField(null=True, blank=True)
 
     def __str__(self) -> str:
         return self.category_name
 
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.category_name)
+        super(Category, self).save(*args, **kwargs)
 
 class Size(models.Model):
     size = models.IntegerField()
@@ -25,12 +33,16 @@ class Size(models.Model):
 
 
 class Brand(models.Model):
-    brand_name = models.CharField(max_length=50)
+    brand_name = models.CharField(max_length=50, unique=True)
     unlisted = models.BooleanField(default=False)
+    slug = models.SlugField(null=True, blank=True)
 
     def __str__(self):
         return self.brand_name
-    
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.brand_name)
+        super(Brand, self).save(*args, **kwargs)
 
 class Color(models.Model):
     color_name = models.CharField(max_length=100)
@@ -124,10 +136,6 @@ class CartItems(BaseModel):
     
     def __str__(self):
         return f'{self.quantity} x {self.product.name} in Cart'
-    
-    @property
-    def is_out_of_stock(self):
-        return self.quantity > ProductVarient.objects.get(product=self.product, size=self.size).stock
 
     def calculate_sub_total(self):
         return self.product.selling_price * self.quantity
@@ -140,4 +148,21 @@ class Review(BaseModel):
     class Meta:
         unique_together = ('user', 'product')
 
-           
+class Banner(BaseModel):
+    banner_image = models.ImageField(upload_to="banner")
+    banner_text = models.CharField(max_length=20)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    expiry_date = models.DateField(auto_now=False, auto_now_add=False)
+    status = models.BooleanField(default=True)
+
+class CategoryOffer(BaseModel):
+    category = models.OneToOneField(Category, on_delete=models.CASCADE, related_name="category_offer")
+    percentage = models.IntegerField(default=0)
+    expiry_date = models.DateField(default=timezone.now)
+
+    def is_valid(self):
+        return self.expiry_date >= timezone.now().date()
+
+    def __str__(self):
+        return f"{self.category.category_name} Offer"
+    

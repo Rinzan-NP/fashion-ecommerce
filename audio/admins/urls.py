@@ -43,11 +43,11 @@ urlpatterns = [
     path('review/detail/<uid>', views.review_detail, name="review_detail"),
     path('coupon/', views.coupon_listing, name= "coupon_listing"),
     path('coupon/add', views.coupon_adding, name= "coupon_adding"),
-    path('coupon/detail/<coupon_uid>', views.coupon_editing, name = "coupon_editing")
+    path('coupon/detail/<coupon_uid>', views.coupon_editing, name = "coupon_editing"),
     
-
-
-
+    path('banner/', views.banner, name = "banner_listing"),
+    path('banner/add/', views.banner_adding, name = "banner_adding"),
+    path('banner/delete/<uid>', views.banner_deleting, name = "block banner"),
 ]
 
 if settings.DEBUG:
