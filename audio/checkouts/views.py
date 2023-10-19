@@ -74,7 +74,13 @@ def checkout(request, user_uid):
                 user=request.user,
                 address=selected_address,
                 payment_method=payment_method,
-                
+                street_address = selected_address.street_address,
+                local_place = selected_address.local_place,
+                city = selected_address.city,
+                district = selected_address.district,
+                state = selected_address.state,
+                pin = selected_address.pin,
+                phone_number = selected_address.phone_number,
             )
 
             
@@ -137,7 +143,7 @@ def coupon_validation(code, uid):
             grand_total += (item.quantity * item.product.selling_price)
         no = CouponHistory.objects.filter(user = user, coupon = coupon).count()
         current_datetime = timezone.now()
-        if coupon.expiry_date >= current_datetime and coupon.minimum_amount <= grand_total and (no + 1) <= coupon.maximum_use :
+        if coupon.expiry_date >= current_datetime and coupon.minimum_amount <= grand_total and (no + 1) <= coupon.maximum_use and coupon.unlisted is False:
             return True
         else:
             return False
@@ -155,11 +161,18 @@ def create_order(request):
         coupon_code = request.POST.get('coupon_code', None)
     
         valid = coupon_validation(coupon_code,request.user.profile.uid)
-
+        address = Address.objects.get(uid=address_id)
         order = Order.objects.create(
             user=request.user,
             address=Address.objects.get(uid=address_id),
             payment_method=payment_method,
+            street_address = address.street_address,
+            local_place = address.local_place,
+            city = address.city,
+            district = address.district,
+            state = address.state,
+            pin = address.pin,
+            phone_number = address.phone_number,
             
         )
 
@@ -372,7 +385,7 @@ def wallet(request):
         no = CouponHistory.objects.filter(user = request.user.profile, coupon = coupon).count()
         
         current_datetime = timezone.now()
-        if coupon.expiry_date >= current_datetime and coupon.minimum_amount <= grand_total and (no + 1) <= coupon.maximum_use :
+        if coupon.expiry_date >= current_datetime and coupon.minimum_amount <= grand_total and (no + 1) <= coupon.maximum_use and coupon.unlisted is False:
             response_data['discount_percent'] = coupon.discount_percentage
             grand_total = float(grand_total) * ((100 - float(coupon.discount_percentage))/100)
             if float(wallet_amount) >= grand_total + 50:
@@ -408,7 +421,7 @@ def validate_coupon(request):
                 current_datetime = timezone.now()
                 no = CouponHistory.objects.filter(user = request.user.profile, coupon = coupon).count()
                 
-                if coupon.expiry_date >= current_datetime and coupon.minimum_amount <= grand_total and (no+1) <= coupon.maximum_use:
+                if coupon.expiry_date >= current_datetime and coupon.minimum_amount <= grand_total and (no+1) <= coupon.maximum_use and coupon.unlisted is False:
                     response_data['success'] = True
                     response_data['discount_percent'] = coupon.discount_percentage
                     grand_total = float(grand_total) * ((100 - float(coupon.discount_percentage))/100)
@@ -471,7 +484,7 @@ def invoice(request, order_uid):
     context = {}
     context['order'] = order
     context['orders'] = OrderItems.objects.filter(order = order)
-    context['amount_to_pay'] = f"{order.bill_amount + 50 :,}"
+    context['amount_to_pay'] = f"{order.amount_to_pay + 50 :,}"
     context['is_paid'] = OrderItems.objects.filter(order = order)[0].is_paid
     return render(request, 'checkouts/bill.html',context)
 

@@ -695,3 +695,9 @@ def banner_deleting(request, uid):
     banner.save()
     return redirect(reverse('banner_listing'))
 
+@admin_required
+def coupon_delete(request, uid):
+    coupon = Coupon.objects.get(uid = uid)
+    coupon.unlisted = True if coupon.unlisted is False else False
+    coupon.save()
+    return redirect(reverse('coupon_listing'))
