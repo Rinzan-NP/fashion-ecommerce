@@ -373,7 +373,7 @@ def wallet(request):
     
     current_datetime = datetime.now() 
     grand_total = 0
-    order = CartItems.objects.filter(cart__user = request.user.profile)
+    order = CartItems.objects.filter(cart__user = request.user.profile,product__is_selling = True,product__category__unlisted = False, product__brand__unlisted = False)
     for item in order:
         grand_total += (item.quantity * item.product.selling_price)
   
@@ -412,7 +412,7 @@ def validate_coupon(request):
         response_data = {}
         
         cart = Cart.objects.get(user = request.user.profile)
-        cart_items = CartItems.objects.filter(cart = cart)
+        cart_items = CartItems.objects.filter(cart = cart,product__is_selling = True,product__category__unlisted = False, product__brand__unlisted = False)
 
         grand_total = 0
         for item in cart_items:
