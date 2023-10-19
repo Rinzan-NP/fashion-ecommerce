@@ -27,4 +27,5 @@ urlpatterns = [
    path('edit_address/<address_uid>', views.address_editing, name = "address_editing"),
 
    path("wallet/", views.wallet_history, name="wallet_history"),
+   # path('edit/', views.name , name = "edit_name")
 ]

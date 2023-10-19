@@ -14,6 +14,7 @@ from django.views.decorators.csrf import csrf_exempt
 from datetime import datetime
 from django.utils import timezone
 from account.decarator import login_required
+from django.contrib import messages
 
 def serialize_cart_items(cart_items):
     serialized_items = []
@@ -34,9 +35,12 @@ def checkout(request, user_uid):
     context = {}
     profile = Profile.objects.get(uid=user_uid)
     cart = Cart.objects.get(user=profile)
-    cart_items = CartItems.objects.filter(cart__user=profile)
+    cart_items = CartItems.objects.filter(cart__user=profile,product__is_selling = True,product__category__unlisted = False, product__brand__unlisted = False)
     addresses = Address.objects.filter(unlisted=False, user=request.user)
-    
+    print(cart_items)
+    if not cart_items:
+        messages.warning(request, "Cart is empty!")
+        return redirect(f'/account/cart/{request.user.profile.uid}')
     out_of_stock = False
     grand_total = 0
     for cart_item in cart_items:
@@ -137,7 +141,7 @@ def coupon_validation(code, uid):
     try:
         user = Profile.objects.get(uid = uid)
         coupon = Coupon.objects.get(code = code)
-        cart_items = CartItems.objects.filter(cart__user = user)
+        cart_items = CartItems.objects.filter(cart__user = user,product__is_selling = True,product__category__unlisted = False, product__brand__unlisted = False)
         grand_total = 0
         for item in cart_items:
             grand_total += (item.quantity * item.product.selling_price)
@@ -155,7 +159,7 @@ def create_order(request):
     if request.method == 'POST':
         address_id = request.POST.get('addressId')
         payment_method = PaymentMethod.objects.get(method="Razor_pay")
-        cart_items = CartItems.objects.filter(cart__user=request.user.profile)
+        cart_items = CartItems.objects.filter(cart__user=request.user.profile,product__is_selling = True,product__category__unlisted = False, product__brand__unlisted = False)
         
         wallet_applied = request.POST.get('useWallet')
         coupon_code = request.POST.get('coupon_code', None)

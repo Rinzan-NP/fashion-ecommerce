@@ -228,7 +228,7 @@ def cart_listing(request, uid):
         cart, created = Cart.objects.get_or_create(user=profile)
 
         # Retrieve the cart items associated with the user's cart.
-        cart_items = CartItems.objects.filter(cart=cart).order_by("-created_at")
+        cart_items = CartItems.objects.filter(cart=cart,product__is_selling = True,product__category__unlisted = False, product__brand__unlisted = False).order_by("-created_at")
 
         # Calculate the grand total of the cart items.
         
@@ -253,6 +253,13 @@ def cart_listing(request, uid):
 
 @login_required
 def profile(request, uid):
+
+    if request.method == "POST":
+        name = request.POST.get('name')
+        request.user.first_name = name
+        request.user.save()
+        messages.success(request, "Edited successfully!")
+        return redirect(f'/account/profile/{request.user.profile.uid}')
     context = {}
     profile = Profile.objects.get(uid=uid)
     wallet, created = Wallet.objects.get_or_create(user=request.user.profile)
