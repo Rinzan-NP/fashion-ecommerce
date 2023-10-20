@@ -32,109 +32,112 @@ def compare_cart_items(initial_cart_items, current_cart_items):
 
 @login_required
 def checkout(request, user_uid):
-    context = {}
-    profile = Profile.objects.get(uid=user_uid)
-    cart = Cart.objects.get(user=profile)
-    cart_items = CartItems.objects.filter(cart__user=profile,product__is_selling = True,product__category__unlisted = False, product__brand__unlisted = False)
-    addresses = Address.objects.filter(unlisted=False, user=request.user)
-    print(cart_items)
-    if not cart_items:
-        messages.warning(request, "Cart is empty!")
-        return redirect(f'/account/cart/{request.user.profile.uid}')
-    out_of_stock = False
-    grand_total = 0
-    for cart_item in cart_items:
-        sub_total = cart_item.calculate_sub_total()
-        grand_total += sub_total
-        variant = ProductVarient.objects.get(product = cart_item.product, size = cart_item.size)
-        if cart_item.quantity > variant.stock:
-            out_of_stock = True
+    try:
+        context = {}
+        profile = Profile.objects.get(uid=user_uid)
+        cart = Cart.objects.get(user=profile)
+        cart_items = CartItems.objects.filter(cart__user=profile,product__is_selling = True,product__category__unlisted = False, product__brand__unlisted = False)
+        addresses = Address.objects.filter(unlisted=False, user=request.user)
+        print(cart_items)
+        if not cart_items:
+            messages.warning(request, "Cart is empty!")
+            return redirect(f'/account/cart/{request.user.profile.uid}')
+        out_of_stock = False
+        grand_total = 0
+        for cart_item in cart_items:
+            sub_total = cart_item.calculate_sub_total()
+            grand_total += sub_total
+            variant = ProductVarient.objects.get(product = cart_item.product, size = cart_item.size)
+            if cart_item.quantity > variant.stock:
+                out_of_stock = True
 
-    if request.method == "POST":
-        if "submit_cod" in request.POST:
-        # Get selected address and payment method from the form
-            initial_cart_items = request.session.get('initial_cart_items', [])
-            
-            if not compare_cart_items(initial_cart_items, cart_items):
-                context['cart_changed'] = True
-                # For example, you can redirect back to the checkout page with an error message
-                context['error_message'] = "Cart items have changed. Please review your order."
-                context['products'] = cart_items
-                context['grand_total'] = grand_total
-                context['user'] = profile
-                context['addresses'] = addresses
-                return render(request, 'checkouts/checkout.html', context)
-
-            payment_method_id = "COD"
-            
-            # Create a new order
-            address_id = request.POST.get('addressId')
-            selected_address = Address.objects.get(uid=address_id)
-            payment_method = PaymentMethod.objects.get(method=payment_method_id)
-            coupon = request.POST.get('coupon_code')
-            
-            
-            order = Order.objects.create(
-                user=request.user,
-                address=selected_address,
-                payment_method=payment_method,
-                street_address = selected_address.street_address,
-                local_place = selected_address.local_place,
-                city = selected_address.city,
-                district = selected_address.district,
-                state = selected_address.state,
-                pin = selected_address.pin,
-                phone_number = selected_address.phone_number,
-            )
-
-            
-
-            for cart_product in cart_items:
+        if request.method == "POST":
+            if "submit_cod" in request.POST:
+            # Get selected address and payment method from the form
+                initial_cart_items = request.session.get('initial_cart_items', [])
                 
-                sub_total = cart_product.quantity * cart_product.product.selling_price
+                if not compare_cart_items(initial_cart_items, cart_items):
+                    context['cart_changed'] = True
+                    # For example, you can redirect back to the checkout page with an error message
+                    context['error_message'] = "Cart items have changed. Please review your order."
+                    context['products'] = cart_items
+                    context['grand_total'] = grand_total
+                    context['user'] = profile
+                    context['addresses'] = addresses
+                    return render(request, 'checkouts/checkout.html', context)
 
+                payment_method_id = "COD"
                 
-
-
-                order_item = OrderItems.objects.create(
-                    order=order,  
-                    product=cart_product.product,
-                    quantity=cart_product.quantity,
-                    product_price=cart_product.product.selling_price,
-                    size = cart_product.size,
-                    sub_total=sub_total,
-                    discounted_subtotal = sub_total,
+                # Create a new order
+                address_id = request.POST.get('addressId')
+                selected_address = Address.objects.get(uid=address_id)
+                payment_method = PaymentMethod.objects.get(method=payment_method_id)
+                coupon = request.POST.get('coupon_code')
+                
+                
+                order = Order.objects.create(
+                    user=request.user,
+                    address=selected_address,
+                    payment_method=payment_method,
+                    street_address = selected_address.street_address,
+                    local_place = selected_address.local_place,
+                    city = selected_address.city,
+                    district = selected_address.district,
+                    state = selected_address.state,
+                    pin = selected_address.pin,
+                    phone_number = selected_address.phone_number,
                 )
 
                 
-                # Calculate the total for the current order item
-                
-                order_item.save()
-                product_stock = ProductVarient.objects.get(product = cart_product.product,size = cart_product.size)
-                product_stock.stock -= cart_product.quantity
-                product_stock.sold += cart_product.quantity
-                product_stock.save()
+
+                for cart_product in cart_items:
+                    
+                    sub_total = cart_product.quantity * cart_product.product.selling_price
+
+                    
+
+
+                    order_item = OrderItems.objects.create(
+                        order=order,  
+                        product=cart_product.product,
+                        quantity=cart_product.quantity,
+                        product_price=cart_product.product.selling_price,
+                        size = cart_product.size,
+                        sub_total=sub_total,
+                        discounted_subtotal = sub_total,
+                    )
+
+                    
+                    # Calculate the total for the current order item
+                    
+                    order_item.save()
+                    product_stock = ProductVarient.objects.get(product = cart_product.product,size = cart_product.size)
+                    product_stock.stock -= cart_product.quantity
+                    product_stock.sold += cart_product.quantity
+                    product_stock.save()
 
 
 
-            order.calculate_bill_amount()
+                order.calculate_bill_amount()
+            
+                order.amount_to_pay = order.bill_amount
+                order.save()
+                # Clear the user's cart
+                cart_items.delete()
+                return redirect(f'/checkout/success_page/{order.uid}')
+            
+            
         
-            order.amount_to_pay = order.bill_amount
-            order.save()
-            # Clear the user's cart
-            cart_items.delete()
-            return redirect(f'/checkout/success_page/{order.uid}')
-          
-        
-    
-    context['out_of_stock'] = out_of_stock
-    context['products'] = cart_items
-    context['grand_total'] = grand_total
-    context['user'] = profile
-    context['addresses'] = addresses
-    request.session['initial_cart_items'] = serialize_cart_items(cart_items)
+        context['out_of_stock'] = out_of_stock
+        context['products'] = cart_items
+        context['grand_total'] = grand_total
+        context['user'] = profile
+        context['addresses'] = addresses
+        request.session['initial_cart_items'] = serialize_cart_items(cart_items)
 
-    return render(request, 'checkouts/checkout.html', context)
+        return render(request, 'checkouts/checkout.html', context)
+    except:
+        return redirect('/404error')
 
 
 def coupon_validation(code, uid):
@@ -257,30 +260,34 @@ def create_order(request):
 
 @login_required
 def success(request, uid):
-    wallet = request.user.profile.wallet
-    cart_items = Cart.objects.filter(user=request.user.profile)
-    order = Order.objects.get(uid = uid)
-    order_items =OrderItems.objects.filter(order = order)
-    total = 0
-    for item in order_items:
-        item.is_paid = True
-        total += item.discounted_subtotal
-        item.save()
-        varient = ProductVarient.objects.get(product = item.product, size = item.size)
-        varient.stock -= item.quantity
-        varient.sold += item.quantity
-        varient.save()
-    if order.wallet_applied is True :
-        if wallet.amount > order.bill_amount + 50 :
-            wallet.amount -= total
-            WalletHistory.objects.create(wallet = wallet, amount = total,action = "Debit")
-            wallet.save()
-        else:
-            WalletHistory.objects.create(wallet = wallet, amount = wallet.amount,action = "Debit")
-            wallet.amount = 0
-            wallet.save()
-    cart_items.delete()
-    return  redirect(f'/checkout/success_page/{order.uid}')
+    try:
+        wallet = request.user.profile.wallet
+        cart_items = Cart.objects.filter(user=request.user.profile)
+        order = Order.objects.get(uid = uid)
+        order_items =OrderItems.objects.filter(order = order)
+        total = 0
+        for item in order_items:
+            item.is_paid = True
+            total += item.discounted_subtotal
+            item.save()
+            varient = ProductVarient.objects.get(product = item.product, size = item.size)
+            varient.stock -= item.quantity
+            varient.sold += item.quantity
+            varient.save()
+        if order.wallet_applied is True :
+            if wallet.amount > order.bill_amount + 50 :
+                wallet.amount -= total
+                WalletHistory.objects.create(wallet = wallet, amount = total,action = "Debit")
+                wallet.save()
+            else:
+                WalletHistory.objects.create(wallet = wallet, amount = wallet.amount,action = "Debit")
+                wallet.amount = 0
+                wallet.save()
+        cart_items.delete()
+        return  redirect(f'/checkout/success_page/{order.uid}')
+    except:
+        return redirect('/404error')
+
 
 @login_required
 @csrf_exempt
@@ -463,32 +470,37 @@ def success_page(request,uid):
 
 @login_required
 def success_pages(request, uid):
-    wallet = request.user.profile.wallet
-    cart_items = CartItems.objects.filter(cart__user=request.user.profile)
-    order = Order.objects.get(uid = uid)
-    order_items =OrderItems.objects.filter(order = order)
-    total = 0
-    for item in order_items:
-        item.is_paid = True
-        total += item.discounted_subtotal
-        item.save()
-        varient = ProductVarient.objects.get(product = item.product, size = item.size)
-        varient.stock -= item.quantity
-        varient.sold += item.quantity
-        varient.save()
-    wallet.amount -= total + 50
-    wallet.save()
-    WalletHistory.objects.create(wallet = wallet, amount = total + 50,action = "Debit")
-    cart_items.delete()
-    return  redirect(f'/checkout/success_page/{order.uid}')
+    try:
+        wallet = request.user.profile.wallet
+        cart_items = CartItems.objects.filter(cart__user=request.user.profile)
+        order = Order.objects.get(uid = uid)
+        order_items =OrderItems.objects.filter(order = order)
+        total = 0
+        for item in order_items:
+            item.is_paid = True
+            total += item.discounted_subtotal
+            item.save()
+            varient = ProductVarient.objects.get(product = item.product, size = item.size)
+            varient.stock -= item.quantity
+            varient.sold += item.quantity
+            varient.save()
+        wallet.amount -= total + 50
+        wallet.save()
+        WalletHistory.objects.create(wallet = wallet, amount = total + 50,action = "Debit")
+        cart_items.delete()
+        return  redirect(f'/checkout/success_page/{order.uid}')
+    except:
+        return redirect('/404error')
 
 @login_required
 def invoice(request, order_uid):
-    order = Order.objects.get(uid = order_uid)
-    context = {}
-    context['order'] = order
-    context['orders'] = OrderItems.objects.filter(order = order)
-    context['amount_to_pay'] = f"{order.amount_to_pay + 50 :,}"
-    context['is_paid'] = OrderItems.objects.filter(order = order)[0].is_paid
-    return render(request, 'checkouts/bill.html',context)
-
+    try:
+        order = Order.objects.get(uid = order_uid)
+        context = {}
+        context['order'] = order
+        context['orders'] = OrderItems.objects.filter(order = order)
+        context['amount_to_pay'] = f"{order.amount_to_pay + 50 :,}"
+        context['is_paid'] = OrderItems.objects.filter(order = order)[0].is_paid
+        return render(request, 'checkouts/bill.html',context)
+    except:
+        return redirect('/404error')

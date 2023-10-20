@@ -20,7 +20,7 @@ def wishlist_management(request,user_uid, product_uid):
             Wishlist.objects.filter(user = user_obj, product = product_obj).delete()
         return redirect(request.META.get('HTTP_REFERER'))
     except Exception as e:
-        return HttpResponse(e)
+        return redirect('/404error')
     
         
 @login_required
@@ -51,7 +51,7 @@ def add_to_cart(request, product_uid, size_id):
         return redirect(request.META.get('HTTP_REFERER'))
 
     except Exception as e:
-        return HttpResponse(e)
+        return redirect('/404error')
 
 @login_required
 def cart_deleting(request, uid):
@@ -62,7 +62,7 @@ def cart_deleting(request, uid):
     except Cart.DoesNotExist:
         return HttpResponse("Cart not found")
     except Exception as e:
-        return HttpResponse(str(e))
+        return redirect('/404error')
 
 @login_required
 def quantity_decreasing(request, uid, product_uid):
