@@ -59,7 +59,6 @@ def send_email_tokent(sender,  instance, created, **kwargs):
             profile_obj.email_token = email_token
             username = instance.first_name
             profile_obj.email_token_created_at = timezone.now()
-            
             profile_obj.save()
             send_account_activation_email(email, email_token, username)
 
