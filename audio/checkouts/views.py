@@ -32,7 +32,7 @@ def compare_cart_items(initial_cart_items, current_cart_items):
 
 @login_required
 def checkout(request, user_uid):
-    # try:
+    try:
         context = {}
         profile = Profile.objects.get(uid=user_uid)
         cart = Cart.objects.get(user=profile)
@@ -136,8 +136,8 @@ def checkout(request, user_uid):
         request.session['initial_cart_items'] = serialize_cart_items(cart_items)
 
         return render(request, 'checkouts/checkout.html', context)
-    # except:
-    #     return redirect('/404error')
+    except:
+        return redirect('/404error')
 
 
 def coupon_validation(code, uid):
@@ -260,7 +260,7 @@ def create_order(request):
 
 @login_required
 def success(request, uid):
-    # try:
+    try:
         wallet = request.user.profile.wallet
         cart_items = Cart.objects.filter(user=request.user.profile)
         order = Order.objects.get(uid = uid)
@@ -285,8 +285,8 @@ def success(request, uid):
                 wallet.save()
         cart_items.delete()
         return  redirect(f'/checkout/success_page/{order.uid}')
-    # except:
-    #     return redirect('/404error')
+    except:
+        return redirect('/404error')
 
 
 @login_required
@@ -470,7 +470,7 @@ def success_page(request,uid):
 
 @login_required
 def success_pages(request, uid):
-    # try:
+    try:
         wallet = request.user.profile.wallet
         cart_items = CartItems.objects.filter(cart__user=request.user.profile)
         order = Order.objects.get(uid = uid)
@@ -489,12 +489,12 @@ def success_pages(request, uid):
         WalletHistory.objects.create(wallet = wallet, amount = total + 50,action = "Debit")
         cart_items.delete()
         return  redirect(f'/checkout/success_page/{order.uid}')
-    # except:
-    #     return redirect('/404error')
+    except:
+        return redirect('/404error')
 
 @login_required
 def invoice(request, order_uid):
-    # try:
+    try:
         order = Order.objects.get(uid = order_uid)
         context = {}
         context['order'] = order
@@ -502,5 +502,5 @@ def invoice(request, order_uid):
         context['amount_to_pay'] = f"{order.amount_to_pay + 50 :,}"
         context['is_paid'] = OrderItems.objects.filter(order = order)[0].is_paid
         return render(request, 'checkouts/bill.html',context)
-    # except:
-    #     return redirect('/404error')
+    except:
+        return redirect('/404error')
