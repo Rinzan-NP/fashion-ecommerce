@@ -7,7 +7,7 @@ def send_account_activation_email(email, email_token, username):
     subject = 'Verification'
     message = f"""
 Hello {username}
-You registered an account on Audio, before being able to use your account you need to verify that this is your email address by clicking here: http://127.0.0.1:8000/account/verify/{email_token}
+You registered an account on Audio, before being able to use your account you need to verify that this is your email address by clicking here: http://fashionecommerce.shop/account/verify/{email_token}
 
 Kind Regards, Audio"""
     email_from = settings.EMAIL_HOST_USER
@@ -23,7 +23,7 @@ Resetting your password is easy.
 
 Just press the button below. We’ll have you up and running in no time.
 
-Click on : http://127.0.0.1:8000/account/change_password/{forgot_password_token}
+Click on : http://fashionecommerce.shop/account/change_password/{forgot_password_token}
 
 If you did not make this request then please ignore this email.
 
