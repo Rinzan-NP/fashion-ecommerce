@@ -19,7 +19,7 @@ from checkouts.views import validate_coupon
 # Create your views here.
 
 def register(request):
-    try:
+    # try:
         if request.user.is_authenticated and request.user.is_staff is False:
             return redirect('/')
         if request.method == "POST":
@@ -50,11 +50,11 @@ def register(request):
                 return HttpResponseRedirect(request.path_info)
         
         return render(request, 'accounts/register.html')
-    except:
-        return redirect('/404error')
+    # except:
+    #     return redirect('/404error')
 
 def logining(request):
-    try:
+    # try:
         if request.user.is_authenticated and not request.user.is_staff:
             return redirect('/')
         
@@ -85,11 +85,11 @@ def logining(request):
             return HttpResponseRedirect(request.path_info)
 
         return render(request, 'accounts/login.html')
-    except:
-        return redirect('/404error')
+    # except:
+    #     return redirect('/404error')
 
 def verify_email(request, email_token):
-    try:
+    # try:
         user = Profile.objects.get(email_token=email_token)
         token_expiration = user.email_token_created_at + timedelta(minutes=2)
         if timezone.now() > token_expiration:
@@ -110,8 +110,8 @@ def verify_email(request, email_token):
         user.save()
         messages.success(request, 'Your account is  verified.')
         return redirect('/account/login')  # Use the URL pattern name 'login'
-    except Profile.DoesNotExist:
-        return redirect('/404error')
+    # except Profile.DoesNotExist:
+    #     return redirect('/404error')
 
 def logouting(request):
     try:
@@ -122,7 +122,7 @@ def logouting(request):
         return redirect('/404error')
 
 def verify_account(request):
-    try:
+    # try:
         if request.method == "POST":
             email = request.POST.get('email')
             user = User.objects.filter(username = email)
@@ -152,8 +152,8 @@ def verify_account(request):
                 return HttpResponseRedirect(request.path_info)
         else:        
             return render(request, 'accounts/verify_account.html')
-    except:
-        return redirect('/404error')
+    # except:
+    #     return redirect('/404error')
     
 def change_password(request, forgot_password_token):
     context = {}
