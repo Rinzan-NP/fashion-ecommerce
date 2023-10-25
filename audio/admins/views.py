@@ -173,7 +173,7 @@ def product_adding(request):
             ProductVarient.objects.create(product = product_obj,size = size_obj_8[0], stock = stock_8)
             ProductVarient.objects.create(product = product_obj,size = size_obj_9[0], stock = stock_9)
             ProductVarient.objects.create(product = product_obj,size = size_obj_10[0], stock = stock_10)
-            messages.success(request, 'Product added successfully!')
+            messages.success(request, 'Product added successfully')
             return redirect(reverse('product_adding'))
            
 
