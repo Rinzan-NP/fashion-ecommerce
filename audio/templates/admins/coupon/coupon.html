@@ -162,7 +162,14 @@
                             <td>{{coupon.expiry_date}}</td>
                             <td class="text">
                                 <a href="/admin/coupon/detail/{{coupon.uid}}" class="btn btn-primary rounded font-sm h-auto px-2">Detail</a> 
-                            </td>
+                                {% if coupon.unlisted is False %}
+                                <a href="/admin/coupon/delete/{{coupon.uid}}" class="btn btn-danger rounded font-sm h-auto px-2">Unlist</a> 
+                                {% else %}
+                                <a href="/admin/coupon/delete/{{coupon.uid}}" class="btn btn-success rounded font-sm h-auto px-2">List</a> 
+
+                                {% endif %}
+
+                              </td>
                         </tr>
                         {% endfor %}
 

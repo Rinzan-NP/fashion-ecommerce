@@ -64,8 +64,8 @@
                                 <label for="address">Address:</label>
                                 <span id="address">
                                 <p class="card-text">
-                                    {{order.order.address.street_address}}, {{order.order.address.local_place}}, {{order.order.address.city}}, {{order.order.address.district}},{{order.order.address.state}}
-                                    {{order.order.address.pincode}}
+                                    {{order.order.street_address}}, {{order.order.local_place}}, {{order.order.city}}, {{order.order.district}},{{order.order.state}}
+                                    {{order.order.pincode}}
                                 </p>
                                 
                             </div>
@@ -87,6 +87,7 @@
                         {% endif %}
 
                         {% if order.status  == "Delivered" %}
+                        <a href="/checkout/invoice/{{order.order.uid}}" class="btn btn-dark h-auto">Invoice</a>
                         <hr class="border-2 border-secondary" />
                         <!-- Review Section -->
                             <div class="container mt-5">

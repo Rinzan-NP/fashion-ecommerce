@@ -14,6 +14,8 @@ from django.utils import timezone
 from django.db.models import Count
 from django.db.models.functions import TruncMonth
 from django.db.models import Sum, Q
+from datetime import date
+
 # Create your views here.
 def dashboard(request):
     if  request.user.is_authenticated and request.user.is_staff is True:
@@ -695,3 +697,27 @@ def banner_deleting(request, uid):
     banner.save()
     return redirect(reverse('banner_listing'))
 
+@admin_required
+def coupon_delete(request, uid):
+    coupon = Coupon.objects.get(uid = uid)
+    coupon.unlisted = True if coupon.unlisted is False else False
+    coupon.save()
+    return redirect(reverse('coupon_listing'))
+
+@admin_required
+def sales_report(request):
+    context = {}
+    today = date.today()  # Get today's date
+    start_date = request.GET.get('start_date', today.strftime('%Y-%m-%d'))  # Format the date
+    end_date = request.GET.get('end_date', today.strftime('%Y-%m-%d'))  # Format the date
+
+    # Query the orders with the date filter
+    orders = OrderItems.objects.filter(
+        Q(created_at__date__gte=start_date) &
+        Q(created_at__date__lte=end_date)
+    )
+
+    context['sales'] = orders
+    context['start_date'] = start_date
+    context['end_date'] = end_date
+    return render(request, 'admins/sales_report.html', context)

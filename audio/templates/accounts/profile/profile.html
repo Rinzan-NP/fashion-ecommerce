@@ -18,7 +18,16 @@
             <p>Referance code : {{request.user.profile.referance_code}}</p>
             <div class="mb-4">
               <h2 class="h4 fw-bold">Name:</h2>
-              <p class="lead">{{request.user.first_name}}</p>
+              <form method="post">
+                {% csrf_token %}
+                <div class="d-flex">          
+                  <input type="text" value="{{request.user.first_name}}" class="lead" name="name">
+                  <button class="btn btn-dark text-white h-auto" type="submit">
+                    <i class="material-icons md-edit"></i>
+                  </button>
+                </div>
+              </form>
+              
             </div>
             <div class="mb-4">
               <h2 class="h4 fw-bold">Email:</h2>
