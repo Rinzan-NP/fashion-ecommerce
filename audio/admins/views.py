@@ -170,9 +170,9 @@ def product_adding(request):
             Product.objects.create(name = name, description = description, price = price, selling_price = selling_price,color = color_obj,brand = brand_obj,main_image = image,category = category_obj)
             product_obj = Product.objects.get(name = name, description = description, price = price, selling_price = selling_price,color = color_obj,brand = brand_obj,category = category_obj)
             Product_image.objects.create(product = product_obj, image_side = image_side, image_back = image_back, image_up = image_up)
-            ProductVarient.objects.create(product = product_obj,size = size_obj_8, stock = stock_8)
-            ProductVarient.objects.create(product = product_obj,size = size_obj_9, stock = stock_9)
-            ProductVarient.objects.create(product = product_obj,size = size_obj_10, stock = stock_10)
+            ProductVarient.objects.create(product = product_obj,size = size_obj_8[0], stock = stock_8)
+            ProductVarient.objects.create(product = product_obj,size = size_obj_9[0], stock = stock_9)
+            ProductVarient.objects.create(product = product_obj,size = size_obj_10[0], stock = stock_10)
             messages.success(request, 'Product added successfully!')
             return redirect(reverse('product_adding'))
            

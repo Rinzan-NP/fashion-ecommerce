@@ -16,7 +16,7 @@ def category_offer(products):
 
 
 def home(request):
-    try:
+    # try:
         context = {}
 
         latest_products = Product.objects.filter(is_selling = True,
@@ -39,8 +39,8 @@ def home(request):
         context['banners'] = banners
         
         return render(request, 'navbarpages/index.html', context)
-    except:
-        return redirect('/404error')
+    # except:
+    #     return redirect('/404error')
 
 
 def shop_listing(request):
