@@ -16,13 +16,16 @@ def category_offer(products):
 
 
 def home(request):
-    # try:
+    try:
         context = {}
 
         latest_products = Product.objects.filter(is_selling = True,
             category__unlisted=False,
             brand__unlisted=False).order_by('-created_at')[:8]
-        category_offer(latest_products)
+        try:
+            category_offer(latest_products)
+        except:
+            pass
         context['products'] = latest_products
 
         if request.user.is_authenticated and request.user.is_staff is False:
@@ -35,12 +38,14 @@ def home(request):
             context['reviews'] = reviews
         except:
             pass
-        context['item'] = banners[0]
-        context['banners'] = banners
-        
+        try:
+            context['item'] = banners[0]
+            context['banners'] = banners
+        except:
+            pass
         return render(request, 'navbarpages/index.html', context)
-    # except:
-    #     return redirect('/404error')
+    except:
+        return redirect('/404error')
 
 
 def shop_listing(request):
