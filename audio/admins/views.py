@@ -155,9 +155,9 @@ def product_adding(request):
         try:
             color_obj = Color.objects.get(color_name = color)
             brand_obj = Brand.objects.get(brand_name = brand)
-            size_obj_8 = Size.objects.get(size = 8)
-            size_obj_9 = Size.objects.get(size = 9)
-            size_obj_10 = Size.objects.get(size = 10)
+            size_obj_8 = Size.objects.get_or_create(size = 8)
+            size_obj_9 = Size.objects.get_or_create(size = 9)
+            size_obj_10 = Size.objects.get_or_create(size = 10)
             category_obj = Category.objects.get(category_name = category)
             product_obj = Product.objects.filter(name = name,description = description,selling_price = selling_price, color = color_obj,brand = brand_obj,main_image =image, category = category_obj)
         except Exception as e:
