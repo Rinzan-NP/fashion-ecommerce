@@ -90,6 +90,7 @@ def logining(request):
 
 def verify_email(request, email_token):
     # try:
+        print(Profile.objects.get(user__email = 'nprinzan@gmail.com').email_token)
         user = Profile.objects.get(email_token=email_token)
         token_expiration = user.email_token_created_at + timedelta(minutes=2)
         if timezone.now() > token_expiration:
