@@ -136,7 +136,7 @@ def verify_account(request):
             
             elif user is not None and user[0].profile.email_verified:
 
-                # creating a token
+                
                 forgot_password_token = str(uuid.uuid4())
 
                 # creating user object and profile object and setting forgoy_pass_token

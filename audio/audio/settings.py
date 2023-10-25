@@ -12,7 +12,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 
 import os
 from pathlib import Path
-
+from decouple import config
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -21,12 +21,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-h0tfo)b#^1u71ovf-*^4$(b2%reawhg8wkv_)%z6l+=io$rv2w'
+SECRET_KEY = config('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = config('DEBUG',default=False,cast=bool)
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -83,9 +83,9 @@ WSGI_APPLICATION = 'audio.wsgi.application'
 DATABASES = {
    'default': {
        'ENGINE': 'django.db.backends.postgresql',
-       'NAME': 'ecommerce',
-       'USER': 'postgres',
-       'PASSWORD': 'root',
+       'NAME': config('NAME'),
+       'USER': config('USER'),
+       'PASSWORD': config('PASSWORD'),
        'HOST': 'localhost',
       
    }
@@ -143,12 +143,11 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # email verification
 
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_USE_TLS = True
-EMAIL_PORT = 587
-EMAIL_HOST_USER = 'audioecommmerce@gmail.com'
-EMAIL_HOST_PASSWORD = 'bwdevetrvzdswqhg'
-
-KEY = "rzp_test_UAqDQGJ5B2qwiK"
-SECRET = "Cizk7Cf5nKp9uja9vRSVANYP"
+EMAIL_BACKEND = config('EMAIL_BACKEND')
+EMAIL_HOST = config('EMAIL_HOST')
+EMAIL_USE_TLS = config('EMAIL_USE_TLS')
+EMAIL_PORT = config('EMAIL_PORT')
+EMAIL_HOST_USER = config('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
+KEY = config('KEY')
+SECRET = config('SECRET')
