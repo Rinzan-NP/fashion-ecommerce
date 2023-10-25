@@ -89,8 +89,7 @@ def logining(request):
     #     return redirect('/404error')
 
 def verify_email(request, email_token):
-    # try:
-        print(Profile.objects.get(user__email = 'nprinzan@gmail.com').email_token)
+    try:
         user = Profile.objects.get(email_token=email_token)
         token_expiration = user.email_token_created_at + timedelta(minutes=2)
         if timezone.now() > token_expiration:
@@ -111,8 +110,8 @@ def verify_email(request, email_token):
         user.save()
         messages.success(request, 'Your account is  verified.')
         return redirect('/account/login')  # Use the URL pattern name 'login'
-    # except Profile.DoesNotExist:
-    #     return redirect('/404error')
+    except Profile.DoesNotExist:
+        return redirect('/404error')
 
 def logouting(request):
     try:
@@ -123,7 +122,7 @@ def logouting(request):
         return redirect('/404error')
 
 def verify_account(request):
-    # try:
+    try:
         if request.method == "POST":
             email = request.POST.get('email')
             user = User.objects.filter(username = email)
@@ -153,8 +152,8 @@ def verify_account(request):
                 return HttpResponseRedirect(request.path_info)
         else:        
             return render(request, 'accounts/verify_account.html')
-    # except:
-    #     return redirect('/404error')
+    except:
+        return redirect('/404error')
     
 def change_password(request, forgot_password_token):
     context = {}
