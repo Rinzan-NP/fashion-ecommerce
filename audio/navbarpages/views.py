@@ -49,7 +49,7 @@ def home(request):
 
 
 def shop_listing(request):
-    try:
+    # try:
         context = {}
         query = request.GET.get('q')
         brand_filter = request.GET.get('brand')
@@ -122,11 +122,11 @@ def shop_listing(request):
             context['user'] = Profile.objects.get(user=request.user)
 
         return render(request, 'navbarpages/shop.html', context)
-    except:
-        return redirect('/404error')
+    # except:
+    #     return redirect('/404error')
 
 def product_detail(request, uid):
-    try:
+    # try:
         context = {}
         product_obj = Product.objects.get(uid = uid)
         product_img_obj = Product_image.objects.get(product = product_obj)
@@ -148,8 +148,8 @@ def product_detail(request, uid):
         context['images'] = product_img_obj
         context['category_products'] = products_with_category
         return render(request, 'navbarpages/product_detail.html', context)
-    except:
-        return redirect('/404error')
+    # except:
+    #     return redirect('/404error')
 
 def contact(request):
     return render(request, 'navbarpages/contact.html')
