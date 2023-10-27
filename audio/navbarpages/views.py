@@ -49,7 +49,7 @@ def home(request):
 
 
 def shop_listing(request):
-    # try:
+    try:
         context = {}
         query = request.GET.get('q')
         brand_filter = request.GET.get('brand')
@@ -64,8 +64,10 @@ def shop_listing(request):
             category__unlisted=False,
             brand__unlisted=False
         )
-
-        category_offer(product_obj)
+        try:
+            category_offer(product_obj)
+        except:
+            pass
         categories = Category.objects.filter(unlisted=False)
         brands = Brand.objects.filter(unlisted=False)
         sizes = Size.objects.all()
@@ -122,18 +124,21 @@ def shop_listing(request):
             context['user'] = Profile.objects.get(user=request.user)
 
         return render(request, 'navbarpages/shop.html', context)
-    # except:
-    #     return redirect('/404error')
+    except:
+        return redirect('/404error')
 
 def product_detail(request, uid):
-    # try:
+    try:
         context = {}
         product_obj = Product.objects.get(uid = uid)
         product_img_obj = Product_image.objects.get(product = product_obj)
         category_obj = product_obj.category
         sizes = Size.objects.all()
         products_with_category = Product.objects.filter(category = category_obj).order_by('?')
-        category_offer(Product.objects.filter(uid = uid))
+        try:
+            category_offer(Product.objects.filter(uid = uid))
+        except:
+            pass
         if request.method == "POST":
             size = request.POST.get('size')
             size_obj  = Size.objects.get(id = size)
@@ -148,8 +153,8 @@ def product_detail(request, uid):
         context['images'] = product_img_obj
         context['category_products'] = products_with_category
         return render(request, 'navbarpages/product_detail.html', context)
-    # except:
-    #     return redirect('/404error')
+    except:
+        return redirect('/404error')
 
 def contact(request):
     return render(request, 'navbarpages/contact.html')
